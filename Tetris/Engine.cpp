@@ -53,7 +53,7 @@ HRESULT Engine::InitializeD2D(HWND m_hwnd)
     );
 
     // Initialize the D2D part of your game elements here
-    InitializeTextAndScore();
+    InitializeTextAndScore();   
     stack->InitializeD2D(m_pRenderTarget);
     activePiece->InitializeD2D(m_pRenderTarget);
     waitingPiece->InitializeD2D(m_pRenderTarget);

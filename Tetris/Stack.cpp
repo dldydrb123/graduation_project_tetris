@@ -125,8 +125,8 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 			if (cells->Get(j, i) == true)
 			{
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					padding + (j + 1) * CELL_SIZE + 1, padding + i * CELL_SIZE + 1,
-					padding + (j + 2) * CELL_SIZE - 1, padding + (i + 1) * CELL_SIZE - 1
+					padding + (j + 1) * CELL_SIZE, padding + i * CELL_SIZE ,
+					padding + (j + 2) * CELL_SIZE , padding + (i + 1) * CELL_SIZE 
 				);
 				if (entireLine)
 				{
