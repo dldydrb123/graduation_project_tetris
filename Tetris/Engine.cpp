@@ -53,7 +53,7 @@ HRESULT Engine::InitializeD2D(HWND m_hwnd)
     );
 
     // Initialize the D2D part of your game elements here
-    InitializeTextAndScore();   
+    InitializeTextAndScore();
     stack->InitializeD2D(m_pRenderTarget);
     activePiece->InitializeD2D(m_pRenderTarget);
     waitingPiece->InitializeD2D(m_pRenderTarget);
@@ -149,6 +149,8 @@ void Engine::Logic(double elapsedTime)
 
     if (gameOver) // Do nothing if game over
     {
+        over = true;
+
         return;
     }
 
@@ -257,11 +259,12 @@ HRESULT Engine::Draw()
     m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 	
 	// Below you can add drawing logic for your game elements
-    DrawTextAndScore();
+    
     stack->Draw(m_pRenderTarget);
     activePiece->Draw(m_pRenderTarget);
     waitingPiece->Draw(m_pRenderTarget);
-    
+    DrawTextAndScore();
+
     hr = m_pRenderTarget->EndDraw();
 
     return S_OK;
@@ -304,4 +307,15 @@ void Engine::DrawTextAndScore()
         rectangle3,
         m_pWhiteBrush
     );
+
+    if (over == true) {
+        D2D1_RECT_F rectangle4 = D2D1::RectF(RESOLUTION_X / 2 - 200, RESOLUTION_Y / 2 + 200, RESOLUTION_X / 2 + 200, RESOLUTION_Y / 2 - 200);
+        m_pRenderTarget->DrawText(
+            L"Game Over!!",
+            15,
+            m_pTextFormat,
+            rectangle4,
+            m_pWhiteBrush
+        );
+    }
 }

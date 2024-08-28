@@ -4,7 +4,7 @@
 #include "Piece.h"
 #include "Stack.h"
 
-#define RESOLUTION_X 1200
+#define RESOLUTION_X 1600
 #define RESOLUTION_Y 900
 
 #define CELL_SIZE 20
@@ -45,6 +45,7 @@ private:
 	bool leftPressed = false;
 	bool rightPressed = false;
 	bool spacePressed = false;
+	bool over = false;
 
 	int score = 0;
 
