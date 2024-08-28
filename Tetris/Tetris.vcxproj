@@ -154,12 +154,14 @@
     <ClInclude Include="Piece.h" />
     <ClInclude Include="Point2D.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Scenemaneger.h" />
     <ClInclude Include="Stack.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Piece.cpp" />
     <ClCompile Include="Stack.cpp" />

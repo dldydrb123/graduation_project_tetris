@@ -257,11 +257,14 @@ HRESULT Engine::Draw()
     m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 	
 	// Below you can add drawing logic for your game elements
+
     DrawTextAndScore();
+    
     stack->Draw(m_pRenderTarget);
     activePiece->Draw(m_pRenderTarget);
     waitingPiece->Draw(m_pRenderTarget);
     
+
     hr = m_pRenderTarget->EndDraw();
 
     return S_OK;

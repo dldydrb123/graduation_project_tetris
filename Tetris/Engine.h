@@ -5,7 +5,7 @@
 #include "Stack.h"
 
 #define RESOLUTION_X 1600
-#define RESOLUTION_Y 1200
+#define RESOLUTION_Y 900
 
 #define CELL_SIZE 20
 
