@@ -207,6 +207,29 @@ bool Piece::StackCollision(Matrix* stackCells)
 			}
 		}
 	}
+	
+	// Returns true if we're in a collision with the bottom wall or current stack
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			if (cells->Get(j, i) == true)
+			{
+				int realx = position.x + j;
+				int realy = position.y + i;
+				// Check if we are colliding with the bottom
+				if (realy >= STACK_HEIGHT)
+				{
+					return true;
+				}
+				// Check if we are colliding with existing stack
+				if (stackCells->Get(realx, realy))
+				{
+					return true;
+				}
+			}
+		}
+	}
 	return false;
 }
 

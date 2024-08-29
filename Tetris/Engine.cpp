@@ -21,7 +21,7 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     activePiece->Activate();
     waitingPiece = new Piece();
 
-    autoFallDelay = 1;
+    autoFallDelay = 0.5;
     autoFallAccumulated = 0;
     keyPressDelay = 0.07;
     keyPressAccumulated = 0;

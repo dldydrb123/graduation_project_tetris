@@ -25,7 +25,7 @@ Matrix::~Matrix()
     delete[] matrix;
 }
 
-bool Matrix::Get(int x, int y)
+bool Matrix::   Get(int x, int y)
 {
     // Returns the value of an element
     return matrix[y][x];
