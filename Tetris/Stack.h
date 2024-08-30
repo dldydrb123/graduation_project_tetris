@@ -5,6 +5,8 @@
 
 #define STACK_WIDTH 10
 #define STACK_HEIGHT 20
+#define STACK_WIDTH 10
+#define STACK_HEIGHT 20
 
 class Stack
 {
