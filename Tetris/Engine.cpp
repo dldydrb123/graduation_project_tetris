@@ -16,15 +16,26 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     srand(time(NULL));
 	
     stack = new Stack();
+    stack2 = new Stack();
 
     activePiece = new Piece();
     activePiece->Activate();
     waitingPiece = new Piece();
 
-    autoFallDelay = 0.5;
+    activePiece2 = new Piece();
+    activePiece2->Activate();
+    waitingPiece2 = new Piece();
+
+    //블록 떨어지는 속도
+    autoFallDelay = 0.7;
     autoFallAccumulated = 0;
     keyPressDelay = 0.07;
     keyPressAccumulated = 0;
+
+    autoFallDelay2 = 0.7;
+    autoFallAccumulated2 = 0;
+    keyPressDelay2 = 0.07;
+    keyPressAccumulated2 = 0;
 
 }
 
@@ -39,6 +50,9 @@ Engine::~Engine()
     delete stack;
     delete waitingPiece;
     delete activePiece;
+    delete stack2;
+    delete waitingPiece2;
+    delete activePiece2;
 }
 
 HRESULT Engine::InitializeD2D(HWND m_hwnd)
@@ -57,6 +71,10 @@ HRESULT Engine::InitializeD2D(HWND m_hwnd)
     stack->InitializeD2D(m_pRenderTarget);
     activePiece->InitializeD2D(m_pRenderTarget);
     waitingPiece->InitializeD2D(m_pRenderTarget);
+
+    stack2->InitializeD2D(m_pRenderTarget);
+    activePiece2->InitializeD2D(m_pRenderTarget);
+    waitingPiece2->InitializeD2D(m_pRenderTarget);
 
     return S_OK;
 }
@@ -196,7 +214,7 @@ void Engine::Logic(double elapsedTime)
 
     // The piece falls automatically after a delay
     autoFallAccumulated += elapsedTime;
-    if (autoFallAccumulated > autoFallDelay)
+    if (autoFallAccumulated > autoFallDelay) //여기
     {
         autoFallAccumulated = 0;
 
@@ -240,6 +258,51 @@ void Engine::Logic(double elapsedTime)
                 gameOver = true;
         }
     }
+    autoFallAccumulated2 += elapsedTime;
+    if (autoFallAccumulated2 > autoFallDelay2) //여기
+    {
+        autoFallAccumulated2 = 0;
+
+        // Remove any full rows
+        int removed = stack->RemoveLines();
+        if (removed > 0)
+        {
+            score += pow(2, removed) * 100;
+            autoFallDelay2 = autoFallDelay2 * 0.98;
+        }
+
+        // Move down the active piece
+        bool isConflict = activePiece2->Advance(stackCells);
+        // If we have a conflict with the stack, it means we were sitting on the stack or bottom wall already
+        if (isConflict)
+        {
+            // We add the piece to stack
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    if (activePiece2->GetCells()->Get(j, i) == true)
+                    {
+                        int realx = activePiece2->GetPosition().x + j;
+                        int realy = activePiece2->GetPosition().y + i;
+                        stackCells->Set(realx, realy, true);
+                    }
+                }
+            }
+
+            // Delete active piece, activate the waiting piece and generate new waiting piece
+            delete activePiece2;
+            activePiece2 = waitingPiece2;
+            activePiece2->Activate();
+            waitingPiece2 = new Piece();
+            waitingPiece2->InitializeD2D(m_pRenderTarget);
+
+            // If we have a collision right after we generate the new piece, 
+            // it means the stack is too high, so game over
+            if (activePiece2->StackCollision(stackCells))
+                gameOver = true;
+        }
+    }
 
 }
 
@@ -263,6 +326,10 @@ HRESULT Engine::Draw()
     stack->Draw(m_pRenderTarget);
     activePiece->Draw(m_pRenderTarget);
     waitingPiece->Draw(m_pRenderTarget);
+
+    stack2->Draw(m_pRenderTarget);
+    activePiece2->Draw(m_pRenderTarget);
+    waitingPiece2->Draw(m_pRenderTarget);
     DrawTextAndScore();
 
     hr = m_pRenderTarget->EndDraw();

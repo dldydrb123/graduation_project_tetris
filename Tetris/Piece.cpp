@@ -10,9 +10,15 @@ Piece::Piece() : m_pRedBrush(NULL)
 	position.x = STACK_WIDTH / 2 - 2 ;
 	position.y = 0;
 
+	position2.x = STACK_WIDTH + 3 + (STACK_WIDTH / 2 - 2);
+	position2.y = 0;
+
 	waiting = true;
 
 	cells = new Matrix(4, 4);
+	cells2 = new Matrix(4, 4);
+
+
 	// Randomly select the piece type
 	int pieceType = rand() % 7;
 	for (int i = 0; i < 4; i++)
@@ -264,7 +270,21 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 			}
 		}
 	}
-
+	center_x = padding + (position.x + 1) * CELL_SIZE + (STACK_WIDTH + 3) * CELL_SIZE;
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			if (cells->Get(j, i) == true)
+			{
+				D2D1_RECT_F rectangle4 = D2D1::RectF(
+					center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
+					center_x + (j + 1) * CELL_SIZE - 1, center_y + (i + 1) * CELL_SIZE - 1
+				);
+				m_pRenderTarget->FillRectangle(&rectangle4, m_pRedBrush);
+			}
+		}
+	}
 }
 
 Point2D Piece::GetPosition()

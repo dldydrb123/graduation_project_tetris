@@ -5,8 +5,6 @@
 
 #define STACK_WIDTH 10
 #define STACK_HEIGHT 20
-#define STACK_WIDTH 10
-#define STACK_HEIGHT 20
 
 class Stack
 {
@@ -21,6 +19,7 @@ public:
 	Matrix* GetCells();
 private:
 	Matrix* cells;
+	Matrix* cells2;
 
 	ID2D1SolidColorBrush* m_pBlueBrush;
 	ID2D1SolidColorBrush* m_pGreenBrush;

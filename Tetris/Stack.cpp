@@ -6,11 +6,13 @@
 Stack::Stack() : m_pBlueBrush(NULL), m_pGreenBrush(NULL), m_pYellowBrush(NULL)
 {
 	cells = new Matrix(STACK_WIDTH, STACK_HEIGHT);
+	cells2 = new Matrix(STACK_WIDTH, STACK_HEIGHT);
 }
 
 Stack::~Stack()
 {
 	delete cells;
+	delete cells2;
 	SafeRelease(&m_pBlueBrush);
 	SafeRelease(&m_pGreenBrush);
 	SafeRelease(&m_pYellowBrush);

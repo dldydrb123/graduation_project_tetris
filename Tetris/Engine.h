@@ -38,8 +38,12 @@ private:
 	Stack* stack;
 	Piece* activePiece;
 	Piece* waitingPiece;
+	Stack* stack2;
+	Piece* activePiece2;
+	Piece* waitingPiece2;
 
 	bool gameOver = false;
+	bool gameOver2 = false;
 
 	bool downPressed = false;
 	bool leftPressed = false;
@@ -53,5 +57,9 @@ private:
 	double autoFallAccumulated;
 	double keyPressDelay;
 	double keyPressAccumulated;
+	double autoFallDelay2;
+	double autoFallAccumulated2;
+	double keyPressDelay2;
+	double keyPressAccumulated2;
 };
 

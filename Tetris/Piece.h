@@ -26,7 +26,9 @@ public:
 
 private:
 	Point2D position;
+	Point2D position2;
 	Matrix* cells;
+	Matrix* cells2;
 
 	bool waiting; // Is the current piece or the next piece?
 
