@@ -247,10 +247,10 @@ void Engine::Logic(double elapsedTime)
 
             // Delete active piece, activate the waiting piece and generate new waiting piece
             delete activePiece;
-            activePiece = waitingPiece;
+            //activePiece = waitingPiece;
             activePiece->Activate();
-            waitingPiece = new Piece();
-            waitingPiece->InitializeD2D(m_pRenderTarget);
+            //waitingPiece = new Piece();
+            //waitingPiece->InitializeD2D(m_pRenderTarget);
 
             // If we have a collision right after we generate the new piece, 
             // it means the stack is too high, so game over

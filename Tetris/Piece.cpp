@@ -245,14 +245,12 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 
 	int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 2;
 
-	int center_x = centerRight;
-	int center_y = padding + 2 * CELL_SIZE + 100;
+	//int center_x = centerRight;
+	//int center_y = padding + 2 * CELL_SIZE + 100;
 
-	if (!waiting)
-	{
-		center_x = padding + (position.x + 1) * CELL_SIZE;
-		center_y = padding + position.y * CELL_SIZE;
-	}
+
+	int center_x = padding + (position.x + 1) * CELL_SIZE;
+	int center_y = padding + position.y * CELL_SIZE;
 
 	// Drawing the cells
 	
@@ -270,21 +268,21 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 			}
 		}
 	}
-	center_x = padding + (position.x + 1) * CELL_SIZE + (STACK_WIDTH + 3) * CELL_SIZE;
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			if (cells->Get(j, i) == true)
-			{
-				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
-					center_x + (j + 1) * CELL_SIZE - 1, center_y + (i + 1) * CELL_SIZE - 1
-				);
-				m_pRenderTarget->FillRectangle(&rectangle4, m_pRedBrush);
-			}
-		}
-	}
+	//center_x = padding + (position2.x + 1) * CELL_SIZE;
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	for (int j = 0; j < 4; j++)
+	//	{
+	//		if (cells->Get(j, i) == true)
+	//		{
+	//			D2D1_RECT_F rectangle4 = D2D1::RectF(
+	//				center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
+	//				center_x + (j + 1) * CELL_SIZE - 1, center_y + (i + 1) * CELL_SIZE - 1
+	//			);
+	//			m_pRenderTarget->FillRectangle(&rectangle4, m_pRedBrush);
+	//		}
+	//	}
+	//}
 }
 
 Point2D Piece::GetPosition()
