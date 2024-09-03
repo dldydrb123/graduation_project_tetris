@@ -3,7 +3,7 @@
 #include "Stack.h"
 #include "Engine.h"
 
-Stack::Stack() : m_pBlueBrush(NULL), m_pGreenBrush(NULL), m_pYellowBrush(NULL)
+Stack::Stack() : m_pBlueBrush(NULL), m_pGreenBrush(NULL), m_pGreenBrush2(NULL), m_pYellowBrush(NULL)
 {
 	cells = new Matrix(STACK_WIDTH, STACK_HEIGHT);
 	cells2 = new Matrix(STACK_WIDTH, STACK_HEIGHT);
@@ -15,6 +15,7 @@ Stack::~Stack()
 	delete cells2;
 	SafeRelease(&m_pBlueBrush);
 	SafeRelease(&m_pGreenBrush);
+	SafeRelease(&m_pGreenBrush2);
 	SafeRelease(&m_pYellowBrush);
 }
 
@@ -28,6 +29,10 @@ void Stack::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 	m_pRenderTarget->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Green),
 		&m_pGreenBrush
+	);
+	m_pRenderTarget->CreateSolidColorBrush(
+		D2D1::ColorF(D2D1::ColorF::Green),
+		&m_pGreenBrush2
 	);
 	m_pRenderTarget->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Yellow),
@@ -153,36 +158,34 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
 		bool entireLine = true;
+
+		// 라인 전체가 채워져 있는지 검사
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (cells2->Get(j, i) == false)
+			if (!cells2->Get(j, i))
 			{
 				entireLine = false;
+				break; // 효율성을 위해 빈 셀이 발견되면 검사 중지
 			}
 		}
 
+		// 라인에 있는 모든 셀을 그리기
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (cells2->Get(j, i) == true)
+			if (cells2->Get(j, i))
 			{
-				//한 픽셀 그리기
+				// 한 픽셀 그리기
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
 					padding + (j + 1) * CELL_SIZE + 1, padding + i * CELL_SIZE + 1,
 					padding + (j + 2) * CELL_SIZE - 1, padding + (i + 1) * CELL_SIZE - 1
 				);
-				if (entireLine)
-				{
-					m_pRenderTarget->FillRectangle(&rectangle4, m_pYellowBrush);
-				}
-				else
-				{
-					m_pRenderTarget->FillRectangle(&rectangle4, m_pGreenBrush);
-				}
+
+				// 라인이 모두 채워진 경우 노란색, 아니면 초록색으로 그리기
+				m_pRenderTarget->FillRectangle(&rectangle4, entireLine ? m_pYellowBrush : m_pGreenBrush2);
 			}
 		}
 	}
 }
-
 Matrix* Stack::GetCells()
 {
 	return cells;

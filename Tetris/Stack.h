@@ -25,6 +25,7 @@ private:
 
 	ID2D1SolidColorBrush* m_pBlueBrush;
 	ID2D1SolidColorBrush* m_pGreenBrush;
+	ID2D1SolidColorBrush* m_pGreenBrush2;
 	ID2D1SolidColorBrush* m_pYellowBrush;
 
 };
