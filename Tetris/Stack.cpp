@@ -126,6 +126,27 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 		{
 			if (cells->Get(j, i) == true)
 			{
+				//한 픽셀 그리기
+				D2D1_RECT_F rectangle4 = D2D1::RectF(
+					padding + (j + 1) * CELL_SIZE + 1 + (STACK_WIDTH + 3) * CELL_SIZE, padding + i * CELL_SIZE + 1,
+					padding + (j + 2) * CELL_SIZE - 1 + (STACK_WIDTH + 3) * CELL_SIZE, padding + (i + 1) * CELL_SIZE - 1
+				);
+				if (entireLine)
+				{
+					m_pRenderTarget->FillRectangle(&rectangle4, m_pYellowBrush);
+				}
+				else
+				{
+					m_pRenderTarget->FillRectangle(&rectangle4, m_pGreenBrush);
+				}
+			}
+		}
+
+		for (int j = 0; j < STACK_WIDTH; j++)
+		{
+			if (cells->Get(j, i) == true)
+			{
+				//한 픽셀 그리기
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
 					padding + (j + 1) * CELL_SIZE + 1, padding + i * CELL_SIZE + 1,
 					padding + (j + 2) * CELL_SIZE - 1, padding + (i + 1) * CELL_SIZE - 1

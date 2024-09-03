@@ -13,16 +13,22 @@ public:
 	void InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget);
 	void Activate();
 	bool Advance(Matrix* stackCells);
+	bool Advance2(Matrix* stackCells2);
 	void GoLeft(Matrix* stackCells);
 	void GoRight(Matrix* stackCells);
 	void Rotate(Matrix* stackCells);
+
 	void Draw(ID2D1HwndRenderTarget* m_pRenderTarget);
+	void Draw2(ID2D1HwndRenderTarget* m_pRenderTarget);
 
 	bool LeftWallCollision();
 	bool RightWallCollision();
 	bool StackCollision(Matrix* stackCells);
+	bool StackCollision2(Matrix* stackCells);
 	Point2D GetPosition();
+	Point2D GetPosition2();
 	Matrix* GetCells();
+	Matrix* GetCells2();
 
 private:
 	Point2D position;

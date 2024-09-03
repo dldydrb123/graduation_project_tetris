@@ -32,7 +32,7 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     keyPressDelay = 0.07;
     keyPressAccumulated = 0;
 
-    autoFallDelay2 = 0.7;
+    autoFallDelay2 = 0.2;
     autoFallAccumulated2 = 0;
     keyPressDelay2 = 0.07;
     keyPressAccumulated2 = 0;
@@ -174,6 +174,7 @@ void Engine::Logic(double elapsedTime)
 
     // We will need the stack in several places below
     Matrix* stackCells = stack->GetCells();
+    Matrix* stackCells2 = stack2->GetCells();
 
     // Due to a high FPS, we can't consider the keys at every frame because movement will be very fast
     // So we're using a delay, and if enough time has passed we take a key press into consideration
@@ -247,10 +248,10 @@ void Engine::Logic(double elapsedTime)
 
             // Delete active piece, activate the waiting piece and generate new waiting piece
             delete activePiece;
-            //activePiece = waitingPiece;
+            activePiece = waitingPiece;
             activePiece->Activate();
-            //waitingPiece = new Piece();
-            //waitingPiece->InitializeD2D(m_pRenderTarget);
+            waitingPiece = new Piece();
+            waitingPiece->InitializeD2D(m_pRenderTarget);
 
             // If we have a collision right after we generate the new piece, 
             // it means the stack is too high, so game over
@@ -272,7 +273,7 @@ void Engine::Logic(double elapsedTime)
         }
 
         // Move down the active piece
-        bool isConflict = activePiece2->Advance(stackCells);
+        bool isConflict = activePiece2->Advance2(stackCells2);
         // If we have a conflict with the stack, it means we were sitting on the stack or bottom wall already
         if (isConflict)
         {
@@ -283,9 +284,9 @@ void Engine::Logic(double elapsedTime)
                 {
                     if (activePiece2->GetCells()->Get(j, i) == true)
                     {
-                        int realx = activePiece2->GetPosition().x + j;
-                        int realy = activePiece2->GetPosition().y + i;
-                        stackCells->Set(realx, realy, true);
+                        int realx = activePiece2->GetPosition2().x + j;
+                        int realy = activePiece2->GetPosition2().y + i;
+                        stackCells2->Set(realx, realy, true);
                     }
                 }
             }
@@ -328,8 +329,8 @@ HRESULT Engine::Draw()
     waitingPiece->Draw(m_pRenderTarget);
 
     stack2->Draw(m_pRenderTarget);
-    activePiece2->Draw(m_pRenderTarget);
-    waitingPiece2->Draw(m_pRenderTarget);
+    activePiece2->Draw2(m_pRenderTarget);
+    waitingPiece2->Draw2(m_pRenderTarget);
     DrawTextAndScore();
 
     hr = m_pRenderTarget->EndDraw();

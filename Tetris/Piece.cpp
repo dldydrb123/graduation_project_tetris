@@ -26,6 +26,7 @@ Piece::Piece() : m_pRedBrush(NULL)
 		for (int j = 0; j < 4; j++)
 		{
 			cells->Set(j, i, cellsTemplates[pieceType][i][j]);
+			cells2->Set(j, i, cellsTemplates[pieceType][i][j]);
 		}
 	}
 }
@@ -33,6 +34,7 @@ Piece::Piece() : m_pRedBrush(NULL)
 Piece::~Piece()
 {
 	delete cells;
+	delete cells2;
 	SafeRelease(&m_pRedBrush);
 }
 
@@ -58,6 +60,20 @@ bool Piece::Advance(Matrix* stackCells)
 	if (StackCollision(stackCells))
 	{
 		position.y -= 1;
+		return true;
+	}
+
+	return false;
+}
+
+bool Piece::Advance2(Matrix* stackCells)
+{
+	// Advances the piece down. If there is a collision, returns true and reverts the movement
+	position2.y += 1;
+
+	if (StackCollision(stackCells))
+	{
+		position2.y -= 1;
 		return true;
 	}
 
@@ -213,7 +229,11 @@ bool Piece::StackCollision(Matrix* stackCells)
 			}
 		}
 	}
-	
+	return false;
+}
+
+bool Piece::StackCollision2(Matrix* stackCells)
+{
 	// Returns true if we're in a collision with the bottom wall or current stack
 	for (int i = 0; i < 4; i++)
 	{
@@ -221,8 +241,8 @@ bool Piece::StackCollision(Matrix* stackCells)
 		{
 			if (cells->Get(j, i) == true)
 			{
-				int realx = position.x + j;
-				int realy = position.y + i;
+				int realx = position2.x + j;
+				int realy = position2.y + i;
 				// Check if we are colliding with the bottom
 				if (realy >= STACK_HEIGHT)
 				{
@@ -245,20 +265,22 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 
 	int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 2;
 
-	//int center_x = centerRight;
-	//int center_y = padding + 2 * CELL_SIZE + 100;
 
 
 	int center_x = padding + (position.x + 1) * CELL_SIZE;
 	int center_y = padding + position.y * CELL_SIZE;
 
+	if (waiting)
+	{
+		center_x = padding + (position2.x + 1) * CELL_SIZE * 2;
+	}
 	// Drawing the cells
 	
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (cells2->Get(j, i) == true)
 			{
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
 					center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
@@ -268,21 +290,38 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 			}
 		}
 	}
-	//center_x = padding + (position2.x + 1) * CELL_SIZE;
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	for (int j = 0; j < 4; j++)
-	//	{
-	//		if (cells->Get(j, i) == true)
-	//		{
-	//			D2D1_RECT_F rectangle4 = D2D1::RectF(
-	//				center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
-	//				center_x + (j + 1) * CELL_SIZE - 1, center_y + (i + 1) * CELL_SIZE - 1
-	//			);
-	//			m_pRenderTarget->FillRectangle(&rectangle4, m_pRedBrush);
-	//		}
-	//	}
-	//}
+
+}
+
+void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
+{
+	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 2;
+
+	int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 2;
+	// Drawing the cells
+
+	int center_x = padding + (position2.x + 1) * CELL_SIZE;
+	int center_y = padding + position.y * CELL_SIZE;
+
+	if (waiting)
+	{
+		center_x = padding + (position2.x + 1) * CELL_SIZE * 2;
+		center_y = padding + position.y * CELL_SIZE + 100;
+	}
+for (int i = 0; i < 4; i++)
+{
+	for (int j = 0; j < 4; j++)
+	{
+		if (cells2->Get(j, i) == true)
+		{
+			D2D1_RECT_F rectangle4 = D2D1::RectF(
+				center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
+				center_x + (j + 1) * CELL_SIZE - 1, center_y + (i + 1) * CELL_SIZE - 1
+			);
+			m_pRenderTarget->FillRectangle(&rectangle4, m_pRedBrush);
+		}
+	}
+}
 }
 
 Point2D Piece::GetPosition()
@@ -290,7 +329,17 @@ Point2D Piece::GetPosition()
 	return position;
 }
 
+Point2D Piece::GetPosition2()
+{
+	return position2;
+}
+
 Matrix* Piece::GetCells()
 {
 	return cells;
+}
+
+Matrix* Piece::GetCells2()
+{
+	return cells2;
 }
