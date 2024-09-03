@@ -328,7 +328,7 @@ HRESULT Engine::Draw()
     activePiece->Draw(m_pRenderTarget);
     waitingPiece->Draw(m_pRenderTarget);
 
-    stack2->Draw(m_pRenderTarget);
+    stack2->Draw2(m_pRenderTarget);
     activePiece2->Draw2(m_pRenderTarget);
     waitingPiece2->Draw2(m_pRenderTarget);
     DrawTextAndScore();

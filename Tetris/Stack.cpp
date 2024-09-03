@@ -89,25 +89,64 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	);
 	m_pRenderTarget->FillRectangle(&rectangle3, m_pBlueBrush);
 
+	// Drawing the cells
+
+	for (int i = 0; i < STACK_HEIGHT; i++)
+	{
+		bool entireLine = true;
+		for (int j = 0; j < STACK_WIDTH; j++)
+		{
+			if (cells->Get(j, i) == false)
+			{
+				entireLine = false;
+			}
+		}
+
+		for (int j = 0; j < STACK_WIDTH; j++)
+		{
+			if (cells->Get(j, i) == true)
+			{
+				//한 픽셀 그리기
+				D2D1_RECT_F rectangle4 = D2D1::RectF(
+					padding + (j + 1) * CELL_SIZE + 1, padding + i * CELL_SIZE + 1,
+					padding + (j + 2) * CELL_SIZE - 1, padding + (i + 1) * CELL_SIZE - 1
+				);
+				if (entireLine)
+				{
+					m_pRenderTarget->FillRectangle(&rectangle4, m_pYellowBrush);
+				}
+				else
+				{
+					m_pRenderTarget->FillRectangle(&rectangle4, m_pGreenBrush);
+				}
+			}
+		}
+	}
+}
+
+void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
+{
+	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 2;
+
 	int rightPadding = padding + (STACK_WIDTH + 3) * CELL_SIZE; // 새 벽의 시작점
 
-    D2D1_RECT_F rightRectangle1 = D2D1::RectF(
-        rightPadding, padding,
-        rightPadding + CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
-    );
-    m_pRenderTarget->FillRectangle(&rightRectangle1, m_pBlueBrush);
+	D2D1_RECT_F rightRectangle1 = D2D1::RectF(
+		rightPadding, padding,
+		rightPadding + CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
+	);
+	m_pRenderTarget->FillRectangle(&rightRectangle1, m_pBlueBrush);
 
-    D2D1_RECT_F rightRectangle2 = D2D1::RectF(
-        rightPadding, padding + STACK_HEIGHT * CELL_SIZE,
-        rightPadding + (STACK_WIDTH + 2) * CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
-    );
-    m_pRenderTarget->FillRectangle(&rightRectangle2, m_pBlueBrush);
+	D2D1_RECT_F rightRectangle2 = D2D1::RectF(
+		rightPadding, padding + STACK_HEIGHT * CELL_SIZE,
+		rightPadding + (STACK_WIDTH + 2) * CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
+	);
+	m_pRenderTarget->FillRectangle(&rightRectangle2, m_pBlueBrush);
 
-    D2D1_RECT_F rightRectangle3 = D2D1::RectF(
-        rightPadding + (STACK_WIDTH + 1) * CELL_SIZE, padding,
-        rightPadding + (STACK_WIDTH + 2) * CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
-    );
-    m_pRenderTarget->FillRectangle(&rightRectangle3, m_pBlueBrush);
+	D2D1_RECT_F rightRectangle3 = D2D1::RectF(
+		rightPadding + (STACK_WIDTH + 1) * CELL_SIZE, padding,
+		rightPadding + (STACK_WIDTH + 2) * CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
+	);
+	m_pRenderTarget->FillRectangle(&rightRectangle3, m_pBlueBrush);
 
 	// Drawing the cells
 
@@ -141,28 +180,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 				}
 			}
 		}
-
-		for (int j = 0; j < STACK_WIDTH; j++)
-		{
-			if (cells->Get(j, i) == true)
-			{
-				//한 픽셀 그리기
-				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					padding + (j + 1) * CELL_SIZE + 1, padding + i * CELL_SIZE + 1,
-					padding + (j + 2) * CELL_SIZE - 1, padding + (i + 1) * CELL_SIZE - 1
-				);
-				if (entireLine)
-				{
-					m_pRenderTarget->FillRectangle(&rectangle4, m_pYellowBrush);
-				}
-				else
-				{
-					m_pRenderTarget->FillRectangle(&rectangle4, m_pGreenBrush);
-				}
-			}
-		}
 	}
-
 }
 
 Matrix* Stack::GetCells()

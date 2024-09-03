@@ -71,7 +71,7 @@ bool Piece::Advance2(Matrix* stackCells)
 	// Advances the piece down. If there is a collision, returns true and reverts the movement
 	position2.y += 1;
 
-	if (StackCollision(stackCells))
+	if (StackCollision2(stackCells))
 	{
 		position2.y -= 1;
 		return true;
