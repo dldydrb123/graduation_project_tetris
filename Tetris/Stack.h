@@ -14,6 +14,7 @@ public:
 
 	void InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget);
 	int RemoveLines();
+	int RemoveLines2();
 	void Draw(ID2D1HwndRenderTarget* m_pRenderTarget);
 	void Draw2(ID2D1HwndRenderTarget* m_pRenderTarget);
 

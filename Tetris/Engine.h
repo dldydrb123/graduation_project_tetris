@@ -46,9 +46,13 @@ private:
 	bool gameOver2 = false;
 
 	bool downPressed = false;
+	bool downPressed2 = false;
 	bool leftPressed = false;
+	bool leftPressed2 = false;
 	bool rightPressed = false;
+	bool rightPressed2 = false;
 	bool spacePressed = false;
+	bool spacePressed2 = false;
 	bool over = false;
 
 	int score = 0;
