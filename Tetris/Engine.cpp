@@ -121,8 +121,20 @@ void Engine::KeyUp(WPARAM wParam)
     if (wParam == VK_RIGHT)
         rightPressed = false;
 
-    if (wParam == VK_SPACE || wParam == VK_UP)
+    if (wParam == VK_RETURN || wParam == VK_UP)
         spacePressed = false;
+
+    if (wParam == 83)
+        downPressed2 = false;
+
+    if (wParam == 65)
+        leftPressed2 = false;
+
+    if (wParam == 68)
+        rightPressed2 = false;
+
+    if (wParam == VK_SPACE || wParam == 87)
+        spacePressed2 = false;
 }
 
 void Engine::KeyDown(WPARAM wParam)
@@ -138,8 +150,20 @@ void Engine::KeyDown(WPARAM wParam)
     if (wParam == VK_RIGHT)
         rightPressed = true;
 
-    if (wParam == VK_SPACE || wParam == VK_UP)
+    if (wParam == VK_RETURN || wParam == VK_UP)
         spacePressed = true;
+
+    if (wParam == 83)
+        downPressed2 = true;
+
+    if (wParam == 65)
+        leftPressed2 = true;
+
+    if (wParam == 68)
+        rightPressed2 = true;
+
+    if (wParam == VK_SPACE || wParam == 87)
+        spacePressed2 = true;
 }
 
 void Engine::MousePosition(int x, int y)
@@ -165,7 +189,7 @@ void Engine::Logic(double elapsedTime)
     // This is the logic part of the engine. It receives the elapsed time from the app class, in seconds.
     // It uses this value for a smooth and consistent movement, regardless of the CPU or graphics speed
 
-    if (gameOver) // Do nothing if game over
+    if (gameOver || gameOver2) // Do nothing if game over
     {
         over = true;
 
@@ -214,11 +238,11 @@ void Engine::Logic(double elapsedTime)
     }
     
     keyPressAccumulated2 += elapsedTime;
-    if (keyPressAccumulated2 > keyPressDelay)
+    if (keyPressAccumulated2 > keyPressDelay2)
     {
         keyPressAccumulated2 = 0;
         
-        /*if (leftPressed || rightPressed || spacePressed)
+        if (leftPressed2 || rightPressed2 || spacePressed2)
         {
             // Remove any full rows
             int removed = stack->RemoveLines();
@@ -230,21 +254,21 @@ void Engine::Logic(double elapsedTime)
         }
 
         // Move left or right
-        if (leftPressed)
-            activePiece->GoLeft(stackCells);
-        if (rightPressed)
-            activePiece->GoRight(stackCells);
+        if (leftPressed2)
+            activePiece2->GoLeft2(stackCells2);
+        if (rightPressed2)
+            activePiece2->GoRight2(stackCells2);
 
         // Rotate
-        if (spacePressed)
+        if (spacePressed2)
         {
-            activePiece->Rotate(stackCells);
-            spacePressed = false;
-        }*/
+            activePiece2->Rotate2(stackCells2);
+            spacePressed2 = false;
+        }
 
         // Move down
         // On this one we will just set autoFallAccumulated to be high, because we have the down movemenet logic below
-        if (downPressed)
+        if (downPressed2)
             autoFallAccumulated2 = autoFallDelay2 + 1;
     }
 
@@ -337,8 +361,8 @@ void Engine::Logic(double elapsedTime)
 
             // If we have a collision right after we generate the new piece, 
             // it means the stack is too high, so game over
-            if (activePiece2->StackCollision2(stackCells))
-                gameOver = true;
+            if (activePiece2->StackCollision2(stackCells2))
+                gameOver2 = true;
         }
     }
 

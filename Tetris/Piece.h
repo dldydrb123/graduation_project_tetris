@@ -15,14 +15,19 @@ public:
 	bool Advance(Matrix* stackCells);
 	bool Advance2(Matrix* stackCells2);
 	void GoLeft(Matrix* stackCells);
+	void GoLeft2(Matrix* stackCells2);
 	void GoRight(Matrix* stackCells);
+	void GoRight2(Matrix* stackCells2);
 	void Rotate(Matrix* stackCells);
+	void Rotate2(Matrix* stackCells2);
 
 	void Draw(ID2D1HwndRenderTarget* m_pRenderTarget);
 	void Draw2(ID2D1HwndRenderTarget* m_pRenderTarget);
 
 	bool LeftWallCollision();
+	bool LeftWallCollision2();
 	bool RightWallCollision();
+	bool RightWallCollision2();
 	bool StackCollision(Matrix* stackCells);
 	bool StackCollision2(Matrix* stackCells2);
 	Point2D GetPosition();
