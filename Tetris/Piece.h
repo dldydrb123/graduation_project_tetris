@@ -24,7 +24,7 @@ public:
 	bool LeftWallCollision();
 	bool RightWallCollision();
 	bool StackCollision(Matrix* stackCells);
-	bool StackCollision2(Matrix* stackCells2);
+	bool StackCollision2(Matrix* stackCells);
 	Point2D GetPosition();
 	Point2D GetPosition2();
 	Matrix* GetCells();

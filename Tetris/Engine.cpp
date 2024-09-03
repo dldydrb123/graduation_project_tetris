@@ -217,33 +217,6 @@ void Engine::Logic(double elapsedTime)
     if (keyPressAccumulated2 > keyPressDelay)
     {
         keyPressAccumulated2 = 0;
-        
-        /*if (leftPressed || rightPressed || spacePressed)
-        {
-            // Remove any full rows
-            int removed = stack->RemoveLines();
-            if (removed > 0)
-            {
-                score += pow(2, removed) * 100;
-                autoFallDelay2 = autoFallDelay2 * 0.98;
-            }
-        }
-
-        // Move left or right
-        if (leftPressed)
-            activePiece->GoLeft(stackCells);
-        if (rightPressed)
-            activePiece->GoRight(stackCells);
-
-        // Rotate
-        if (spacePressed)
-        {
-            activePiece->Rotate(stackCells);
-            spacePressed = false;
-        }*/
-
-        // Move down
-        // On this one we will just set autoFallAccumulated to be high, because we have the down movemenet logic below
         if (downPressed)
             autoFallAccumulated2 = autoFallDelay2 + 1;
     }
