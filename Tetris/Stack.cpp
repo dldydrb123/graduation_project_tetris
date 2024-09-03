@@ -107,6 +107,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 			if (cells->Get(j, i) == true)
 			{
 				//한 픽셀 그리기
+				//테트리스 한칸 그려지는 부분
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
 					padding + (j + 1) * CELL_SIZE + 1, padding + i * CELL_SIZE + 1,
 					padding + (j + 2) * CELL_SIZE - 1, padding + (i + 1) * CELL_SIZE - 1
@@ -148,14 +149,13 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	);
 	m_pRenderTarget->FillRectangle(&rightRectangle3, m_pBlueBrush);
 
-	// Drawing the cells
-
+	//셀 그리는 부분
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
 		bool entireLine = true;
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (cells->Get(j, i) == false)
+			if (cells2->Get(j, i) == false)
 			{
 				entireLine = false;
 			}
@@ -163,12 +163,12 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (cells2->Get(j, i) == true)
 			{
 				//한 픽셀 그리기
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					padding + (j + 1) * CELL_SIZE + 1 + (STACK_WIDTH + 3) * CELL_SIZE, padding + i * CELL_SIZE + 1,
-					padding + (j + 2) * CELL_SIZE - 1 + (STACK_WIDTH + 3) * CELL_SIZE, padding + (i + 1) * CELL_SIZE - 1
+					padding + (j + 1) * CELL_SIZE + 1, padding + i * CELL_SIZE + 1,
+					padding + (j + 2) * CELL_SIZE - 1, padding + (i + 1) * CELL_SIZE - 1
 				);
 				if (entireLine)
 				{

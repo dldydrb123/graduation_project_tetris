@@ -15,6 +15,7 @@ public:
 	void InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget);
 	int RemoveLines();
 	void Draw(ID2D1HwndRenderTarget* m_pRenderTarget);
+	void Draw2(ID2D1HwndRenderTarget* m_pRenderTarget);
 
 	Matrix* GetCells();
 	Matrix* GetCells2();

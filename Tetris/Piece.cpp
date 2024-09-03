@@ -66,12 +66,12 @@ bool Piece::Advance(Matrix* stackCells)
 	return false;
 }
 
-bool Piece::Advance2(Matrix* stackCells)
+bool Piece::Advance2(Matrix* stackCells2)
 {
 	// Advances the piece down. If there is a collision, returns true and reverts the movement
 	position2.y += 1;
 
-	if (StackCollision2(stackCells))
+	if (StackCollision2(stackCells2))
 	{
 		position2.y -= 1;
 		return true;
@@ -232,14 +232,14 @@ bool Piece::StackCollision(Matrix* stackCells)
 	return false;
 }
 
-bool Piece::StackCollision2(Matrix* stackCells)
+bool Piece::StackCollision2(Matrix* stackCells2)
 {
 	// Returns true if we're in a collision with the bottom wall or current stack
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (cells2->Get(j, i) == true)
 			{
 				int realx = position2.x + j;
 				int realy = position2.y + i;
@@ -249,7 +249,7 @@ bool Piece::StackCollision2(Matrix* stackCells)
 					return true;
 				}
 				// Check if we are colliding with existing stack
-				if (stackCells->Get(realx, realy))
+				if (stackCells2->Get(realx, realy))
 				{
 					return true;
 				}
@@ -301,12 +301,12 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	// Drawing the cells
 
 	int center_x = padding + (position2.x + 1) * CELL_SIZE;
-	int center_y = padding + position.y * CELL_SIZE;
+	int center_y = padding + position2.y * CELL_SIZE;
 
 	if (waiting)
 	{
 		center_x = padding + (position2.x + 1) * CELL_SIZE * 2;
-		center_y = padding + position.y * CELL_SIZE + 100;
+		center_y = padding + position2.y * CELL_SIZE + 100;
 	}
 	for (int i = 0; i < 4; i++)
 	{

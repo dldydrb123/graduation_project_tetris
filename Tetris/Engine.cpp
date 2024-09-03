@@ -32,7 +32,7 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     keyPressDelay = 0.07;
     keyPressAccumulated = 0;
 
-    autoFallDelay2 = 0.2;
+    autoFallDelay2 = 0.7;
     autoFallAccumulated2 = 0;
     keyPressDelay2 = 0.07;
     keyPressAccumulated2 = 0;
@@ -212,6 +212,42 @@ void Engine::Logic(double elapsedTime)
         if (downPressed)
             autoFallAccumulated = autoFallDelay + 1;
     }
+    
+    keyPressAccumulated2 += elapsedTime;
+    if (keyPressAccumulated2 > keyPressDelay)
+    {
+        keyPressAccumulated2 = 0;
+        
+        /*if (leftPressed || rightPressed || spacePressed)
+        {
+            // Remove any full rows
+            int removed = stack->RemoveLines();
+            if (removed > 0)
+            {
+                score += pow(2, removed) * 100;
+                autoFallDelay2 = autoFallDelay2 * 0.98;
+            }
+        }
+
+        // Move left or right
+        if (leftPressed)
+            activePiece->GoLeft(stackCells);
+        if (rightPressed)
+            activePiece->GoRight(stackCells);
+
+        // Rotate
+        if (spacePressed)
+        {
+            activePiece->Rotate(stackCells);
+            spacePressed = false;
+        }*/
+
+        // Move down
+        // On this one we will just set autoFallAccumulated to be high, because we have the down movemenet logic below
+        if (downPressed)
+            autoFallAccumulated2 = autoFallDelay2 + 1;
+    }
+
 
     // The piece falls automatically after a delay
     autoFallAccumulated += elapsedTime;
@@ -259,6 +295,7 @@ void Engine::Logic(double elapsedTime)
                 gameOver = true;
         }
     }
+
     autoFallAccumulated2 += elapsedTime;
     if (autoFallAccumulated2 > autoFallDelay2) //¿©±â
     {
@@ -300,7 +337,7 @@ void Engine::Logic(double elapsedTime)
 
             // If we have a collision right after we generate the new piece, 
             // it means the stack is too high, so game over
-            if (activePiece2->StackCollision(stackCells))
+            if (activePiece2->StackCollision2(stackCells))
                 gameOver = true;
         }
     }
