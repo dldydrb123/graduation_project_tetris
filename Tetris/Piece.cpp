@@ -10,7 +10,7 @@ Piece::Piece() : m_pRedBrush(NULL)
 	position.x = STACK_WIDTH / 2 - 2 ;
 	position.y = 0;
 
-	position2.x = STACK_WIDTH + 3 + (STACK_WIDTH / 2 - 2);
+	position2.x = (STACK_WIDTH / 2 - 2);
 	position2.y = 0;
 
 	waiting = true;
