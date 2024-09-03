@@ -17,6 +17,7 @@ public:
 	void Draw(ID2D1HwndRenderTarget* m_pRenderTarget);
 
 	Matrix* GetCells();
+	Matrix* GetCells2();
 private:
 	Matrix* cells;
 	Matrix* cells2;

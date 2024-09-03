@@ -174,7 +174,7 @@ void Engine::Logic(double elapsedTime)
 
     // We will need the stack in several places below
     Matrix* stackCells = stack->GetCells();
-    Matrix* stackCells2 = stack2->GetCells();
+    Matrix* stackCells2 = stack2->GetCells2();
 
     // Due to a high FPS, we can't consider the keys at every frame because movement will be very fast
     // So we're using a delay, and if enough time has passed we take a key press into consideration

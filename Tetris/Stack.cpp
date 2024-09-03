@@ -169,3 +169,8 @@ Matrix* Stack::GetCells()
 {
 	return cells;
 }
+
+Matrix* Stack::GetCells2()
+{
+	return cells2;
+}
