@@ -4,8 +4,8 @@
 #include "Piece.h"
 #include "Stack.h"
 
-#define RESOLUTION_X 2000
-#define RESOLUTION_Y 2000
+#define RESOLUTION_X 1200
+#define RESOLUTION_Y 800
 
 #define CELL_SIZE 20
 

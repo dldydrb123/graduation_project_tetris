@@ -113,28 +113,28 @@ void Engine::KeyUp(WPARAM wParam)
     // If keyup, un-set the keys flags
     // Don't do any logic here, you want to control the actual logic in the Logic method below
     if (wParam == VK_DOWN)
-        downPressed = false;
-
-    if (wParam == VK_LEFT)
-        leftPressed = false;
-
-    if (wParam == VK_RIGHT)
-        rightPressed = false;
-
-    if (wParam == VK_RETURN || wParam == VK_UP)
-        spacePressed = false;
-
-    if (wParam == 83)
         downPressed2 = false;
 
-    if (wParam == 65)
+    if (wParam == VK_LEFT)
         leftPressed2 = false;
 
-    if (wParam == 68)
+    if (wParam == VK_RIGHT)
         rightPressed2 = false;
 
-    if (wParam == VK_SPACE || wParam == 87)
+    if (wParam == VK_RETURN || wParam == VK_UP)
         spacePressed2 = false;
+
+    if (wParam == 83)
+        downPressed = false;
+
+    if (wParam == 65)
+        leftPressed = false;
+
+    if (wParam == 68)
+        rightPressed = false;
+
+    if (wParam == VK_SPACE || wParam == 87)
+        spacePressed = false;
 }
 
 void Engine::KeyDown(WPARAM wParam)
@@ -142,28 +142,28 @@ void Engine::KeyDown(WPARAM wParam)
 	// If keyup, set the keys flags
 	// Don't do any logic here, you want to control the actual logic in the Logic method below
     if (wParam == VK_DOWN)
-        downPressed = true;
-
-    if (wParam == VK_LEFT)
-        leftPressed = true;
-
-    if (wParam == VK_RIGHT)
-        rightPressed = true;
-
-    if (wParam == VK_RETURN || wParam == VK_UP)
-        spacePressed = true;
-
-    if (wParam == 83)
         downPressed2 = true;
 
-    if (wParam == 65)
+    if (wParam == VK_LEFT)
         leftPressed2 = true;
 
-    if (wParam == 68)
+    if (wParam == VK_RIGHT)
         rightPressed2 = true;
 
-    if (wParam == VK_SPACE || wParam == 87)
+    if (wParam == VK_RETURN || wParam == VK_UP)
         spacePressed2 = true;
+
+    if (wParam == 83)
+        downPressed = true;
+
+    if (wParam == 65)
+        leftPressed = true;
+
+    if (wParam == 68)
+        rightPressed = true;
+
+    if (wParam == VK_SPACE || wParam == 87)
+        spacePressed = true;
 }
 
 void Engine::MousePosition(int x, int y)
@@ -210,7 +210,7 @@ void Engine::Logic(double elapsedTime)
         if (leftPressed || rightPressed || spacePressed)
         {
             // Remove any full rows
-            int removed = stack->RemoveLines();
+            int removed = stack->RemoveLines(stackCells);
             if (removed > 0)
             {
                 score += pow(2, removed) * 100;
@@ -245,7 +245,7 @@ void Engine::Logic(double elapsedTime)
         if (leftPressed2 || rightPressed2 || spacePressed2)
         {
             // Remove any full rows
-            int removed = stack->RemoveLines();
+            int removed = stack->RemoveLines(stackCells2);
             if (removed > 0)
             {
                 score += pow(2, removed) * 100;
@@ -277,10 +277,10 @@ void Engine::Logic(double elapsedTime)
     autoFallAccumulated += elapsedTime;
     if (autoFallAccumulated > autoFallDelay) //¿©±â
     {
-        autoFallAccumulated = 0;
+       autoFallAccumulated = 0;
 
         // Remove any full rows
-        int removed = stack->RemoveLines();
+        int removed = stack->RemoveLines(stackCells);
         if (removed > 0)
         {
             score += pow(2, removed) * 100;
@@ -326,7 +326,7 @@ void Engine::Logic(double elapsedTime)
         autoFallAccumulated2 = 0;
 
         // Remove any full rows
-        int removed = stack->RemoveLines();
+        int removed = stack->RemoveLines(stackCells2);
         if (removed > 0)
         {
             score += pow(2, removed) * 100;
@@ -343,7 +343,7 @@ void Engine::Logic(double elapsedTime)
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    if (activePiece2->GetCells()->Get(j, i) == true)
+                    if (activePiece2->GetCells2()->Get(j, i) == true)
                     {
                         int realx = activePiece2->GetPosition2().x + j;
                         int realy = activePiece2->GetPosition2().y + i;
@@ -361,7 +361,7 @@ void Engine::Logic(double elapsedTime)
 
             // If we have a collision right after we generate the new piece, 
             // it means the stack is too high, so game over
-            if (activePiece2->StackCollision2(stackCells2))
+            if (activePiece2->StackCollision(stackCells2))
                 gameOver2 = true;
         }
     }

@@ -13,8 +13,7 @@ public:
 	~Stack();
 
 	void InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget);
-	int RemoveLines();
-	int RemoveLines2();
+	int RemoveLines(Matrix* stackCells);
 	void Draw(ID2D1HwndRenderTarget* m_pRenderTarget);
 	void Draw2(ID2D1HwndRenderTarget* m_pRenderTarget);
 

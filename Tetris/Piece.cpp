@@ -10,7 +10,7 @@ Piece::Piece() : m_pRedBrush(NULL)
 	position.x = STACK_WIDTH / 2 - 2 ;
 	position.y = 0;
 
-	position2.x = (STACK_WIDTH / 2 - 2);
+	position2.x = STACK_WIDTH / 2 - 2;
 	position2.y = 0;
 
 	waiting = true;
@@ -86,7 +86,7 @@ void Piece::GoLeft(Matrix* stackCells)
 	int initialPosX = position.x;
 	position.x -= 1;
 
-	if (LeftWallCollision())
+	if (LeftWallCollision(stackCells))
 	{
 		position.x = initialPosX;
 		return;
@@ -99,19 +99,19 @@ void Piece::GoLeft(Matrix* stackCells)
 	}
 }
 
-void Piece::GoLeft2(Matrix* stackCells2)
+void Piece::GoLeft2(Matrix* stackCells)
 {
 	// Tries to go left, and checks for collisions with the wall or current stack
 	int initialPosX = position2.x;
 	position2.x -= 1;
 
-	if (LeftWallCollision2())
+	if (LeftWallCollision(stackCells))
 	{
 		position2.x = initialPosX;
 		return;
 	}
 
-	if (StackCollision2(stackCells2))
+	if (StackCollision2(stackCells))
 	{
 		position2.x = initialPosX;
 		return;
@@ -124,7 +124,7 @@ void Piece::GoRight(Matrix* stackCells)
 	int initialPosX = position.x;
 	position.x += 1;
 
-	if (RightWallCollision())
+	if (RightWallCollision(stackCells))
 	{
 		position.x = initialPosX;
 		return;
@@ -137,19 +137,19 @@ void Piece::GoRight(Matrix* stackCells)
 	}
 }
 
-void Piece::GoRight2(Matrix* stackCells2)
+void Piece::GoRight2(Matrix* stackCells)
 {
 	// Tries to go right, and checks for collisions with the wall or current stack
 	int initialPosX = position2.x;
 	position2.x += 1;
 
-	if (RightWallCollision2())
+	if (RightWallCollision(stackCells))
 	{
 		position2.x = initialPosX;
 		return;
 	}
 
-	if (StackCollision2(stackCells2))
+	if (StackCollision2(stackCells))
 	{
 		position2.x = initialPosX;
 		return;
@@ -178,11 +178,11 @@ void Piece::Rotate(Matrix* stackCells)
 		}
 	}
 
-	while(LeftWallCollision())
+	while(LeftWallCollision(stackCells))
 	{
 		position.x += 1;
 	};
-	while (RightWallCollision())
+	while (RightWallCollision(stackCells))
 	{
 		position.x -= 1;
 	};
@@ -201,15 +201,15 @@ void Piece::Rotate(Matrix* stackCells)
 	}
 }
 
-void Piece::Rotate2(Matrix* stackCells2)
+void Piece::Rotate2(Matrix* stackCells)
 {
 	// Store initial values
-	Matrix* temp2 = new Matrix(4, 4);
+	Matrix* temp = new Matrix(4, 4);
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			temp2->Set(j, i, cells2->Get(j, i));
+			temp->Set(j, i, cells2->Get(j, i));
 		}
 	}
 	int initialPosX = position2.x;
@@ -219,26 +219,26 @@ void Piece::Rotate2(Matrix* stackCells2)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			cells2->Set(j, i, temp2->Get(i, 3 - j));
+			cells2->Set(j, i, temp->Get(i, 3 - j));
 		}
 	}
 
-	while (LeftWallCollision2())
+	while (LeftWallCollision(stackCells))
 	{
 		position2.x += 1;
 	};
-	while (RightWallCollision2())
+	while (RightWallCollision(stackCells))
 	{
 		position2.x -= 1;
 	};
 
-	if (StackCollision2(stackCells2)) {
+	if (StackCollision2(stackCells)) {
 		// Revert
 		for (int i = 0; i < 4; i++)
 		{
 			for (int j = 0; j < 4; j++)
 			{
-				cells2->Set(j, i, temp2->Get(j, i));
+				cells2->Set(j, i, temp->Get(j, i));
 			}
 		}
 		position2.x = initialPosX;
@@ -246,14 +246,14 @@ void Piece::Rotate2(Matrix* stackCells2)
 	}
 }
 
-bool Piece::LeftWallCollision()
+bool Piece::LeftWallCollision(Matrix* stackCells)
 {
 	// Returns true if we're in a collision with the left wall
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (stackCells->Get(j, i) == true)
 			{
 				int realx = position.x + j;
 				if (realx < 0)
@@ -267,59 +267,17 @@ bool Piece::LeftWallCollision()
 	return false;
 }
 
-bool Piece::LeftWallCollision2()
-{
-	// Returns true if we're in a collision with the left wall
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			if (cells2->Get(j, i) == true)
-			{
-				int realx = position2.x + j;
-				if (realx <= 0)
-				{
-					return true;
-				}
-			}
-		}
-	}
-
-	return false;
-}
-
-bool Piece::RightWallCollision()
+bool Piece::RightWallCollision(Matrix* stackCells)
 {
 	// Returns true if we're in a collision with the right wall
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (stackCells->Get(j, i) == true)
 			{
 				int realx = position.x + j;
 				if (realx >= STACK_WIDTH)
-				{
-					return true;
-				}
-			}
-		}
-	}
-
-	return false;
-}
-
-bool Piece::RightWallCollision2()
-{
-	// Returns true if we're in a collision with the right wall
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			if (cells2->Get(j, i) == true)
-			{
-				int realx = position2.x + j;
-				if (realx >= 40)
 				{
 					return true;
 				}
@@ -397,7 +355,7 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 
 	if (waiting)
 	{
-		center_x = padding + (position2.x + 1) * CELL_SIZE * 2;
+		center_x = padding + ((position2.x + STACK_WIDTH + 4)+ 1) * CELL_SIZE * 2;
 	}
 	// Drawing the cells
 	
@@ -425,12 +383,12 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 2;
 	// Drawing the cells
 
-	int center_x = padding + (position2.x + 1) * CELL_SIZE;
+	int center_x = padding + ((position2.x + STACK_WIDTH + 4 )+ 1) * CELL_SIZE;
 	int center_y = padding + position2.y * CELL_SIZE;
 
 	if (waiting)
 	{
-		center_x = padding + (position2.x + 1) * CELL_SIZE * 2;
+		center_x = padding + ((position2.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2;
 		center_y = padding + position2.y * CELL_SIZE + 100;
 	}
 	for (int i = 0; i < 4; i++)

@@ -40,7 +40,7 @@ void Stack::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 	);
 }
 
-int Stack::RemoveLines()
+int Stack::RemoveLines(Matrix* stackCells)
 {
 	// This removes the full rows
 	int removed = 0;
@@ -49,7 +49,7 @@ int Stack::RemoveLines()
 		bool entireLine = true;
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (cells->Get(j, i) == false)
+			if (stackCells->Get(j, i) == false)
 			{
 				entireLine = false;
 			}
@@ -61,37 +61,7 @@ int Stack::RemoveLines()
 			{
 				for (int j = 0; j < STACK_WIDTH; j++)
 				{
-					cells->Set(j, k, cells->Get(j, k - 1));
-				}
-			}
-			i++;
-		}
-	}
-	return removed;
-}
-
-int Stack::RemoveLines2()
-{
-	// This removes the full rows
-	int removed = 0;
-	for (int i = STACK_HEIGHT - 1; i >= 0; i--)
-	{
-		bool entireLine = true;
-		for (int j = 0; j < STACK_WIDTH; j++)
-		{
-			if (cells2->Get(j, i) == false)
-			{
-				entireLine = false;
-			}
-		}
-		if (entireLine)
-		{
-			removed++;
-			for (int k = i; k > 0; k--)
-			{
-				for (int j = 0; j < STACK_WIDTH; j++)
-				{
-					cells2->Set(j, k, cells2->Get(j, k - 1));
+					stackCells->Set(j, k, stackCells->Get(j, k - 1));
 				}
 			}
 			i++;
