@@ -13,13 +13,9 @@ public:
 	void InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget);
 	void Activate();
 	bool Advance(Matrix* stackCells);
-	bool Advance2(Matrix* stackCells2);
 	void GoLeft(Matrix* stackCells);
-	void GoLeft2(Matrix* stackCells2);
 	void GoRight(Matrix* stackCells);
-	void GoRight2(Matrix* stackCells2);
 	void Rotate(Matrix* stackCells);
-	void Rotate2(Matrix* stackCells2);
 
 	void Draw(ID2D1HwndRenderTarget* m_pRenderTarget);
 	void Draw2(ID2D1HwndRenderTarget* m_pRenderTarget);
@@ -29,15 +25,11 @@ public:
 	bool StackCollision(Matrix* stackCells);
 	bool StackCollision2(Matrix* stackCells);
 	Point2D GetPosition();
-	Point2D GetPosition2();
 	Matrix* GetCells();
-	Matrix* GetCells2();
 
 private:
 	Point2D position;
-	Point2D position2;
 	Matrix* cells;
-	Matrix* cells2;
 
 	bool waiting; // Is the current piece or the next piece?
 

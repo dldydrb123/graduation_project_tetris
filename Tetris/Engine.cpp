@@ -27,12 +27,12 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     waitingPiece2 = new Piece();
 
     //블록 떨어지는 속도
-    autoFallDelay = 0.7;
+    autoFallDelay = 100;
     autoFallAccumulated = 0;
     keyPressDelay = 0.07;
     keyPressAccumulated = 0;
 
-    autoFallDelay2 = 0.7;
+    autoFallDelay2 = 100;
     autoFallAccumulated2 = 0;
     keyPressDelay2 = 0.07;
     keyPressAccumulated2 = 0;
@@ -198,7 +198,7 @@ void Engine::Logic(double elapsedTime)
 
     // We will need the stack in several places below
     Matrix* stackCells = stack->GetCells();
-    Matrix* stackCells2 = stack2->GetCells2();
+    Matrix* stackCells2 = stack2->GetCells();
 
     // Due to a high FPS, we can't consider the keys at every frame because movement will be very fast
     // So we're using a delay, and if enough time has passed we take a key press into consideration
@@ -255,14 +255,14 @@ void Engine::Logic(double elapsedTime)
 
         // Move left or right
         if (leftPressed2)
-            activePiece2->GoLeft2(stackCells2);
+            activePiece2->GoLeft(stackCells2);
         if (rightPressed2)
-            activePiece2->GoRight2(stackCells2);
+            activePiece2->GoRight(stackCells2);
 
         // Rotate
         if (spacePressed2)
         {
-            activePiece2->Rotate2(stackCells2);
+            activePiece2->Rotate(stackCells2);
             spacePressed2 = false;
         }
 
@@ -334,7 +334,7 @@ void Engine::Logic(double elapsedTime)
         }
 
         // Move down the active piece
-        bool isConflict = activePiece2->Advance2(stackCells2);
+        bool isConflict = activePiece2->Advance(stackCells2);
         // If we have a conflict with the stack, it means we were sitting on the stack or bottom wall already
         if (isConflict)
         {
@@ -343,10 +343,10 @@ void Engine::Logic(double elapsedTime)
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    if (activePiece2->GetCells2()->Get(j, i) == true)
+                    if (activePiece2->GetCells()->Get(j, i) == true)
                     {
-                        int realx = activePiece2->GetPosition2().x + j;
-                        int realy = activePiece2->GetPosition2().y + i;
+                        int realx = activePiece2->GetPosition().x + j;
+                        int realy = activePiece2->GetPosition().y + i;
                         stackCells2->Set(realx, realy, true);
                     }
                 }

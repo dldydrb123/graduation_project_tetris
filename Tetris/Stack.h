@@ -18,14 +18,11 @@ public:
 	void Draw2(ID2D1HwndRenderTarget* m_pRenderTarget);
 
 	Matrix* GetCells();
-	Matrix* GetCells2();
 private:
 	Matrix* cells;
-	Matrix* cells2;
 
 	ID2D1SolidColorBrush* m_pBlueBrush;
 	ID2D1SolidColorBrush* m_pGreenBrush;
-	ID2D1SolidColorBrush* m_pGreenBrush2;
 	ID2D1SolidColorBrush* m_pYellowBrush;
 
 };

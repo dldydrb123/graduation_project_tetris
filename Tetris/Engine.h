@@ -7,7 +7,7 @@
 #define RESOLUTION_X 1200
 #define RESOLUTION_Y 800
 
-#define CELL_SIZE 20
+#define CELL_SIZE 17
 
 class Engine
 {
