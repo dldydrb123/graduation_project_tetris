@@ -66,7 +66,7 @@ void Piece::GoLeft(Matrix* stackCells)
 	int initialPosX = position.x;
 	position.x -= 1;
 
-	if (LeftWallCollision(stackCells))
+	if (LeftWallCollision())
 	{
 		position.x = initialPosX;
 		return;
@@ -85,7 +85,7 @@ void Piece::GoRight(Matrix* stackCells)
 	int initialPosX = position.x;
 	position.x += 1;
 
-	if (RightWallCollision(stackCells))
+	if (RightWallCollision())
 	{
 		position.x = initialPosX;
 		return;
@@ -120,11 +120,11 @@ void Piece::Rotate(Matrix* stackCells)
 		}
 	}
 
-	while(LeftWallCollision(stackCells))
+	while(LeftWallCollision())
 	{
 		position.x += 1;
 	};
-	while (RightWallCollision(stackCells))
+	while (RightWallCollision())
 	{
 		position.x -= 1;
 	};
@@ -143,14 +143,14 @@ void Piece::Rotate(Matrix* stackCells)
 	}
 }
 
-bool Piece::LeftWallCollision(Matrix* stackCells)
+bool Piece::LeftWallCollision()
 {
 	// Returns true if we're in a collision with the left wall
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (stackCells->Get(j, i) == true)
+			if (cells->Get(j, i) == true)
 			{
 				int realx = position.x + j;
 				if (realx < 0)
@@ -164,14 +164,14 @@ bool Piece::LeftWallCollision(Matrix* stackCells)
 	return false;
 }
 
-bool Piece::RightWallCollision(Matrix* stackCells)
+bool Piece::RightWallCollision()
 {
 	// Returns true if we're in a collision with the right wall
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (stackCells->Get(j, i) == true)
+			if (cells->Get(j, i) == true)
 			{
 				int realx = position.x + j;
 				if (realx >= STACK_WIDTH)
@@ -214,11 +214,7 @@ bool Piece::StackCollision(Matrix* stackCells)
 
 void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 2;
-
-	int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 2;
-
-
+	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 
 	int center_x = padding + (position.x + 1) * CELL_SIZE;
 	int center_y = padding + position.y * CELL_SIZE;
@@ -248,10 +244,7 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 
 void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 2;
-
-	int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 2;
-	// Drawing the cells
+	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 
 	int center_x = padding + ((position.x + STACK_WIDTH + 4 )+ 1) * CELL_SIZE;
 	int center_y = padding + position.y * CELL_SIZE;

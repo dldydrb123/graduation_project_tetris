@@ -20,10 +20,9 @@ public:
 	void Draw(ID2D1HwndRenderTarget* m_pRenderTarget);
 	void Draw2(ID2D1HwndRenderTarget* m_pRenderTarget);
 
-	bool LeftWallCollision(Matrix* stackCells);
-	bool RightWallCollision(Matrix* stackCells);
+	bool LeftWallCollision();
+	bool RightWallCollision();
 	bool StackCollision(Matrix* stackCells);
-	bool StackCollision2(Matrix* stackCells);
 	Point2D GetPosition();
 	Matrix* GetCells();
 

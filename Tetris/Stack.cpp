@@ -65,7 +65,7 @@ int Stack::RemoveLines(Matrix* stackCells)
 
 void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 2;
+	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 
 	// Drawing the walls first
 
@@ -125,7 +125,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 
 void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 2;
+	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 
 	int rightPadding = padding + (STACK_WIDTH + 3) * CELL_SIZE; // 새 벽의 시작점
 
