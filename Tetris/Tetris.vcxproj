@@ -150,6 +150,7 @@
     <ClInclude Include="Engine.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="App.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Piece.h" />
     <ClInclude Include="Point2D.h" />
@@ -160,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Piece.cpp" />
     <ClCompile Include="Stack.cpp" />

@@ -2,6 +2,7 @@
 #include "Matrix.h"
 #include "Stack.h"
 #include "Engine.h"
+#include "item.h"
 
 Stack::Stack() : m_pBlueBrush(NULL), m_pGreenBrush(NULL), m_pYellowBrush(NULL)
 {
@@ -18,7 +19,7 @@ Stack::~Stack()
 
 void Stack::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	// Creates the brushes for drawing
+	// 그리기용 브러쉬
 	m_pRenderTarget->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Blue),
 		&m_pBlueBrush
@@ -35,8 +36,9 @@ void Stack::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 
 int Stack::RemoveLines(Matrix* stackCells)
 {
-	// This removes the full rows
+	// 꽉찬 열 삭제
 	int removed = 0;
+
 	for (int i = STACK_HEIGHT - 1; i >= 0 ; i--)
 	{
 		bool entireLine = true;
@@ -47,6 +49,53 @@ int Stack::RemoveLines(Matrix* stackCells)
 				entireLine = false;
 			}
 		}
+
+		if (i == STACK_HEIGHT - 1 && ItemUse == true)
+		{
+			entireLine = true;
+			ItemUse = 0;
+			ItemGet = false;
+		}
+
+		if (entireLine)
+		{
+			removed++;
+			for (int k = i; k > 0; k--)
+			{
+				for (int j = 0; j < STACK_WIDTH; j++)
+				{
+					stackCells->Set(j, k, stackCells->Get(j, k - 1));
+				}
+			}
+			i++;
+		}
+	}
+	return removed;
+}
+
+int Stack::RemoveLines2(Matrix* stackCells)
+{
+	// 꽉찬 열 삭제
+	int removed = 0;
+
+	for (int i = STACK_HEIGHT - 1; i >= 0; i--)
+	{
+		bool entireLine = true;
+		for (int j = 0; j < STACK_WIDTH; j++)
+		{
+			if (stackCells->Get(j, i) == false)
+			{
+				entireLine = false;
+			}
+		}
+
+		if (i == STACK_HEIGHT - 1 && ItemUse2 == true)
+		{
+			entireLine = true;
+			ItemUse2 = 0;
+			ItemGet2 = false;
+		}
+
 		if (entireLine)
 		{
 			removed++;
@@ -67,7 +116,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 
-	// Drawing the walls first
+	// 벽 그리기
 
 	D2D1_RECT_F rectangle1 = D2D1::RectF(
 		padding, padding, 
@@ -87,7 +136,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	);
 	m_pRenderTarget->FillRectangle(&rectangle3, m_pBlueBrush);
 
-	// Drawing the cells
+	// 셀 그리기
 
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{

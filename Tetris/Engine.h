@@ -4,8 +4,8 @@
 #include "Piece.h"
 #include "Stack.h"
 
-#define RESOLUTION_X 1000
-#define RESOLUTION_Y 1000
+#define RESOLUTION_X 1200
+#define RESOLUTION_Y 800
 
 #define CELL_SIZE 20
 
@@ -41,6 +41,12 @@ private:
 	Stack* stack2;
 	Piece* activePiece2;
 	Piece* waitingPiece2;
+
+	int fcheck;
+	int scheck;
+
+	int Speed;
+	int Speed2;
 
 	bool gameOver = false;
 	bool gameOver2 = false;

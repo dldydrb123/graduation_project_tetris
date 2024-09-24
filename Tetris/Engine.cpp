@@ -3,6 +3,7 @@
 #include "Stack.h"
 #include "Piece.h"
 #include "Engine.h"
+#include "Item.h"
 
 #pragma comment(lib, "d2d1")
 #pragma comment(lib, "dwrite")
@@ -32,11 +33,13 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     keyPressDelay = 0.07;
     keyPressAccumulated = 0;
 
-    autoFallDelay2 = 100;
+    autoFallDelay2 = 0.7;
     autoFallAccumulated2 = 0;
     keyPressDelay2 = 0.07;
     keyPressAccumulated2 = 0;
 
+    fcheck = 0;
+    scheck = 0;
 }
 
 Engine::~Engine()
@@ -164,6 +167,30 @@ void Engine::KeyDown(WPARAM wParam)
 
     if (wParam == VK_SPACE || wParam == 87)
         spacePressed = true;
+    
+    if (wParam == VK_HOME)
+        ItemGet = true;
+
+    if (wParam == VK_END)
+        ItemGet2 = true;
+
+    if (wParam == VK_INSERT)
+        SItemGet = true;
+
+    if (wParam == VK_DELETE)
+        SItemGet2 = true;
+
+    if (wParam == 49 && ItemGet)
+        ItemUse = 1;
+
+    if (wParam == 50 && SItemGet)
+        ItemUse = 2;
+
+    if (wParam == VK_NUMPAD1 && ItemGet2)
+        ItemUse2 = 1;
+
+    if (wParam == VK_NUMPAD2 && SItemGet2)
+        ItemUse2 = 2;
 }
 
 void Engine::MousePosition(int x, int y)
@@ -189,7 +216,7 @@ void Engine::Logic(double elapsedTime)
     // This is the logic part of the engine. It receives the elapsed time from the app class, in seconds.
     // It uses this value for a smooth and consistent movement, regardless of the CPU or graphics speed
 
-    if (gameOver || gameOver2) // Do nothing if game over
+    if (gameOver || gameOver2) // 게임오버 체크
     {
         over = true;
 
@@ -202,6 +229,8 @@ void Engine::Logic(double elapsedTime)
 
     // Due to a high FPS, we can't consider the keys at every frame because movement will be very fast
     // So we're using a delay, and if enough time has passed we take a key press into consideration
+
+    
     keyPressAccumulated += elapsedTime;
     if (keyPressAccumulated > keyPressDelay)
     {
@@ -245,7 +274,7 @@ void Engine::Logic(double elapsedTime)
         if (leftPressed2 || rightPressed2 || spacePressed2)
         {
             // Remove any full rows
-            int removed = stack->RemoveLines(stackCells2);
+            int removed = stack->RemoveLines2(stackCells2);
             if (removed > 0)
             {
                 score += pow(2, removed) * 100;
@@ -285,6 +314,30 @@ void Engine::Logic(double elapsedTime)
         {
             score += pow(2, removed) * 100;
             autoFallDelay = autoFallDelay * 0.98;
+
+            if ((score - scorecheck) >= 2000) {
+                scorecheck += 2000;
+                if (random == 0) {
+                    ItemGet = true;
+                }
+                else {
+                    SItemGet = true;
+                }
+            }
+        }
+
+        if (ItemUse2 == 2) {
+            SItemGet2 = false;
+            autoFallDelay = autoFallDelay - 0.6;
+
+            ItemUse2 = 3;
+        }
+
+        if (fcheck == 3 && ItemUse2 == 3) {
+            ItemUse2 = 0;
+            fcheck = 0;
+
+            autoFallDelay2 = autoFallDelay2 + 0.6;
         }
 
         // Move down the active piece
@@ -305,6 +358,7 @@ void Engine::Logic(double elapsedTime)
                     }
                 }
             }
+            fcheck++;
 
             // Delete active piece, activate the waiting piece and generate new waiting piece
             delete activePiece;
@@ -326,11 +380,37 @@ void Engine::Logic(double elapsedTime)
         autoFallAccumulated2 = 0;
 
         // Remove any full rows
-        int removed = stack->RemoveLines(stackCells2);
+        int removed = stack->RemoveLines2(stackCells2);
         if (removed > 0)
         {
             score += pow(2, removed) * 100;
             autoFallDelay2 = autoFallDelay2 * 0.98;
+
+            if ((score - scorecheck) >= 2000) {
+                scorecheck += 2000;
+                if (random == 0) {
+                    ItemGet2 = true;
+                }
+                else {
+                    SItemGet2 = true;
+                }
+            }
+        }
+
+
+        if (ItemUse == 2) {
+            SItemGet = false;
+
+            autoFallDelay2 = autoFallDelay2 - 0.6;
+            
+            ItemUse = 3;
+        }
+
+        if (scheck == 3 && ItemUse == 3) {
+            ItemUse = 0;
+            scheck = 0;
+
+            autoFallDelay2 = autoFallDelay2 + 0.6;
         }
 
         // Move down the active piece
@@ -351,6 +431,7 @@ void Engine::Logic(double elapsedTime)
                     }
                 }
             }
+            scheck++;
 
             // Delete active piece, activate the waiting piece and generate new waiting piece
             delete activePiece2;
@@ -406,44 +487,132 @@ void Engine::DrawTextAndScore()
     int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
 
 
-    D2D1_RECT_F rectangle1 = D2D1::RectF(centerRight - 200, padding, centerRight + 200, padding + 100);
+    D2D1_RECT_F Next = D2D1::RectF(centerRight - 200, padding, centerRight + 200, padding + 100);
     m_pRenderTarget->DrawText(
         L"Next Piece",
         15,
         m_pTextFormat,
-        rectangle1,
+        Next,
         m_pWhiteBrush
     );
 
 
-    D2D1_RECT_F rectangle2 = D2D1::RectF(centerRight - 200, padding + 200, centerRight + 200, padding + 300);
+    D2D1_RECT_F ScoreLoca = D2D1::RectF(centerRight - 200, padding + 200, centerRight + 200, padding + 300);
     m_pRenderTarget->DrawText(
         L"Score",
         5,
         m_pTextFormat,
-        rectangle2,
+        ScoreLoca,
         m_pWhiteBrush
     );
 
 
-    D2D1_RECT_F rectangle3 = D2D1::RectF(centerRight - 200, padding + 300, centerRight + 200, padding + 400);
+    D2D1_RECT_F PScore = D2D1::RectF(centerRight - 200, padding + 300, centerRight + 200, padding + 400);
     WCHAR scoreStr[64];
     swprintf_s(scoreStr, L"%d        ", score);
     m_pRenderTarget->DrawText(
         scoreStr,
         7,
         m_pTextFormat,
-        rectangle3,
+        PScore,
         m_pWhiteBrush
     );
 
+    D2D1_RECT_F TestView = D2D1::RectF(20, 20, 100, 100);
+    if (ItemGet == true) {
+        m_pRenderTarget->DrawText(
+            L"한줄삭제 소지중",
+            8,
+            m_pTextFormat,
+            TestView,
+            m_pWhiteBrush
+        );
+    }
+
+    D2D1_RECT_F TestView2 = D2D1::RectF(720, 20, 800, 100);
+    if (ItemGet2 == true) {
+        m_pRenderTarget->DrawText(
+            L"한줄삭제 소지중",
+            8,
+            m_pTextFormat,
+            TestView2,
+            m_pWhiteBrush
+        );
+    }
+
+    D2D1_RECT_F SpeView = D2D1::RectF(20, 120, 100, 150);
+    if (SItemGet == true) {
+        m_pRenderTarget->DrawText(
+            L"속도증가 소지중",
+            8,
+            m_pTextFormat,
+            SpeView,
+            m_pWhiteBrush
+        );
+    }
+
+    D2D1_RECT_F SpeView2 = D2D1::RectF(720, 120, 800, 150);
+    if (SItemGet2 == true) {
+        m_pRenderTarget->DrawText(
+            L"속도증가 소지중",
+            8,
+            m_pTextFormat,
+            SpeView2,
+            m_pWhiteBrush
+        );
+    }
+
+    D2D1_RECT_F UseView = D2D1::RectF(170, 550, 350, 650);
+    if (ItemUse == 1) {
+        m_pRenderTarget->DrawText(
+            L"아이템 사용됨",
+            7,
+            m_pTextFormat,
+            UseView,
+            m_pWhiteBrush
+        );
+    }
+
+    D2D1_RECT_F UseView2 = D2D1::RectF(570, 550, 750, 650);
+    if (ItemUse2 == 1) {
+        m_pRenderTarget->DrawText(
+            L"아이템 사용됨",
+            7,
+            m_pTextFormat,
+            UseView2,
+            m_pWhiteBrush
+        );
+    }
+
+    D2D1_RECT_F SpeedView = D2D1::RectF(130, 620, 350, 670);
+    if (ItemUse2 == 2 || ItemUse2 == 3) {
+        m_pRenderTarget->DrawText(
+            L"속도증가 사용됨",
+            8,
+            m_pTextFormat,
+            SpeedView,
+            m_pWhiteBrush
+        );
+    }
+
+    D2D1_RECT_F SpeedView2 = D2D1::RectF(550, 620, 750, 670);
+    if (ItemUse == 2 || ItemUse == 3) {
+        m_pRenderTarget->DrawText(
+            L"속도증가 사용됨",
+            8,
+            m_pTextFormat,
+            SpeedView2,
+            m_pWhiteBrush
+        );
+    }
+
     if (over == true) {
-        D2D1_RECT_F rectangle4 = D2D1::RectF(RESOLUTION_X / 2 - 200, RESOLUTION_Y / 2 + 200, RESOLUTION_X / 2 + 200, RESOLUTION_Y / 2 - 200);
+        D2D1_RECT_F Over = D2D1::RectF(RESOLUTION_X / 2 - 200, RESOLUTION_Y / 2 + 200, RESOLUTION_X / 2 + 200, RESOLUTION_Y / 2 - 200);
         m_pRenderTarget->DrawText(
             L"Game Over!!",
             15,
             m_pTextFormat,
-            rectangle4,
+            Over,
             m_pWhiteBrush
         );
     }
