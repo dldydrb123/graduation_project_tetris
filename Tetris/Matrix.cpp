@@ -2,7 +2,7 @@
 
 Matrix::Matrix(int sizeX, int sizeY)
 {
-    // Initializes the matrix
+    // 블럭이 담기는 매트릭스입니다.
     xSize = sizeX;
     ySize = sizeY;
 
@@ -17,7 +17,6 @@ Matrix::Matrix(int sizeX, int sizeY)
 
 Matrix::~Matrix()
 {
-    // Destroys the matrix
     for (int i = 0; i < ySize; ++i)
     {
         delete[] matrix[i];
@@ -27,13 +26,11 @@ Matrix::~Matrix()
 
 bool Matrix::Get(int x, int y)
 {
-    // Returns the value of an element
     return matrix[y][x];
 }
 
 void Matrix::Set(int x, int y, bool value)
 {
-    // Sets the value of an element
     matrix[y][x] = value;
 }
 

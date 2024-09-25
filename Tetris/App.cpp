@@ -6,6 +6,7 @@
 #include "App.h"
 #include <thread>
 #include <atomic>
+#include <socketapi.h>
 
 // 게임 루프 실행 상태를 관리할 변수
 std::atomic<bool> running(true);
@@ -95,7 +96,7 @@ HRESULT MainApp::Initialize()
 {
     HRESULT hr = S_OK;
 
-    // Register the window class.
+    // 윈도우 창 만드는 부분
     WNDCLASSEX wcex = { sizeof(WNDCLASSEX) };
     wcex.style = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc = MainApp::WndProc;

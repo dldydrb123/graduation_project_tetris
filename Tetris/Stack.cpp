@@ -36,12 +36,15 @@ void Stack::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 
 int Stack::RemoveLines(Matrix* stackCells)
 {
-	// 꽉찬 열 삭제
+	// 꽉찬 열을 삭제하는 부분입니다
 	int removed = 0;
 
+	// 스택을 아래서부터 위로 한줄씩 확인합니다.
 	for (int i = STACK_HEIGHT - 1; i >= 0 ; i--)
 	{
 		bool entireLine = true;
+
+		//모든 칸을 확인하면서 빈칸이 있다면 entrieLine을 false로 바꿔 줄을 넘어갑니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
 			if (stackCells->Get(j, i) == false)
@@ -50,6 +53,7 @@ int Stack::RemoveLines(Matrix* stackCells)
 			}
 		}
 
+		// 만약 아이템이 사용되었다면 entireLine을 true로 바꿔 줄을 지웁니다.
 		if (i == STACK_HEIGHT - 1 && ItemUse == true)
 		{
 			entireLine = true;
@@ -57,6 +61,8 @@ int Stack::RemoveLines(Matrix* stackCells)
 			ItemGet = false;
 		}
 
+		// 꽉찬 줄을 지우고 스택을 한칸씩 내립니다.
+		// 스택을 내렸으니 i 값을 하나 내려 내려온 스택에 맞게 검사합니다.
 		if (entireLine)
 		{
 			removed++;
@@ -73,14 +79,18 @@ int Stack::RemoveLines(Matrix* stackCells)
 	return removed;
 }
 
+// 아이템 사용 구분을 위해 2p용이 따로 나누어졌습니다.
 int Stack::RemoveLines2(Matrix* stackCells)
 {
-	// 꽉찬 열 삭제
+	// 꽉찬 열을 삭제하는 부분입니다
 	int removed = 0;
 
+	// 스택을 아래서부터 위로 한줄씩 확인합니다.
 	for (int i = STACK_HEIGHT - 1; i >= 0; i--)
 	{
 		bool entireLine = true;
+
+		//모든 칸을 확인하면서 빈칸이 있다면 entrieLine을 false로 바꿔 줄을 넘어갑니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
 			if (stackCells->Get(j, i) == false)
@@ -89,6 +99,7 @@ int Stack::RemoveLines2(Matrix* stackCells)
 			}
 		}
 
+		// 만약 아이템이 사용되었다면 entireLine을 true로 바꿔 줄을 지웁니다.
 		if (i == STACK_HEIGHT - 1 && ItemUse2 == true)
 		{
 			entireLine = true;
@@ -96,6 +107,8 @@ int Stack::RemoveLines2(Matrix* stackCells)
 			ItemGet2 = false;
 		}
 
+		// 꽉찬 줄을 지우고 스택을 한칸씩 내립니다.
+		// 스택을 내렸으니 i 값을 하나 내려 내려온 스택에 맞게 검사합니다.
 		if (entireLine)
 		{
 			removed++;
@@ -116,7 +129,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 
-	// 벽 그리기
+	// 벽을 그리는 부분입니다.
 
 	D2D1_RECT_F rectangle1 = D2D1::RectF(
 		padding, padding, 
@@ -136,29 +149,34 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	);
 	m_pRenderTarget->FillRectangle(&rectangle3, m_pBlueBrush);
 
-	// 셀 그리기
 
+	// 블럭을 그리는 부분입니다.
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
 		bool entireLine = true;
+
+		// 열이 채워져있는지 검사합니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
 			if (cells->Get(j, i) == false)
 			{
 				entireLine = false;
+				break; // 효율성을 위해 빈 셀이 발견되면 검사 중지
 			}
 		}
 
+		// 라인에 있는 모든 셀을 그리기
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
 			if (cells->Get(j, i) == true)
 			{
-				//한 픽셀 그리기
 				//테트리스 한칸 그려지는 부분
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
 					padding + (j + 1) * CELL_SIZE + 1, padding + i * CELL_SIZE + 1,
 					padding + (j + 2) * CELL_SIZE - 1, padding + (i + 1) * CELL_SIZE - 1
 				);
+
+				//열이 채워져있으면 없어질 스택을 노란색으로, 열이 비어있다면 초록색으로 칠합니다.
 				if (entireLine)
 				{
 					m_pRenderTarget->FillRectangle(&rectangle4, m_pYellowBrush);
@@ -172,12 +190,14 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	}
 }
 
+// 2p용 벽과 블럭을 그리는 부분입니다.
 void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 
 	int rightPadding = padding + (STACK_WIDTH + 3) * CELL_SIZE; // 새 벽의 시작점
 
+	// 벽을 그리는 부분입니다.
 	D2D1_RECT_F rightRectangle1 = D2D1::RectF(
 		rightPadding + CELL_SIZE, padding,
 		rightPadding + CELL_SIZE*2, padding + (STACK_HEIGHT + 1) * CELL_SIZE
@@ -196,12 +216,12 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	);
 	m_pRenderTarget->FillRectangle(&rightRectangle3, m_pBlueBrush);
 
-	//셀 그리는 부분
+	//블럭을 그리는 부분입니다.
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
 		bool entireLine = true;
 
-		// 라인 전체가 채워져 있는지 검사
+		// 열이 채워져있는지 검사합니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
 			if (!cells->Get(j, i))
@@ -216,11 +236,13 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 		{
 			if (cells->Get(j, i))
 			{
-				//한 픽셀 그리기
+				//테트리스 한칸 그려지는 부분
 				D2D1_RECT_F rightrectangle4 = D2D1::RectF(
 					padding + CELL_SIZE + (j + 1) * CELL_SIZE + 1 + (STACK_WIDTH + 3) * CELL_SIZE, padding + i * CELL_SIZE + 1,
 					padding + CELL_SIZE + (j + 2) * CELL_SIZE - 1 + (STACK_WIDTH + 3) * CELL_SIZE, padding + (i + 1) * CELL_SIZE - 1
 				);
+
+				//열이 채워져있으면 없어질 스택을 노란색으로, 열이 비어있다면 초록색으로 칠합니다.
 				if (entireLine)
 				{
 					m_pRenderTarget->FillRectangle(&rightrectangle4, m_pYellowBrush);

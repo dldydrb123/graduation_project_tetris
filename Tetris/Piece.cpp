@@ -15,7 +15,8 @@ Piece::Piece() : m_pRedBrush(NULL)
 	cells = new Matrix(4, 4);
 
 
-	// Randomly select the piece type
+	// 랜덤으로 블럭을 선택해서 불러옵니다.
+	// 블럭 목록은 Piece.h에 있습니다.
 	int pieceType = rand() % 7;
 	for (int i = 0; i < 4; i++)
 	{
@@ -34,13 +35,14 @@ Piece::~Piece()
 
 void Piece::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	// Creates a red brush for drawing
+	// 블럭을 그리는 브러쉬를 만듭니다.
 	m_pRenderTarget->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Red),
 		&m_pRedBrush
 	);
 }
 
+//블럭을 활성화 시키는 부분
 void Piece::Activate()
 {
 	waiting = false;
@@ -48,9 +50,11 @@ void Piece::Activate()
 
 bool Piece::Advance(Matrix* stackCells)
 {
-	// Advances the piece down. If there is a collision, returns true and reverts the movement
+	// 블럭이 떨어지는 부분입니다.
+	// 스택에서 y값을 하나 떨어트림으로 아래로 한칸씩 내립니다.
 	position.y += 1;
 
+	// 만약 스택과 충돌이 일어나면 쌓아야되기 때문에 다시 한칸 위로 올립니다.
 	if (StackCollision(stackCells))
 	{
 		position.y -= 1;
@@ -62,10 +66,11 @@ bool Piece::Advance(Matrix* stackCells)
 
 void Piece::GoLeft(Matrix* stackCells)
 {
-	// Tries to go left, and checks for collisions with the wall or current stack
+	// 왼쪽방향으로 움직이는 코드입니다.
 	int initialPosX = position.x;
 	position.x -= 1;
 
+	// 벽이나 스택과 부딪히는지 확인후 부딪히면 움직이지 않습니다.
 	if (LeftWallCollision())
 	{
 		position.x = initialPosX;
@@ -81,10 +86,11 @@ void Piece::GoLeft(Matrix* stackCells)
 
 void Piece::GoRight(Matrix* stackCells)
 {
-	// Tries to go right, and checks for collisions with the wall or current stack
+	// 오른쪽방향으로 움직이는 코드입니다.
 	int initialPosX = position.x;
 	position.x += 1;
 
+	// 벽이나 스택과 부딪히는지 확인후 부딪히면 움직이지 않습니다.
 	if (RightWallCollision())
 	{
 		position.x = initialPosX;
@@ -100,7 +106,7 @@ void Piece::GoRight(Matrix* stackCells)
 
 void Piece::Rotate(Matrix* stackCells)
 {
-	// Store initial values
+	// 돌릴 블럭의 모양을 가져옵니다.
 	Matrix* temp = new Matrix(4, 4);
 	for (int i = 0; i < 4; i++)
 	{
@@ -111,7 +117,7 @@ void Piece::Rotate(Matrix* stackCells)
 	}
 	int initialPosX = position.x;
 
-	// Rotate
+	// 미리 가져온 블럭으로 현재 블럭을 교체합니다.
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
@@ -120,6 +126,7 @@ void Piece::Rotate(Matrix* stackCells)
 		}
 	}
 
+	// 왼쪽, 오른쪽 벽과 충돌하는 확인하고 벽과 충돌하면 한칸씩 움직여 벽에 끼는 현상을 방지합니다.
 	while(LeftWallCollision())
 	{
 		position.x += 1;
@@ -129,8 +136,9 @@ void Piece::Rotate(Matrix* stackCells)
 		position.x -= 1;
 	};
 
+	// 스택과 충돌하는지 검사하고, 
 	if (StackCollision(stackCells)) {
-		// Revert
+		// 충돌이 일어나면 다시 원래의 블럭으로 돌립니다.
 		for (int i = 0; i < 4; i++)
 		{
 			for (int j = 0; j < 4; j++)
@@ -145,7 +153,7 @@ void Piece::Rotate(Matrix* stackCells)
 
 bool Piece::LeftWallCollision()
 {
-	// Returns true if we're in a collision with the left wall
+	// 왼쪽 벽과 충돌이 일어나는지 확인하고 충돌이 일어나면 이동을 막습니다.
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
@@ -166,7 +174,7 @@ bool Piece::LeftWallCollision()
 
 bool Piece::RightWallCollision()
 {
-	// Returns true if we're in a collision with the right wall
+	// 오른쪽 벽과 충돌이 일어나는지 확인하고 충돌이 일어나면 이동을 막습니다.
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
@@ -187,7 +195,7 @@ bool Piece::RightWallCollision()
 
 bool Piece::StackCollision(Matrix* stackCells)
 {
-	// Returns true if we're in a collision with the bottom wall or current stack
+	// 밑 바닥이나 스택과 충돌이 일어났는지 확인합니다.
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
@@ -196,12 +204,12 @@ bool Piece::StackCollision(Matrix* stackCells)
 			{
 				int realx = position.x + j;
 				int realy = position.y + i;
-				// Check if we are colliding with the bottom
+				// 밑바닥과 충돌이 일어났는지 확인합니다.
 				if (realy >= STACK_HEIGHT)
 				{
 					return true;
 				}
-				// Check if we are colliding with existing stack
+				// 다른 스택과 충돌이 일어났는지 확인합니다.
 				if (stackCells->Get(realx, realy))
 				{
 					return true;
@@ -212,6 +220,7 @@ bool Piece::StackCollision(Matrix* stackCells)
 	return false;
 }
 
+// 블럭을 그리는 부분입니다.
 void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
@@ -219,12 +228,13 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	int center_x = padding + (position.x + 1) * CELL_SIZE;
 	int center_y = padding + position.y * CELL_SIZE;
 
+	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
 		center_x = padding + ((position.x + STACK_WIDTH + 4)+ 1) * CELL_SIZE * 2;
 	}
-	// Drawing the cells
 	
+	// 활성 블럭을 그리는 부분입니다.
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
@@ -242,6 +252,7 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 
 }
 
+// 2p 블럭을 그리는 부분
 void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
@@ -249,11 +260,14 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	int center_x = padding + ((position.x + STACK_WIDTH + 4 )+ 1) * CELL_SIZE;
 	int center_y = padding + position.y * CELL_SIZE;
 
+	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
 		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2;
 		center_y = padding + position.y * CELL_SIZE + 100;
 	}
+
+	// 활성 블럭을 그리는 부분입니다.
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
