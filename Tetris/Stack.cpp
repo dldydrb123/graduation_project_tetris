@@ -128,27 +128,27 @@ int Stack::RemoveLines2(Matrix* stackCells)
 void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
+	int shiftX = 30; // x축 이동 값
+	int shiftY = 30; // y축 이동 값
 
 	// 벽을 그리는 부분입니다.
-
 	D2D1_RECT_F rectangle1 = D2D1::RectF(
-		padding, padding, 
-		padding + CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
+		padding + shiftX, padding + shiftY,
+		padding + CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
 	);
 	m_pRenderTarget->FillRectangle(&rectangle1, m_pBlueBrush);
 
 	D2D1_RECT_F rectangle2 = D2D1::RectF(
-		padding, padding + STACK_HEIGHT * CELL_SIZE,
-		padding + (STACK_WIDTH + 2) * CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
+		padding + shiftX, padding + STACK_HEIGHT * CELL_SIZE + shiftY,
+		padding + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
 	);
 	m_pRenderTarget->FillRectangle(&rectangle2, m_pBlueBrush);
 
 	D2D1_RECT_F rectangle3 = D2D1::RectF(
-		padding + (STACK_WIDTH + 1) * CELL_SIZE, padding,
-		padding + (STACK_WIDTH + 2) * CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
+		padding + (STACK_WIDTH + 1) * CELL_SIZE + shiftX, padding + shiftY,
+		padding + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
 	);
 	m_pRenderTarget->FillRectangle(&rectangle3, m_pBlueBrush);
-
 
 	// 블럭을 그리는 부분입니다.
 	for (int i = 0; i < STACK_HEIGHT; i++)
@@ -172,8 +172,8 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 			{
 				//테트리스 한칸 그려지는 부분
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					padding + (j + 1) * CELL_SIZE + 1, padding + i * CELL_SIZE + 1,
-					padding + (j + 2) * CELL_SIZE - 1, padding + (i + 1) * CELL_SIZE - 1
+					padding + (j + 1) * CELL_SIZE + 1 + shiftX, padding + i * CELL_SIZE + 1 + shiftY,
+					padding + (j + 2) * CELL_SIZE - 1 + shiftX, padding + (i + 1) * CELL_SIZE - 1 + shiftY
 				);
 
 				//열이 채워져있으면 없어질 스택을 노란색으로, 열이 비어있다면 초록색으로 칠합니다.
@@ -194,25 +194,26 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
-
+	int shiftX = 30; // x축 이동 값
+	int shiftY = 30; // y축 이동 값
 	int rightPadding = padding + (STACK_WIDTH + 3) * CELL_SIZE; // 새 벽의 시작점
 
 	// 벽을 그리는 부분입니다.
 	D2D1_RECT_F rightRectangle1 = D2D1::RectF(
-		rightPadding + CELL_SIZE, padding,
-		rightPadding + CELL_SIZE*2, padding + (STACK_HEIGHT + 1) * CELL_SIZE
+		rightPadding + CELL_SIZE + shiftX, padding + shiftY,
+		rightPadding + CELL_SIZE * 2 + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
 	);
 	m_pRenderTarget->FillRectangle(&rightRectangle1, m_pBlueBrush);
 
 	D2D1_RECT_F rightRectangle2 = D2D1::RectF(
-		rightPadding + CELL_SIZE, padding + STACK_HEIGHT * CELL_SIZE,
-		rightPadding + CELL_SIZE + (STACK_WIDTH + 2) * CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
+		rightPadding + CELL_SIZE + shiftX, padding + STACK_HEIGHT * CELL_SIZE + shiftY,
+		rightPadding + CELL_SIZE + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
 	);
 	m_pRenderTarget->FillRectangle(&rightRectangle2, m_pBlueBrush);
 
 	D2D1_RECT_F rightRectangle3 = D2D1::RectF(
-		rightPadding + CELL_SIZE + (STACK_WIDTH + 1) * CELL_SIZE, padding,
-		rightPadding + CELL_SIZE + (STACK_WIDTH + 2) * CELL_SIZE, padding + (STACK_HEIGHT + 1) * CELL_SIZE
+		rightPadding + CELL_SIZE + (STACK_WIDTH + 1) * CELL_SIZE + shiftX, padding + shiftY,
+		rightPadding + CELL_SIZE + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
 	);
 	m_pRenderTarget->FillRectangle(&rightRectangle3, m_pBlueBrush);
 
@@ -238,8 +239,8 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 			{
 				//테트리스 한칸 그려지는 부분
 				D2D1_RECT_F rightrectangle4 = D2D1::RectF(
-					padding + CELL_SIZE + (j + 1) * CELL_SIZE + 1 + (STACK_WIDTH + 3) * CELL_SIZE, padding + i * CELL_SIZE + 1,
-					padding + CELL_SIZE + (j + 2) * CELL_SIZE - 1 + (STACK_WIDTH + 3) * CELL_SIZE, padding + (i + 1) * CELL_SIZE - 1
+					padding + CELL_SIZE + (j + 1) * CELL_SIZE + 1 + (STACK_WIDTH + 3) * CELL_SIZE + shiftX, padding + i * CELL_SIZE + 1 + shiftY,
+					padding + CELL_SIZE + (j + 2) * CELL_SIZE - 1 + (STACK_WIDTH + 3) * CELL_SIZE + shiftX, padding + (i + 1) * CELL_SIZE - 1 + shiftY
 				);
 
 				//열이 채워져있으면 없어질 스택을 노란색으로, 열이 비어있다면 초록색으로 칠합니다.

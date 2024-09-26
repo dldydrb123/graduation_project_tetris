@@ -69,7 +69,7 @@ private:
 						  { false, false, false, false } }
 	};
 
-	ID2D1SolidColorBrush* m_pRedBrush;
-
+	ID2D1SolidColorBrush* m_pBrushes[7];
+	ID2D1SolidColorBrush* m_pSelectedBrush;
 };
 

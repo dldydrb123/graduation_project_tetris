@@ -4,7 +4,7 @@
 #include "Piece.h"
 #include "Engine.h"
 
-Piece::Piece() : m_pRedBrush(NULL)
+Piece::Piece() : m_pSelectedBrush(NULL)
 {
 
 	position.x = STACK_WIDTH / 2 - 2 ;
@@ -18,6 +18,7 @@ Piece::Piece() : m_pRedBrush(NULL)
 	// 랜덤으로 블럭을 선택해서 불러옵니다.
 	// 블럭 목록은 Piece.h에 있습니다.
 	int pieceType = rand() % 7;
+
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
@@ -30,16 +31,34 @@ Piece::Piece() : m_pRedBrush(NULL)
 Piece::~Piece()
 {
 	delete cells;
-	SafeRelease(&m_pRedBrush);
+	// 각 브러쉬 COM 객체 해제
+	for (int i = 0; i < 7; i++)
+	{
+		SafeRelease(&m_pBrushes[i]); // 배열의 각 브러쉬 해제
+	}
 }
 
 void Piece::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	// 블럭을 그리는 브러쉬를 만듭니다.
-	m_pRenderTarget->CreateSolidColorBrush(
-		D2D1::ColorF(D2D1::ColorF::Red),
-		&m_pRedBrush
-	);
+	// 블럭을 그리는 색깔 정의
+	D2D1_COLOR_F colors[7] = {
+		D2D1::ColorF(D2D1::ColorF::Red),        // 0
+		D2D1::ColorF(D2D1::ColorF::Blue),       // 1
+		D2D1::ColorF(D2D1::ColorF::Green),      // 2
+		D2D1::ColorF(D2D1::ColorF::Yellow),     // 3
+		D2D1::ColorF(D2D1::ColorF::Cyan),       // 4
+		D2D1::ColorF(D2D1::ColorF::Magenta),    // 5
+		D2D1::ColorF(D2D1::ColorF::Orange)      // 6
+	};
+
+	// 각 브러쉬 초기화
+	for (int i = 0; i < 7; i++)
+	{
+		m_pRenderTarget->CreateSolidColorBrush(colors[i], &m_pBrushes[i]);
+	}
+	// 무작위로 브러시 선택
+	int randomBrushIndex = rand() % 7;
+	m_pSelectedBrush = m_pBrushes[randomBrushIndex]; // 선택된 브러쉬를 저장
 }
 
 //블럭을 활성화 시키는 부분
@@ -224,16 +243,18 @@ bool Piece::StackCollision(Matrix* stackCells)
 void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
+	int shiftX = 30;  // x축 이동 값
+	int shiftY = 30;  // y축 이동 값
 
-	int center_x = padding + (position.x + 1) * CELL_SIZE;
-	int center_y = padding + position.y * CELL_SIZE;
+	int center_x = padding + (position.x + 1) * CELL_SIZE + shiftX;
+	int center_y = padding + position.y * CELL_SIZE + shiftY;
 
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
-		center_x = padding + ((position.x + STACK_WIDTH + 4)+ 1) * CELL_SIZE * 2;
+		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2 + shiftX;
 	}
-	
+
 	// 활성 블럭을 그리는 부분입니다.
 	for (int i = 0; i < 4; i++)
 	{
@@ -245,26 +266,27 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 					center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
 					center_x + (j + 1) * CELL_SIZE - 1, center_y + (i + 1) * CELL_SIZE - 1
 				);
-				m_pRenderTarget->FillRectangle(&rectangle4, m_pRedBrush);
+				m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
 			}
 		}
 	}
-
 }
 
 // 2p 블럭을 그리는 부분
 void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
+	int shiftX = 30;  // x축 이동 값
+	int shiftY = 30;  // y축 이동 값
 
-	int center_x = padding + ((position.x + STACK_WIDTH + 4 )+ 1) * CELL_SIZE;
-	int center_y = padding + position.y * CELL_SIZE;
+	int center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE + shiftX;
+	int center_y = padding + position.y * CELL_SIZE + shiftY;
 
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
-		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2;
-		center_y = padding + position.y * CELL_SIZE + 100;
+		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2 + shiftX;
+		center_y = padding + position.y * CELL_SIZE + 100 + shiftY;
 	}
 
 	// 활성 블럭을 그리는 부분입니다.
@@ -278,7 +300,7 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 					center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
 					center_x + (j + 1) * CELL_SIZE - 1, center_y + (i + 1) * CELL_SIZE - 1
 				);
-				m_pRenderTarget->FillRectangle(&rectangle4, m_pRedBrush);
+				m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
 			}
 		}
 	}
