@@ -6,7 +6,7 @@
 
 Piece::Piece() : m_pSelectedBrush(NULL)
 {
-
+	//블록의 시작위치
 	position.x = STACK_WIDTH / 2 - 2 ;
 	position.y = 0;
 
@@ -40,24 +40,13 @@ Piece::~Piece()
 
 void Piece::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	// 블럭을 그리는 색깔 정의
-	D2D1_COLOR_F colors[7] = {
-		D2D1::ColorF(D2D1::ColorF::Red),        // 0
-		D2D1::ColorF(D2D1::ColorF::Blue),       // 1
-		D2D1::ColorF(D2D1::ColorF::Green),      // 2
-		D2D1::ColorF(D2D1::ColorF::Yellow),     // 3
-		D2D1::ColorF(D2D1::ColorF::Cyan),       // 4
-		D2D1::ColorF(D2D1::ColorF::Magenta),    // 5
-		D2D1::ColorF(D2D1::ColorF::Orange)      // 6
-	};
-
 	// 각 브러쉬 초기화
 	for (int i = 0; i < 7; i++)
 	{
 		m_pRenderTarget->CreateSolidColorBrush(colors[i], &m_pBrushes[i]);
 	}
 	// 무작위로 브러시 선택
-	int randomBrushIndex = rand() % 7;
+	randomBrushIndex = rand() % 7;
 	m_pSelectedBrush = m_pBrushes[randomBrushIndex]; // 선택된 브러쉬를 저장
 }
 
@@ -252,7 +241,7 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
-		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2 + shiftX;
+		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2 + shiftX+20;
 	}
 
 	// 활성 블럭을 그리는 부분입니다.
@@ -285,7 +274,7 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
-		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2 + shiftX;
+		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2 + shiftX+20;
 		center_y = padding + position.y * CELL_SIZE + 100 + shiftY;
 	}
 
@@ -314,4 +303,9 @@ Point2D Piece::GetPosition()
 Matrix* Piece::GetCells()
 {
 	return cells;
+}
+
+// Getter 함수 추가
+int Piece :: GetRandomBrushIndex()  {
+	return randomBrushIndex;
 }

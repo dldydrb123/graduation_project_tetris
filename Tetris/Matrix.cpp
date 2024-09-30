@@ -6,10 +6,10 @@ Matrix::Matrix(int sizeX, int sizeY)
     xSize = sizeX;
     ySize = sizeY;
 
-    matrix = new bool* [ySize];
+    matrix = new int* [ySize];
     for (int i = 0; i < ySize; ++i)
     {
-        matrix[i] = new bool[xSize];
+        matrix[i] = new int[xSize];
         for (int j = 0; j < xSize; ++j)
             matrix[i][j] = false;
     }
@@ -29,7 +29,7 @@ bool Matrix::Get(int x, int y)
     return matrix[y][x];
 }
 
-void Matrix::Set(int x, int y, bool value)
+void Matrix::Set(int x, int y, int value)
 {
     matrix[y][x] = value;
 }

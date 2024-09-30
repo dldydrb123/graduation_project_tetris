@@ -23,8 +23,18 @@ private:
 	Matrix* cells;
 
 	ID2D1SolidColorBrush* m_pBlueBrush;
-	ID2D1SolidColorBrush* m_pGreenBrush;
+	ID2D1SolidColorBrush* m_pSelectedBrush;
+	ID2D1SolidColorBrush* m_pBrushes[7];
 	ID2D1SolidColorBrush* m_pYellowBrush;
-
+	// 블럭을 그리는 색깔 정의
+	D2D1_COLOR_F colors[7] = {
+		D2D1::ColorF(D2D1::ColorF::Red),        // 0
+		D2D1::ColorF(D2D1::ColorF::Blue),       // 1
+		D2D1::ColorF(D2D1::ColorF::Green),      // 2
+		D2D1::ColorF(D2D1::ColorF::Yellow),     // 3
+		D2D1::ColorF(D2D1::ColorF::Cyan),       // 4
+		D2D1::ColorF(D2D1::ColorF::Magenta),    // 5
+		D2D1::ColorF(D2D1::ColorF::Orange)      // 6
+	};
 };
 

@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "item.h"
 
-Stack::Stack() : m_pBlueBrush(NULL), m_pGreenBrush(NULL), m_pYellowBrush(NULL)
+Stack::Stack() : m_pBlueBrush(NULL), m_pSelectedBrush(NULL), m_pYellowBrush(NULL)
 {
 	cells = new Matrix(STACK_WIDTH, STACK_HEIGHT);
 }
@@ -13,7 +13,7 @@ Stack::~Stack()
 {
 	delete cells;
 	SafeRelease(&m_pBlueBrush);
-	SafeRelease(&m_pGreenBrush);
+	SafeRelease(&m_pSelectedBrush);
 	SafeRelease(&m_pYellowBrush);
 }
 
@@ -25,13 +25,15 @@ void Stack::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 		&m_pBlueBrush
 	);
 	m_pRenderTarget->CreateSolidColorBrush(
-		D2D1::ColorF(D2D1::ColorF::Green),
-		&m_pGreenBrush
-	);
-	m_pRenderTarget->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Yellow),
 		&m_pYellowBrush
 	);
+	// 각 브러쉬 초기화
+	for (int i = 0; i < 7; i++)
+	{
+		m_pRenderTarget->CreateSolidColorBrush(colors[i], &m_pBrushes[i]);
+	}
+
 }
 
 int Stack::RemoveLines(Matrix* stackCells)
@@ -170,6 +172,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 		{
 			if (cells->Get(j, i) == true)
 			{
+				m_pSelectedBrush = m_pBrushes[cells->Get(j, i)];
 				//테트리스 한칸 그려지는 부분
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
 					padding + (j + 1) * CELL_SIZE + 1 + shiftX, padding + i * CELL_SIZE + 1 + shiftY,
@@ -183,7 +186,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 				}
 				else
 				{
-					m_pRenderTarget->FillRectangle(&rectangle4, m_pGreenBrush);
+					m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
 				}
 			}
 		}
@@ -237,6 +240,7 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 		{
 			if (cells->Get(j, i))
 			{
+				
 				//테트리스 한칸 그려지는 부분
 				D2D1_RECT_F rightrectangle4 = D2D1::RectF(
 					padding + CELL_SIZE + (j + 1) * CELL_SIZE + 1 + (STACK_WIDTH + 3) * CELL_SIZE + shiftX, padding + i * CELL_SIZE + 1 + shiftY,
@@ -250,7 +254,7 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 				}
 				else
 				{
-					m_pRenderTarget->FillRectangle(&rightrectangle4, m_pGreenBrush);
+					m_pRenderTarget->FillRectangle(&rightrectangle4, m_pSelectedBrush);
 				}
 			}
 		}
