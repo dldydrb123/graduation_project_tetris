@@ -170,7 +170,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 		// 라인에 있는 모든 셀을 그리기
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (cells->Get(j, i) > 0)
 			{
 				m_pSelectedBrush = m_pBrushes[cells->Get(j, i)];
 				//테트리스 한칸 그려지는 부분

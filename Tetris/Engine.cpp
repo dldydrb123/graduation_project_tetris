@@ -578,23 +578,7 @@ void Engine::DrawTextAndScore()
         ScoreLoca,
         m_pWhiteBrush
     );
-    // brushIndex 값을 화면에 표시
-    int brushIndex = activePiece->GetRandomBrushIndex();  // 현재 선택된 brushIndex 가져오기
 
-    // brushIndex 값을 문자열로 변환
-    std::wstring brushIndexText = L"BrushIndex: " + std::to_wstring(brushIndex);
-
-    // 텍스트를 그릴 위치 설정 (임의로 설정한 위치를 사용)
-    D2D1_RECT_F brushIndexLoca = D2D1::RectF(centerRight - 400, padding + 200, centerRight + 200, padding + 300);
-
-    // brushIndex 텍스트를 화면에 출력
-    m_pRenderTarget->DrawText(
-        brushIndexText.c_str(),  // 변환된 텍스트
-        static_cast<UINT32>(brushIndexText.length()),  // 텍스트 길이
-        m_pTextFormat,  // 텍스트 포맷
-        brushIndexLoca,  // 텍스트 위치
-        m_pWhiteBrush  // 텍스트 색상 브러시
-    );
     //실 스코어가 표시되는 부분입니다.
     D2D1_RECT_F PScore = D2D1::RectF(centerRight - 200, padding + 300, centerRight + 200, padding + 400);
     WCHAR scoreStr[64];
