@@ -1,0 +1,29 @@
+﻿  Piece.cpp
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(78,18): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(98,18): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(126,18): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(169,28): warning C4805: '==': 연산에 'int' 형식과 'bool' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(171,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(190,28): warning C4805: '==': 연산에 'int' 형식과 'bool' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(192,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(211,28): warning C4805: '==': 연산에 'int' 형식과 'bool' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(213,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(214,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(238,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(239,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(244,85): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(252,28): warning C4805: '==': 연산에 'int' 형식과 'bool' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(256,73): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(256,37): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(255,61): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(255,31): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(271,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(272,15): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(277,85): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(278,53): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(286,28): warning C4805: '==': 연산에 'int' 형식과 'bool' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(290,73): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(290,37): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(289,61): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\Piece.cpp(289,31): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Tetris.vcxproj -> C:\Users\YUHAN\Desktop\graduation_project_tetris-main\Tetris\x64\Debug\Tetris.exe
