@@ -250,7 +250,7 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (cells->Get(j, i) >= 1)
 			{
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
 					center_x + j * CELL_SIZE + 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + i * CELL_SIZE + 1,
@@ -284,7 +284,7 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (cells->Get(j, i) >= 1)
 			{
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
 					center_x + j * CELL_SIZE + 1 + RESOLUTION_X / 5, center_y + i * CELL_SIZE + 1,

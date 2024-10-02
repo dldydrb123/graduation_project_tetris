@@ -424,7 +424,7 @@ void Engine::Logic(double elapsedTime)
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    if (activePiece->GetCells()->Get(j, i) == true)
+                    if (activePiece->GetCells()->Get(j, i) > 0)
                     {
                         int realx = activePiece->GetPosition().x + j;
                         int realy = activePiece->GetPosition().y + i;
@@ -524,7 +524,7 @@ void Engine::Logic(double elapsedTime)
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    if (activePiece2->GetCells()->Get(j, i) == true)
+                    if (activePiece2->GetCells()->Get(j, i) > 0)
                     {
                         int realx = activePiece2->GetPosition().x + j;
                         int realy = activePiece2->GetPosition().y + i;

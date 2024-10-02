@@ -11,7 +11,7 @@ Matrix::Matrix(int sizeX, int sizeY)
     {
         matrix[i] = new int[xSize];
         for (int j = 0; j < xSize; ++j)
-            matrix[i][j] = false;
+            matrix[i][j] = 0;
     }
 }
 

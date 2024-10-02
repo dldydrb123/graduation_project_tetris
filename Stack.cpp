@@ -49,7 +49,7 @@ int Stack::RemoveLines(Matrix* stackCells)
 		//모든 칸을 확인하면서 빈칸이 있다면 entrieLine을 false로 바꿔 줄을 넘어갑니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (stackCells->Get(j, i) == false)
+			if (stackCells->Get(j, i) == 0)
 			{
 				entireLine = false;
 			}
@@ -95,7 +95,7 @@ int Stack::RemoveLines2(Matrix* stackCells)
 		//모든 칸을 확인하면서 빈칸이 있다면 entrieLine을 false로 바꿔 줄을 넘어갑니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (stackCells->Get(j, i) == false)
+			if (stackCells->Get(j, i) == 0)
 			{
 				entireLine = false;
 			}
@@ -160,7 +160,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 		// 열이 채워져있는지 검사합니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (cells->Get(j, i) == false)
+			if (cells->Get(j, i) == 0)
 			{
 				entireLine = false;
 				break; // 효율성을 위해 빈 셀이 발견되면 검사 중지
@@ -229,7 +229,7 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 		// 열이 채워져있는지 검사합니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (cells->Get(j, i) == false)
+			if (cells->Get(j, i) == 0)
 			{
 				entireLine = false;
 				break; // 효율성을 위해 빈 셀이 발견되면 검사 중지
@@ -239,7 +239,7 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 		// 라인에 있는 모든 셀을 그리기
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (cells->Get(j, i))
+			if (cells->Get(j, i) > 0)
 			{
 				m_pSelectedBrush = m_pBrushes[cells->Get(j, i)];
 
