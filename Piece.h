@@ -45,41 +45,41 @@ private:
 
 	bool waiting;
 
-	bool cellsTemplates[7][4][4] = { // 블럭들이 저장되있습니다.
-						{ { false, false, false, false },
-						  { false, false, false, false },
-						  { true,  true,  true,  true  },
-						  { false, false, false, false } },
+	int cellsTemplates[7][4][4] = { // 블럭들이 저장되어있습니다.
+						{ { 0, 0, 0, 0 },
+						  { 0, 0, 0, 0 },
+						  { 1, 1, 1, 1 },
+						  { 0, 0, 0, 0 } },
 
-						{ { false, false, false, false },
-						  { false, true,  true,  true  },
-						  { false, true,  false, false },
-						  { false, false, false, false } },
+						{ { 0, 0, 0, 0 },
+						  { 0, 1, 1, 1 },
+						  { 0, 1, 0, 0 },
+						  { 0, 0, 0, 0 } },
 
-						{ { false, false, false, false },
-						  { false, true,  false, false },
-						  { false, true,  true,  true  },
-						  { false, false, false, false } },
+						{ { 0, 0, 0, 0 },
+						  { 0, 1, 0, 0 },
+						  { 0, 1, 1, 1 },
+						  { 0, 0, 0, 0 } },
 
-						{ { false, false, false, false },
-						  { false, true,  true,  true  },
-						  { false, false, true,  false },
-						  { false, false, false, false } },
+						{ { 0, 0, 0, 0 },
+						  { 0, 1, 1, 1 },
+						  { 0, 0, 1, 0 },
+						  { 0, 0, 0, 0 } },
 
-						{ { false, false, false, false },
-						  { false, true,  true,  false },
-						  { false, true,  true,  false },
-						  { false, false, false, false } },
+						{ { 0, 0, 0, 0 },
+						  { 0, 1, 1, 0 },
+						  { 0, 1, 1, 0 },
+						  { 0, 0, 0, 0 } },
 
-						{ { false, false, false, false },
-						  { false, true,  true,  false },
-						  { false, false, true,  true  },
-						  { false, false, false, false } },
+						{ { 0, 0, 0, 0 },
+						  { 0, 1, 1, 0 },
+						  { 0, 0, 1, 1 },
+						  { 0, 0, 0, 0 } },
 
-						{ { false, false, false, false },
-						  { false, false, true,  true  },
-						  { false, true,  true,  false },
-						  { false, false, false, false } }
+						{ { 0, 0, 0, 0 },
+						  { 0, 0, 1, 1 },
+						  { 0, 1, 1, 0 },
+						  { 0, 0, 0, 0 } }
 	};
 
 	ID2D1SolidColorBrush* m_pBrushes[8];
