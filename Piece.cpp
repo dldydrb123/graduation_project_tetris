@@ -241,7 +241,8 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
-		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2 + shiftX+20;
+		center_x = (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3 - 310;
+		center_y = center_y + 50;
 	}
 
 	// 활성 블럭을 그리는 부분입니다.
@@ -252,8 +253,8 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 			if (cells->Get(j, i) == true)
 			{
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
-					center_x + (j + 1) * CELL_SIZE - 1, center_y + (i + 1) * CELL_SIZE - 1
+					center_x + j * CELL_SIZE + 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + i * CELL_SIZE + 1,
+					center_x + (j + 1) * CELL_SIZE - 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + (i + 1) * CELL_SIZE - 1
 				);
 				m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
 			}
@@ -274,8 +275,8 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
-		center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE * 2 + shiftX+20;
-		center_y = padding + position.y * CELL_SIZE + 100 + shiftY;
+		center_x = center_x + 250;
+		center_y = center_y + 50;
 	}
 
 	// 활성 블럭을 그리는 부분입니다.
@@ -286,8 +287,8 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 			if (cells->Get(j, i) == true)
 			{
 				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					center_x + j * CELL_SIZE + 1, center_y + i * CELL_SIZE + 1,
-					center_x + (j + 1) * CELL_SIZE - 1, center_y + (i + 1) * CELL_SIZE - 1
+					center_x + j * CELL_SIZE + 1 + RESOLUTION_X / 5, center_y + i * CELL_SIZE + 1,
+					center_x + (j + 1) * CELL_SIZE - 1 + RESOLUTION_X / 5, center_y + (i + 1) * CELL_SIZE - 1
 				);
 				m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
 			}

@@ -4,7 +4,6 @@
 #include "Piece.h"
 #include "Engine.h"
 #include "Item.h"
-#include <random>
 
 #pragma comment(lib, "d2d1")
 #pragma comment(lib, "dwrite")
@@ -43,6 +42,9 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     // 아이템 사용을 확인하는 변수
     fcheck = 0;
     scheck = 0;
+    
+    Speed = 0;
+    Speed2 = 0;
 }
 
 Engine::~Engine()
@@ -130,7 +132,7 @@ void Engine::KeyUp(WPARAM wParam)
     if (wParam == VK_RIGHT)
         rightPressed2 = false;
 
-    if (wParam == VK_RETURN || wParam == VK_UP)
+    if (wParam == VK_UP)
         spacePressed2 = false;
 
     // 1p의 이동, 숫자들은 아스키코드로 W,A,S,D 입니다.
@@ -143,7 +145,7 @@ void Engine::KeyUp(WPARAM wParam)
     if (wParam == 68)
         rightPressed = false;
 
-    if (wParam == VK_SPACE || wParam == 87)
+    if (wParam == 87)
         spacePressed = false;
 }
 
@@ -162,8 +164,11 @@ void Engine::KeyDown(WPARAM wParam)
     if (wParam == VK_RIGHT)
         rightPressed2 = true;
 
-    if (wParam == VK_RETURN || wParam == VK_UP)
+    if (wParam == VK_UP)
         spacePressed2 = true;
+
+    if (wParam == VK_RETURN)
+        enteringPressed2 = true;
 
     // 1p
     if (wParam == 83)
@@ -175,9 +180,12 @@ void Engine::KeyDown(WPARAM wParam)
     if (wParam == 68)
         rightPressed = true;
 
-    if (wParam == VK_SPACE || wParam == 87)
+    if (wParam == 87)
         spacePressed = true;
-    
+
+    if (wParam == VK_SPACE)
+        enteringPressed = true;
+
     // 테스트용 아이템 획득
     // 각각 방향키 위의 Home, End, Insert, Delete
     if (wParam == VK_HOME)
@@ -258,7 +266,12 @@ void Engine::Logic(double elapsedTime)
                 //줄이 삭제되면 한 줄당 200점 씩 획득하고, 자동으로 블럭이 떨어지는 속도를 증가시킵니다.
                 //autoFallDelay가 낮아질수록 빨리 떨어짐
                 score += pow(2, removed) * 100;
-                autoFallDelay = autoFallDelay * 0.98;
+                if (autoFallDelay > 0.175) {
+                    autoFallDelay = autoFallDelay * 0.98;
+                }
+                else {
+                    autoFallDelay = 0.175;
+                }
             }
         }
 
@@ -273,6 +286,12 @@ void Engine::Logic(double elapsedTime)
         {
             activePiece->Rotate(stackCells);
             spacePressed = false;
+        }
+
+        // 블럭 즉시 하강을 위해 속도를 증가시킵니다.
+        if (enteringPressed) {
+            Speed = autoFallDelay;
+            autoFallDelay = 0.001;
         }
 
         // 하강
@@ -297,8 +316,13 @@ void Engine::Logic(double elapsedTime)
             {
                 //줄이 삭제되면 한 줄당 200점 씩 획득하고, 자동으로 블럭이 떨어지는 속도를 증가시킵니다.
                 //autoFallDelay가 낮아질수록 빨리 떨어짐
-                score += pow(2, removed) * 100;
-                autoFallDelay2 = autoFallDelay2 * 0.98;
+                score2 += pow(2, removed) * 100;
+                if (autoFallDelay2 > 0.175) {
+                    autoFallDelay2 = autoFallDelay2 * 0.98;
+                }
+                else {
+                    autoFallDelay2 = 0.175;
+                }
             }
         }
 
@@ -313,6 +337,12 @@ void Engine::Logic(double elapsedTime)
         {
             activePiece2->Rotate(stackCells2);
             spacePressed2 = false;
+        }
+
+        // 블럭 즉시 하강을 위해 속도를 증가시킵니다.
+        if (enteringPressed2) {
+            Speed2 = autoFallDelay2;
+            autoFallDelay2 = 0.001;
         }
 
         // 하강
@@ -335,19 +365,20 @@ void Engine::Logic(double elapsedTime)
         {
             //위와 마찬가지로 지워지면 점수를 증가시키고 속도를 증가시킵니다.
             score += pow(2, removed) * 100;
-            autoFallDelay = autoFallDelay * 0.98;
+            if (autoFallDelay > 0.175) {
+                autoFallDelay = autoFallDelay * 0.98;
+            }
+            else {
+                autoFallDelay = 0.175;
+            }
 
             //점수가 2000점에 도달할때마다 아이템을 획득합니다.
             if ((score - scorecheck) >= 2000) 
             {
                 scorecheck += 2000;
 
-                //랜덤한 값을 불러오기 위해 사용된 함수들입니다.
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_int_distribution<int> dis(1, 100);
-
-                int random = dis(gen) % 2;
+                //랜덤한 값을 불러오기 위해 사용된 함수입니다.
+                int random = rand() % 2;
 
                 //랜덤값을 2로 나눈 나머지로 속도증가를 먹거나 한줄삭제를 먹습니다.
                 if (random == 0) {
@@ -363,8 +394,11 @@ void Engine::Logic(double elapsedTime)
         if (ItemUse2 == 2) {
             SItemGet2 = false;
             
+            //바뀌기 전 속도를 저장하는 부분입니다.
+            Speed = autoFallDelay;
+
             // 속도를 증가시키는 부분입니다.
-            autoFallDelay = autoFallDelay - 0.6;
+            autoFallDelay = 0.175;
 
             // 아이템이 사용되었으니 사용중으로 변수를 바꿉니다.
             ItemUse2 = 3;
@@ -376,7 +410,7 @@ void Engine::Logic(double elapsedTime)
             ItemUse2 = 0;
             fcheck = 0;
 
-            autoFallDelay2 = autoFallDelay2 + 0.6;
+            autoFallDelay = Speed;
         }
 
         // Advance 함수를 호출해 자동으로 블럭을 떨어트리는 부분입니다.
@@ -400,8 +434,14 @@ void Engine::Logic(double elapsedTime)
             }
 
             // 아이템이 사용되면 블럭이 떨어지는 걸 확인해 아이템의 사용시간을 체크합니다.
-            if (ItemUse2 == 3)
+            if (ItemUse2 == 3 || enteringPressed == true)
                 fcheck++;
+
+            if (fcheck == 1) {
+                autoFallDelay = Speed;
+                fcheck = 0;
+                enteringPressed = false;
+            }
 
             // 블럭을 스택에 쌓았으니 사용한 블럭을 제거하고
             // 다음 블럭을 가져와 사용 블럭으로 변경,
@@ -430,19 +470,15 @@ void Engine::Logic(double elapsedTime)
         if (removed > 0)
         {
             //위와 마찬가지로 지워지면 점수를 증가시키고 속도를 증가시킵니다.
-            score += pow(2, removed) * 100;
+            score2 += pow(2, removed) * 100;
             autoFallDelay2 = autoFallDelay2 * 0.98;
 
             //점수가 2000점에 도달할때마다 아이템을 획득합니다.
-            if ((score - scorecheck) >= 2000) {
+            if ((score2 - scorecheck) >= 2000) {
                 scorecheck += 2000;
 
-                //랜덤한 값을 불러오기 위해 사용된 함수들입니다.
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_int_distribution<int> dis(1, 100);
-
-                int random = dis(gen) % 2;
+                //랜덤한 값을 불러오기 위해 사용된 함수입니다.
+                int random = rand() % 7;
 
                 //랜덤값을 2로 나눈 나머지로 속도증가를 먹거나 한줄삭제를 먹습니다.
                 if (random == 0) {
@@ -458,8 +494,11 @@ void Engine::Logic(double elapsedTime)
         if (ItemUse == 2) {
             SItemGet = false;
 
+            //바뀌기 전 속도를 저장하는 부분입니다.
+            Speed2 = autoFallDelay2;
+
             // 속도를 증가시키는 부분입니다.
-            autoFallDelay2 = autoFallDelay2 - 0.6;
+            autoFallDelay2 = 0.175;
 
             // 아이템이 사용되었으니 사용중으로 변수를 바꿉니다.
             ItemUse = 3;
@@ -471,7 +510,7 @@ void Engine::Logic(double elapsedTime)
             ItemUse = 0;
             scheck = 0;
 
-            autoFallDelay2 = autoFallDelay2 + 0.6;
+            autoFallDelay2 = Speed2;
         }
 
         // Advance 함수를 호출해 자동으로 블럭을 떨어트리는 부분입니다.
@@ -495,8 +534,14 @@ void Engine::Logic(double elapsedTime)
             }
 
             // 아이템이 사용되면 블럭이 떨어지는 걸 확인해 아이템의 사용시간을 체크합니다.
-            if (ItemUse == 3)
+            if (ItemUse == 3 || enteringPressed2 == true)
                 scheck++;
+
+            if (scheck == 1) {
+                autoFallDelay2 = Speed2;
+                scheck = 0;
+                enteringPressed2 = false;
+            }
 
             // 블럭을 스택에 쌓았으니 사용한 블럭을 제거하고
             // 다음 블럭을 가져와 사용 블럭으로 변경,
@@ -558,10 +603,12 @@ void Engine::DrawTextAndScore()
     // 위치 조정용 변수들
     int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
     int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
+    int centerLeft = (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
+
 
     // RECT_F를 이용해 글씨 상자를 만들고, 해당 크기만큼 생성된 글씨 상자안에 글씨가 적힙니다.
     // ""안의 내용(Next Piece)들을 그리는데 바로 아래있는 숫자(15)만큼 그립니다.
-    D2D1_RECT_F Next = D2D1::RectF(centerRight - 200, padding, centerRight + 200, padding + 100);
+    D2D1_RECT_F Next = D2D1::RectF(centerLeft - 200, padding, centerLeft, padding + 100);
     m_pRenderTarget->DrawText(
         L"Next Piece",
         15,
@@ -571,17 +618,17 @@ void Engine::DrawTextAndScore()
     );
 
 
-    D2D1_RECT_F ScoreLoca = D2D1::RectF(centerRight - 200, padding + 200, centerRight + 200, padding + 300);
+    D2D1_RECT_F ScoreLoca = D2D1::RectF(centerLeft - 200, padding + 200, centerLeft, padding + 300);
     m_pRenderTarget->DrawText(
-        L"Score",
-        5,
+        L"1P Score",
+        8,
         m_pTextFormat,
         ScoreLoca,
         m_pWhiteBrush
     );
 
     //실 스코어가 표시되는 부분입니다.
-    D2D1_RECT_F PScore = D2D1::RectF(centerRight - 200, padding + 300, centerRight + 200, padding + 400);
+    D2D1_RECT_F PScore = D2D1::RectF(centerLeft - 200, padding + 300, centerLeft, padding + 400);
     WCHAR scoreStr[64];
     swprintf_s(scoreStr, L"%d        ", score);
     m_pRenderTarget->DrawText(
@@ -589,6 +636,36 @@ void Engine::DrawTextAndScore()
         7,
         m_pTextFormat,
         PScore,
+        m_pWhiteBrush
+    );
+
+    D2D1_RECT_F Next2 = D2D1::RectF(centerRight, padding, centerRight + 200, padding + 100);
+    m_pRenderTarget->DrawText(
+        L"Next Piece",
+        15,
+        m_pTextFormat,
+        Next2,
+        m_pWhiteBrush
+    );
+
+    D2D1_RECT_F ScoreLoca2 = D2D1::RectF(centerRight, padding + 200, centerRight + 200, padding + 300);
+    m_pRenderTarget->DrawText(
+        L"2P Score",
+        8,
+        m_pTextFormat,
+        ScoreLoca2,
+        m_pWhiteBrush
+    );
+
+    //실 스코어가 표시되는 부분입니다.
+    D2D1_RECT_F PScore2 = D2D1::RectF(centerRight, padding + 300, centerRight + 200, padding + 400);
+    WCHAR scoreStr2[64];
+    swprintf_s(scoreStr2, L"%d        ", score2);
+    m_pRenderTarget->DrawText(
+        scoreStr2,
+        7,
+        m_pTextFormat,
+        PScore2,
         m_pWhiteBrush
     );
 

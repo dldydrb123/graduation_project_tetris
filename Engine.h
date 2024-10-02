@@ -45,8 +45,8 @@ private:
 	int fcheck;
 	int scheck;
 
-	int Speed;
-	int Speed2;
+	double Speed;
+	double Speed2;
 
 	bool gameOver = false;
 	bool gameOver2 = false;
@@ -59,9 +59,12 @@ private:
 	bool rightPressed2 = false;
 	bool spacePressed = false;
 	bool spacePressed2 = false;
+	bool enteringPressed = false;
+	bool enteringPressed2 = false;
 	bool over = false;
 
 	int score = 0;
+	int score2 = 0;
 
 	double autoFallDelay;
 	double autoFallAccumulated;
