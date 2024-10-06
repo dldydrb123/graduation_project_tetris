@@ -4,11 +4,84 @@
 #include "Piece.h"
 #include "Engine.h"
 #include "Item.h"
+#include <wincodec.h>
+#include <wrl.h> // For Microsoft::WRL::ComPtr
+
+using namespace Microsoft::WRL;
 
 #pragma comment(lib, "d2d1")
 #pragma comment(lib, "dwrite")
 #pragma comment(lib, "Windowscodecs.lib")
 
+// 전역 변수
+ComPtr<ID2D1Factory> d2dFactory;
+ComPtr<IWICImagingFactory> wicFactory;
+ComPtr<ID2D1RenderTarget> renderTarget;
+
+// DRAW 함수 내에서 실행될 코드
+HRESULT Engine::DrawJpgImage(ID2D1RenderTarget* pRenderTarget, IWICImagingFactory* pWICFactory, const wchar_t* filename, float x, float y, float width, float height)
+{
+    HRESULT hr = S_OK;
+    ComPtr<IWICBitmapDecoder> pDecoder;
+    ComPtr<IWICBitmapFrameDecode> pFrame;
+    ComPtr<IWICFormatConverter> pConverter;
+    ComPtr<ID2D1Bitmap> pBitmap;
+
+    // JPG 이미지를 디코딩
+    hr = pWICFactory->CreateDecoderFromFilename(
+        filename,                   // 이미지 파일 경로
+        nullptr,                    // GUID (자동 선택)
+        GENERIC_READ,               // 읽기 전용 모드
+        WICDecodeMetadataCacheOnLoad,   // 전체 메타데이터를 로드
+        &pDecoder                   // 출력 디코더
+    );
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    // 이미지의 첫 번째 프레임을 가져옵니다.
+    hr = pDecoder->GetFrame(0, &pFrame);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    // 포맷 변환기를 생성합니다.
+    hr = pWICFactory->CreateFormatConverter(&pConverter);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    // 비트맵 포맷을 32bppPBGRA로 변환합니다. (Direct2D와 호환)
+    hr = pConverter->Initialize(
+        pFrame.Get(),                   // 원본 비트맵 소스
+        GUID_WICPixelFormat32bppPBGRA,  // 변환할 포맷
+        WICBitmapDitherTypeNone,        // 디더링 없음
+        nullptr,                        // 팔레트 없음
+        0.f,                            // 알파 임계값 (투명도)
+        WICBitmapPaletteTypeCustom      // 사용자 정의 팔레트
+    );
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    // WIC 비트맵을 Direct2D 비트맵으로 변환
+    hr = pRenderTarget->CreateBitmapFromWicBitmap(
+        pConverter.Get(),
+        nullptr,
+        &pBitmap
+    );
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    // 비트맵을 렌더 타겟에 그립니다. 고정된 좌표 값을 사용해 그릴 위치를 조정합니다.
+    pRenderTarget->DrawBitmap(
+        pBitmap.Get(),
+        D2D1::RectF(x, y, x + width, y + height)  // 고정된 위치와 크기
+    );
+
+    return hr;
+}
 Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
 {
     // 생성자입니다.
@@ -83,6 +156,23 @@ HRESULT Engine::InitializeD2D(HWND m_hwnd)
     stack2->InitializeD2D(m_pRenderTarget);
     activePiece2->InitializeD2D(m_pRenderTarget);
     waitingPiece2->InitializeD2D(m_pRenderTarget);
+
+    // Direct2D 팩토리 생성
+    HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, d2dFactory.GetAddressOf());
+    if (FAILED(hr)) {
+        // 오류 처리
+    }
+
+    // WIC 팩토리 생성
+    hr = CoCreateInstance(
+        CLSID_WICImagingFactory,
+        nullptr,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(&wicFactory)
+    );
+    if (FAILED(hr)) {
+        // 오류 처리
+    }
 
     return S_OK;
 }
@@ -571,10 +661,21 @@ HRESULT Engine::Draw()
     m_pRenderTarget->BeginDraw();
     m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
     m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
-	
 
-	// 게임 내의 각 요소들(스택, 활성 블럭, 대기 블럭)을 실질적으로 그리는 부분입니다.
+
+    // 게임 내의 각 요소들(스택, 활성 블럭, 대기 블럭)을 실질적으로 그리는 부분입니다.
     // Engine 에서 바로 그리는게 아니라 각 Stack 과 Piece에서 선언된 Draw를 호출해 그립니다.
+        // JPG 이미지를 화면에 그리는 부분 - 고정된 좌표 값으로 전달
+    float x = 0.0f;
+    float y = 0.0f;
+    float width = 1200.0f;
+    float height = 800.0f;
+
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\tetris wall paper.png", x, y, width, height);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
     stack->Draw(m_pRenderTarget);
     if (gameOver != true) {
         activePiece->Draw(m_pRenderTarget);

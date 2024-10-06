@@ -7,6 +7,25 @@
 #include <thread>
 #include <atomic>
 #include <socketapi.h>
+#include <gdiplus.h>  // GDI+ 헤더 포함
+
+#pragma comment (lib,"Gdiplus.lib")  // GDI+ 라이브러리 링크
+
+// 전역 변수
+ULONG_PTR gdiplusToken;
+
+// GDI+ 초기화 함수
+void InitGDIPlus() {
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+}
+
+// GDI+ 종료 함수
+void ShutdownGDIPlus() {
+    Gdiplus::GdiplusShutdown(gdiplusToken);
+}
+
+
 
 // 게임 루프 실행 상태를 관리할 변수
 std::atomic<bool> running(true);
@@ -16,6 +35,9 @@ std::atomic<bool> running(true);
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
+
+    // GDI+ 초기화
+    InitGDIPlus();
 
     if (SUCCEEDED(CoInitialize(NULL)))
     {
@@ -28,6 +50,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
         CoUninitialize();
     }
+    // GDI+ 종료
+    ShutdownGDIPlus();
 
     return 0;
 }

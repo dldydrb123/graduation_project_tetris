@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "item.h"
 //TODO 일정 확률로 아이템 블록이 떨어져서 그 줄을 채우면 아이템을 가져가게 하기
-Stack::Stack() : m_pBlueBrush(NULL), m_pSelectedBrush(NULL), m_pYellowBrush(NULL)
+Stack::Stack() : m_pBlueBrush(NULL), m_pSelectedBrush(NULL), m_pYellowBrush(NULL), m_pBlackBrush(NULL)
 {
 	cells = new Matrix(STACK_WIDTH, STACK_HEIGHT);
 }
@@ -14,6 +14,7 @@ Stack::~Stack()
 	delete cells;
 	SafeRelease(&m_pBlueBrush);
 	SafeRelease(&m_pSelectedBrush);
+	SafeRelease(&m_pYellowBrush);
 	SafeRelease(&m_pYellowBrush);
 }
 
@@ -27,6 +28,10 @@ void Stack::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 	m_pRenderTarget->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Yellow),
 		&m_pYellowBrush
+	);
+	m_pRenderTarget->CreateSolidColorBrush(
+		D2D1::ColorF(D2D1::ColorF::Black),
+		&m_pBlackBrush
 	);
 	// 각 브러쉬 초기화
 	for (int i = 0; i < 8; i++)
@@ -152,6 +157,12 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	);
 	m_pRenderTarget->FillRectangle(&rectangle3, m_pBlueBrush);
 
+	D2D1_RECT_F rectangle5 = D2D1::RectF(
+		(padding + RESOLUTION_X / 8) + 2 * CELL_SIZE + shiftX, padding + shiftY,
+		(padding + RESOLUTION_X / 8) + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + STACK_HEIGHT * CELL_SIZE + shiftY
+	);
+	m_pRenderTarget->FillRectangle(&rectangle5, m_pBlackBrush);
+
 	// 블럭을 그리는 부분입니다.
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
@@ -170,15 +181,15 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 		// 라인에 있는 모든 셀을 그리기
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
+			//테트리스 한칸 그려지는 부분
+			D2D1_RECT_F rectangle4 = D2D1::RectF(
+				(padding + RESOLUTION_X / 8) + (j + 1) * CELL_SIZE + 1 + shiftX + CELL_SIZE, padding + i * CELL_SIZE + 1 + shiftY,
+				(padding + RESOLUTION_X / 8) + (j + 2) * CELL_SIZE - 1 + shiftX + CELL_SIZE, padding + (i + 1) * CELL_SIZE - 1 + shiftY
+			);
+			
 			if (cells->Get(j, i) > 0)
 			{
 				m_pSelectedBrush = m_pBrushes[cells->Get(j, i)];
-
-				//테트리스 한칸 그려지는 부분
-				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					(padding + RESOLUTION_X / 8) + (j + 1) * CELL_SIZE + 1 + shiftX + CELL_SIZE, padding + i * CELL_SIZE + 1 + shiftY,
-					(padding + RESOLUTION_X / 8) + (j + 2) * CELL_SIZE - 1 + shiftX + CELL_SIZE, padding + (i + 1) * CELL_SIZE - 1 + shiftY
-				);
 
 				//열이 채워져있으면 없어질 스택을 노란색으로, 열이 비어있다면 초록색으로 칠합니다.
 				if (entireLine)
@@ -221,6 +232,19 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	);
 	m_pRenderTarget->FillRectangle(&rightRectangle3, m_pBlueBrush);
 
+	D2D1_RECT_F rectangle5 = D2D1::RectF(
+		(rightPadding + RESOLUTION_X / 5) + 2 * CELL_SIZE + shiftX, padding + shiftY,
+		(rightPadding + RESOLUTION_X / 5) + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + STACK_HEIGHT * CELL_SIZE + shiftY
+	);
+	m_pRenderTarget->FillRectangle(&rectangle5, m_pBlackBrush);
+
+	for (int i = 0; i < STACK_HEIGHT; i++)
+	{
+		for (int j = 0; j < STACK_WIDTH; j++)
+		{
+
+		}
+	}
 	//블럭을 그리는 부분입니다.
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
