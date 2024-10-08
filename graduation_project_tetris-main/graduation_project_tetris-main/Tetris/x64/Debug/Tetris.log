@@ -1,0 +1,44 @@
+﻿  Stack.cpp
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(64,43): warning C4805: '==': 연산에 'int' 형식과 'bool' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(110,44): warning C4805: '==': 연산에 'int' 형식과 'bool' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(144,107): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(144,56): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(143,62): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(143,41): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(150,127): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(150,76): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(149,89): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(149,41): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(156,127): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(156,76): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(155,94): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(155,73): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(162,109): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(162,64): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(161,66): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(161,48): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(187,116): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(187,69): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(186,110): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(186,69): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(224,104): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(224,53): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(223,67): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(223,49): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(230,132): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(230,81): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(229,94): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(229,49): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(236,132): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(236,81): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(235,99): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(235,81): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(242,114): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(242,69): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(241,71): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(241,53): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(279,121): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(279,77): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(278,115): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\Stack.cpp(278,77): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Tetris.vcxproj -> C:\Users\YUHAN\Desktop\graduation_project_tetris-main\graduation_project_tetris-main\x64\Debug\Tetris.exe
