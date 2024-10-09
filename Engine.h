@@ -4,7 +4,7 @@
 #include "Piece.h"
 #include "Stack.h"
 
-#define RESOLUTION_X 1200
+#define RESOLUTION_X 1000
 #define RESOLUTION_Y 800
 
 #define CELL_SIZE 20
@@ -46,8 +46,8 @@ private:
 	int fcheck;
 	int scheck;
 
-	double Speed;
-	double Speed2;
+	double fall;
+	double fall2;
 
 	bool gameOver = false;
 	bool gameOver2 = false;

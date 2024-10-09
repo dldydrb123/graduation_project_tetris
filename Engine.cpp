@@ -115,9 +115,10 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     // 아이템 사용을 확인하는 변수
     fcheck = 0;
     scheck = 0;
-    
-    Speed = 0;
-    Speed2 = 0;
+
+    //즉시 하강용 변수
+    fall = 0;
+    fall2 = 0;
 }
 
 Engine::~Engine()
@@ -278,32 +279,24 @@ void Engine::KeyDown(WPARAM wParam)
 
     // 테스트용 아이템 획득
     // 각각 방향키 위의 Home, End, Insert, Delete
-    if (wParam == VK_HOME)
-        ItemGet = true;
+    if (wParam == VK_HOME);
 
-    if (wParam == VK_END)
-        ItemGet2 = true;
+    if (wParam == VK_END);
 
-    if (wParam == VK_INSERT)
-        SItemGet = true;
+    if (wParam == VK_INSERT);
 
-    if (wParam == VK_DELETE)
-        SItemGet2 = true;
+    if (wParam == VK_DELETE);
 
     // 아이템 사용 확인
     // 1p는 키보드 상단 1, 2
-    if (wParam == 49 && ItemGet)
-        ItemUse = 1;
+    if (wParam == 49);
 
-    if (wParam == 50 && SItemGet)
-        ItemUse = 2;
+    if (wParam == 50);
 
     //2p는 키보드 우측 1, 2
-    if (wParam == VK_NUMPAD1 && ItemGet2)
-        ItemUse2 = 1;
+    if (wParam == VK_NUMPAD1);
 
-    if (wParam == VK_NUMPAD2 && SItemGet2)
-        ItemUse2 = 2;
+    if (wParam == VK_NUMPAD2);
 }
 
 // 마우스 관련 함수들인데 사용할지 말지 고민중
@@ -380,7 +373,7 @@ void Engine::Logic(double elapsedTime)
 
         // 블럭 즉시 하강을 위해 속도를 증가시킵니다.
         if (enteringPressed) {
-            Speed = autoFallDelay;
+            fall = autoFallDelay;
             autoFallDelay = 0.001;
         }
 
@@ -431,7 +424,7 @@ void Engine::Logic(double elapsedTime)
 
         // 블럭 즉시 하강을 위해 속도를 증가시킵니다.
         if (enteringPressed2) {
-            Speed2 = autoFallDelay2;
+            fall2 = autoFallDelay2;
             autoFallDelay2 = 0.001;
         }
 
@@ -461,46 +454,6 @@ void Engine::Logic(double elapsedTime)
             else {
                 autoFallDelay = 0.175;
             }
-
-            //점수가 2000점에 도달할때마다 아이템을 획득합니다.
-            if ((score - scorecheck) >= 2000) 
-            {
-                scorecheck += 2000;
-
-                //랜덤한 값을 불러오기 위해 사용된 함수입니다.
-                int random = rand() % 2;
-
-                //랜덤값을 2로 나눈 나머지로 속도증가를 먹거나 한줄삭제를 먹습니다.
-                if (random == 0) {
-                    ItemGet = true;
-                }
-                else {
-                    SItemGet = true;
-                }
-            }
-        }
-
-        // 상대의 속도증가 아이템 사용을 확인합니다.
-        if (ItemUse2 == 2) {
-            SItemGet2 = false;
-            
-            //바뀌기 전 속도를 저장하는 부분입니다.
-            Speed = autoFallDelay;
-
-            // 속도를 증가시키는 부분입니다.
-            autoFallDelay = 0.175;
-
-            // 아이템이 사용되었으니 사용중으로 변수를 바꿉니다.
-            ItemUse2 = 3;
-        }
-
-        // 속도증가가 사용중인 부분입니다.
-        // 1p가 블럭 3개를 떨어트리면 멈춥니다.
-        if (fcheck == 3 && ItemUse2 == 3) {
-            ItemUse2 = 0;
-            fcheck = 0;
-
-            autoFallDelay = Speed;
         }
 
         // Advance 함수를 호출해 자동으로 블럭을 떨어트리는 부분입니다.
@@ -514,21 +467,27 @@ void Engine::Logic(double elapsedTime)
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    if (activePiece->GetCells()->Get(j, i) > 0)
+                    if (activePiece->GetCells()->Get(j, i) == 2)
                     {
                         int realx = activePiece->GetPosition().x + j;
                         int realy = activePiece->GetPosition().y + i;
-                        stackCells->Set(realx, realy, brushIndex);
+                        stackCells2->Set(realx, realy, 8);
+                    }
+                    else if (activePiece->GetCells()->Get(j, i) > 0)
+                    {
+                        int realx = activePiece->GetPosition().x + j;
+                        int realy = activePiece->GetPosition().y + i;
+                        stackCells2->Set(realx, realy, brushIndex);
                     }
                 }
             }
 
             // 아이템이 사용되면 블럭이 떨어지는 걸 확인해 아이템의 사용시간을 체크합니다.
-            if (ItemUse2 == 3 || enteringPressed == true)
+            if (enteringPressed == true)
                 fcheck++;
 
             if (fcheck == 1) {
-                autoFallDelay = Speed;
+                autoFallDelay = fall;
                 fcheck = 0;
                 enteringPressed = false;
             }
@@ -562,45 +521,16 @@ void Engine::Logic(double elapsedTime)
             //위와 마찬가지로 지워지면 점수를 증가시키고 속도를 증가시킵니다.
             score2 += pow(2, removed) * 100;
             autoFallDelay2 = autoFallDelay2 * 0.98;
-
-            //점수가 2000점에 도달할때마다 아이템을 획득합니다.
-            if ((score2 - scorecheck) >= 2000) {
-                scorecheck += 2000;
-
-                //랜덤한 값을 불러오기 위해 사용된 함수입니다.
-                int random = rand() % 7;
-
-                //랜덤값을 2로 나눈 나머지로 속도증가를 먹거나 한줄삭제를 먹습니다.
-                if (random == 0) {
-                    ItemGet2 = true;
-                }
-                else {
-                    SItemGet2 = true;
-                }
-            }
         }
 
-        // 상대의 속도증가 아이템 사용을 확인합니다.
-        if (ItemUse == 2) {
-            SItemGet = false;
+        // 아이템이 사용되면 블럭이 떨어지는 걸 확인해 아이템의 사용시간을 체크합니다.
+        if (enteringPressed2 == true)
+            scheck++;
 
-            //바뀌기 전 속도를 저장하는 부분입니다.
-            Speed2 = autoFallDelay2;
-
-            // 속도를 증가시키는 부분입니다.
-            autoFallDelay2 = 0.175;
-
-            // 아이템이 사용되었으니 사용중으로 변수를 바꿉니다.
-            ItemUse = 3;
-        }
-
-        // 속도증가가 사용중인 부분입니다.
-        // 1p가 블럭 3개를 떨어트리면 멈춥니다.
-        if (scheck == 3 && ItemUse == 3) {
-            ItemUse = 0;
+        if (scheck > 0) {
+            enteringPressed2 = false;
+            autoFallDelay2 = fall2;
             scheck = 0;
-
-            autoFallDelay2 = Speed2;
         }
 
         // Advance 함수를 호출해 자동으로 블럭을 떨어트리는 부분입니다.
@@ -614,23 +544,19 @@ void Engine::Logic(double elapsedTime)
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    if (activePiece2->GetCells()->Get(j, i) > 0)
+                    if (activePiece2->GetCells()->Get(j, i) == 2)
+                    {
+                        int realx = activePiece2->GetPosition().x + j;
+                        int realy = activePiece2->GetPosition().y + i;
+                        stackCells2->Set(realx, realy, 8);
+                    }
+                    else if (activePiece2->GetCells()->Get(j, i) > 0)
                     {
                         int realx = activePiece2->GetPosition().x + j;
                         int realy = activePiece2->GetPosition().y + i;
                         stackCells2->Set(realx, realy, brushIndex);
                     }
                 }
-            }
-
-            // 아이템이 사용되면 블럭이 떨어지는 걸 확인해 아이템의 사용시간을 체크합니다.
-            if (ItemUse == 3 || enteringPressed2 == true)
-                scheck++;
-
-            if (scheck == 1) {
-                autoFallDelay2 = Speed2;
-                scheck = 0;
-                enteringPressed2 = false;
             }
 
             // 블럭을 스택에 쌓았으니 사용한 블럭을 제거하고
@@ -772,92 +698,126 @@ void Engine::DrawTextAndScore()
 
     //각 아이템을 소지했는지, 사용했는지 표시하는 부분입니다.
     D2D1_RECT_F TestView = D2D1::RectF(20, 20, 100, 100);
-    if (ItemGet == true) {
+    switch(ItemGet)
+    {
+    case 1 : 
         m_pRenderTarget->DrawText(
-            L"한줄삭제 소지중",
-            8,
+            L"1",
+            1,
             m_pTextFormat,
             TestView,
             m_pWhiteBrush
         );
-    }
-
-    D2D1_RECT_F TestView2 = D2D1::RectF(720, 20, 800, 100);
-    if (ItemGet2 == true) {
+        break;
+    case 2:
         m_pRenderTarget->DrawText(
-            L"한줄삭제 소지중",
-            8,
+            L"2",
+            1,
             m_pTextFormat,
-            TestView2,
+            TestView,
             m_pWhiteBrush
         );
-    }
-
-    D2D1_RECT_F SpeView = D2D1::RectF(20, 120, 100, 150);
-    if (SItemGet == true) {
+        break;
+    case 3:
         m_pRenderTarget->DrawText(
-            L"속도증가 소지중",
-            8,
+            L"3",
+            1,
             m_pTextFormat,
-            SpeView,
+            TestView,
             m_pWhiteBrush
         );
-    }
-
-    D2D1_RECT_F SpeView2 = D2D1::RectF(720, 120, 800, 150);
-    if (SItemGet2 == true) {
+        break;
+    case 4:
         m_pRenderTarget->DrawText(
-            L"속도증가 소지중",
-            8,
+            L"4",
+            1,
             m_pTextFormat,
-            SpeView2,
+            TestView,
             m_pWhiteBrush
         );
-    }
-
-    D2D1_RECT_F UseView = D2D1::RectF(170, 550, 350, 650);
-    if (ItemUse == 1) {
+        break;
+    case 5:
         m_pRenderTarget->DrawText(
-            L"아이템 사용됨",
-            7,
+            L"5",
+            1,
             m_pTextFormat,
-            UseView,
+            TestView,
             m_pWhiteBrush
         );
-    }
-
-    D2D1_RECT_F UseView2 = D2D1::RectF(570, 550, 750, 650);
-    if (ItemUse2 == 1) {
+        break;
+    case 6:
         m_pRenderTarget->DrawText(
-            L"아이템 사용됨",
-            7,
+            L"6",
+            1,
             m_pTextFormat,
-            UseView2,
+            TestView,
             m_pWhiteBrush
         );
+        break;
     }
 
-    D2D1_RECT_F SpeedView = D2D1::RectF(130, 620, 350, 670);
-    if (ItemUse2 == 2 || ItemUse2 == 3) {
+    D2D1_RECT_F TestView2_1 = D2D1::RectF(550, 15, 560, 50);
+    D2D1_RECT_F TestView2_2 = D2D1::RectF(570, 15, 590, 50);
+    D2D1_RECT_F TestView2_3 = D2D1::RectF(590, 15, 610, 50);
+    D2D1_RECT_F TestView2_4 = D2D1::RectF(610, 15, 630, 50);
+    D2D1_RECT_F TestView2_5 = D2D1::RectF(630, 15, 650, 50);
+    D2D1_RECT_F TestView2_6 = D2D1::RectF(650, 15, 670, 50);
+    switch(ItemGet2) {
+    case 1:
         m_pRenderTarget->DrawText(
-            L"속도증가 사용됨",
-            8,
+            L"1",
+            1,
             m_pTextFormat,
-            SpeedView,
+            TestView2_1,
             m_pWhiteBrush
         );
-    }
-
-    D2D1_RECT_F SpeedView2 = D2D1::RectF(550, 620, 750, 670);
-    if (ItemUse == 2 || ItemUse == 3) {
+        break;
+    case 2:
         m_pRenderTarget->DrawText(
-            L"속도증가 사용됨",
-            8,
+            L"2",
+            1,
             m_pTextFormat,
-            SpeedView2,
+            TestView2_2,
             m_pWhiteBrush
         );
-    }
+        break;
+    case 3:
+        m_pRenderTarget->DrawText(
+            L"3",
+            1,
+            m_pTextFormat,
+            TestView2_3,
+            m_pWhiteBrush
+        );
+        break;
+    case 4:
+        m_pRenderTarget->DrawText(
+            L"4",
+            1,
+            m_pTextFormat,
+            TestView2_4,
+            m_pWhiteBrush
+        );
+        break;
+    case 5:
+        m_pRenderTarget->DrawText(
+            L"5",
+            1,
+            m_pTextFormat,
+            TestView2_5,
+            m_pWhiteBrush
+        );
+        break;
+    case 6:
+        m_pRenderTarget->DrawText(
+            L"6",
+            1,
+            m_pTextFormat,
+            TestView2_6,
+            m_pWhiteBrush
+        );
+        break;
+    };
 
     //게임 오버시 나타나는 부분입니다.
     if (over == true) {
