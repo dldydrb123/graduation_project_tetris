@@ -13,6 +13,8 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "dwrite")
 #pragma comment(lib, "Windowscodecs.lib")
 
+#define SOLO_PLAY 0
+
 // 전역 변수
 ComPtr<ID2D1Factory> d2dFactory;
 ComPtr<IWICImagingFactory> wicFactory;
@@ -102,7 +104,11 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
 
     // autoFall 자동으로 블럭이 떨어지는 속도.
     // 0.7 이 기본값입니다.
+#if (SOLO_PLAY!=1)
+    autoFallDelay = 0.7;
+#else
     autoFallDelay = 100;
+#endif
     autoFallAccumulated = 0;
     keyPressDelay = 0.07;
     keyPressAccumulated = 0;
@@ -666,16 +672,86 @@ HRESULT Engine::Draw()
     // 게임 내의 각 요소들(스택, 활성 블럭, 대기 블럭)을 실질적으로 그리는 부분입니다.
     // Engine 에서 바로 그리는게 아니라 각 Stack 과 Piece에서 선언된 Draw를 호출해 그립니다.
         // JPG 이미지를 화면에 그리는 부분 - 고정된 좌표 값으로 전달
+    
+    //배경화면
     float x = 0.0f;
     float y = 0.0f;
-    float width = 1200.0f;
+    float width = 900.0f;
     float height = 800.0f;
-
     hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\tetris wall paper.png", x, y, width, height);
     if (FAILED(hr)) {
         // JPG 이미지 로드 및 그리기 실패
         return hr;
     }
+
+    //1p next
+    float x2 = 70.0f; //1p next
+    float y2 = 140.0f;
+    float width2 = 150.0f;
+    float height2 = 120.0f;
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", x2, y2, width2, height2);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //1p score
+    float x3 = 70.0f;
+    float y3 = 380.0f;
+    float width3 = 145.0f;
+    float height3 = 120.0f;
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", x3, y3, width3, height3);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+
+    //2p score
+    float x4 = 720.0f;
+    float y4 = 380.0f;
+    float width4 = 145.0f;
+    float height4 = 120.0f;
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score2.png", x4, y4, width4, height4);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //2p next
+    float x5 = 720.0f;
+    float y5 = 140.0f;
+    float width5 = 150.0f;
+    float height5 = 120.0f;
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", x5, y5, width5, height5);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //2p black
+    float x6 = 538.0f;
+    float y6 = 138.0f;
+    float width6 = 210.0f;
+    float height6 = 491.0f;
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", x6, y6, width6, height6);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+    //1p black
+    float x7 = 194.0f;
+    float y7 = 138.0f;
+    float width7 = 210.0f;
+    float height7 = 491.0f;
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", x7, y7, width7, height7);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    
+
     stack->Draw(m_pRenderTarget);
     if (gameOver != true) {
         activePiece->Draw(m_pRenderTarget);
@@ -697,7 +773,7 @@ HRESULT Engine::Draw()
     return S_OK;
 }
 
-void Engine::DrawTextAndScore()
+HRESULT Engine::DrawTextAndScore()
 {
     // 글씨와 점수를 그리는 부분입니다.
 
@@ -709,27 +785,27 @@ void Engine::DrawTextAndScore()
 
     // RECT_F를 이용해 글씨 상자를 만들고, 해당 크기만큼 생성된 글씨 상자안에 글씨가 적힙니다.
     // ""안의 내용(Next Piece)들을 그리는데 바로 아래있는 숫자(15)만큼 그립니다.
-    D2D1_RECT_F Next = D2D1::RectF(centerLeft - 200, padding, centerLeft, padding + 100);
+   /* D2D1_RECT_F Next = D2D1::RectF(centerLeft - 200, padding, centerLeft, padding + 100);
     m_pRenderTarget->DrawText(
         L"Next Piece",
         15,
         m_pTextFormat,
         Next,
         m_pWhiteBrush
-    );
+    );*/
 
 
-    D2D1_RECT_F ScoreLoca = D2D1::RectF(centerLeft - 200, padding + 200, centerLeft, padding + 300);
+   /* D2D1_RECT_F ScoreLoca = D2D1::RectF(centerLeft - 200, padding + 200, centerLeft, padding + 300);
     m_pRenderTarget->DrawText(
         L"1P Score",
         8,
         m_pTextFormat,
         ScoreLoca,
         m_pWhiteBrush
-    );
+    );*/
 
     //실 스코어가 표시되는 부분입니다.
-    D2D1_RECT_F PScore = D2D1::RectF(centerLeft - 200, padding + 300, centerLeft, padding + 400);
+    D2D1_RECT_F PScore = D2D1::RectF(centerLeft -265, padding + 300, centerLeft+175, padding + 420);
     WCHAR scoreStr[64];
     swprintf_s(scoreStr, L"%d        ", score);
     m_pRenderTarget->DrawText(
@@ -740,6 +816,7 @@ void Engine::DrawTextAndScore()
         m_pWhiteBrush
     );
 
+    /*
     D2D1_RECT_F Next2 = D2D1::RectF(centerRight, padding, centerRight + 200, padding + 100);
     m_pRenderTarget->DrawText(
         L"Next Piece",
@@ -747,8 +824,9 @@ void Engine::DrawTextAndScore()
         m_pTextFormat,
         Next2,
         m_pWhiteBrush
-    );
+    );*/
 
+    /*
     D2D1_RECT_F ScoreLoca2 = D2D1::RectF(centerRight, padding + 200, centerRight + 200, padding + 300);
     m_pRenderTarget->DrawText(
         L"2P Score",
@@ -756,10 +834,10 @@ void Engine::DrawTextAndScore()
         m_pTextFormat,
         ScoreLoca2,
         m_pWhiteBrush
-    );
+    );*/
 
     //실 스코어가 표시되는 부분입니다.
-    D2D1_RECT_F PScore2 = D2D1::RectF(centerRight, padding + 300, centerRight + 200, padding + 400);
+    D2D1_RECT_F PScore2 = D2D1::RectF(centerRight, padding + 300, centerRight + 180, padding + 420);
     WCHAR scoreStr2[64];
     swprintf_s(scoreStr2, L"%d        ", score2);
     m_pRenderTarget->DrawText(
@@ -858,16 +936,28 @@ void Engine::DrawTextAndScore()
             m_pWhiteBrush
         );
     }
-
+    HRESULT hr;
     //게임 오버시 나타나는 부분입니다.
     if (over == true) {
-        D2D1_RECT_F Over = D2D1::RectF(RESOLUTION_X / 2 - 50, RESOLUTION_Y / 2 + 50, RESOLUTION_X / 2 + 50, RESOLUTION_Y / 2 - 50);
+       /* D2D1_RECT_F Over = D2D1::RectF(RESOLUTION_X / 2 - 50, RESOLUTION_Y / 2 + 50, RESOLUTION_X / 2 + 50, RESOLUTION_Y / 2 - 50);
         m_pRenderTarget->DrawText(
             L"Game Over!!",
             15,
             m_pTextFormat,
             Over,
             m_pWhiteBrush
-        );
+          
+        );*/
+
+        //gameover
+        float x7 = 325.0f;
+        float y7 = 230.0f;
+        float width7 = 300.0f;
+        float height7 = 300.0f;
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\gameover.png", x7, y7, width7, height7);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
     }
 }

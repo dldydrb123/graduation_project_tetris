@@ -135,9 +135,9 @@ int Stack::RemoveLines2(Matrix* stackCells)
 void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
-	int shiftX = 30; // x축 이동 값
+	int shiftX = -46; // x축 이동 값
 	int shiftY = 30; // y축 이동 값
-
+	/*
 	// 벽을 그리는 부분입니다.
 	D2D1_RECT_F rectangle1 = D2D1::RectF(
 		(padding + RESOLUTION_X / 8) + shiftX + CELL_SIZE, padding + shiftY,
@@ -162,7 +162,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 		(padding + RESOLUTION_X / 8) + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + STACK_HEIGHT * CELL_SIZE + shiftY
 	);
 	m_pRenderTarget->FillRectangle(&rectangle5, m_pBlackBrush);
-
+	*/
 	// 블럭을 그리는 부분입니다.
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
@@ -209,10 +209,10 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
-	int shiftX = 30; // x축 이동 값
+	int shiftX = -30; // x축 이동 값
 	int shiftY = 30; // y축 이동 값
 	int rightPadding = padding + (STACK_WIDTH + 3) * CELL_SIZE; // 새 벽의 시작점
-	
+	/*
 	// 벽을 그리는 부분입니다.
 	D2D1_RECT_F rightRectangle1 = D2D1::RectF(
 		(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + shiftX, padding + shiftY,
@@ -235,9 +235,9 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	D2D1_RECT_F rectangle5 = D2D1::RectF(
 		(rightPadding + RESOLUTION_X / 5) + 2 * CELL_SIZE + shiftX, padding + shiftY,
 		(rightPadding + RESOLUTION_X / 5) + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + STACK_HEIGHT * CELL_SIZE + shiftY
-	);
+	); 
 	m_pRenderTarget->FillRectangle(&rectangle5, m_pBlackBrush);
-
+	*/
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
 		for (int j = 0; j < STACK_WIDTH; j++)

@@ -235,13 +235,13 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	int shiftX = 30;  // x축 이동 값
 	int shiftY = 30;  // y축 이동 값
 
-	int center_x = padding + (position.x + 1) * CELL_SIZE + shiftX;
+	int center_x = padding + (position.x + 1) * CELL_SIZE + shiftX-76;
 	int center_y = padding + position.y * CELL_SIZE + shiftY;
 
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
-		center_x = (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3 - 310;
+		center_x = (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3-220 ;
 		center_y = center_y + 50;
 	}
 
@@ -269,13 +269,13 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	int shiftX = 30;  // x축 이동 값
 	int shiftY = 30;  // y축 이동 값
 
-	int center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE + shiftX;
+	int center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE + shiftX-60;
 	int center_y = padding + position.y * CELL_SIZE + shiftY;
 
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
 	{
-		center_x = center_x + 250;
+		center_x = center_x + 150;
 		center_y = center_y + 50;
 	}
 

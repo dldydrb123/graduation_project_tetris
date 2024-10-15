@@ -4,7 +4,7 @@
 #include "Piece.h"
 #include "Stack.h"
 
-#define RESOLUTION_X 1200
+#define RESOLUTION_X 900
 #define RESOLUTION_Y 800
 
 #define CELL_SIZE 20
@@ -33,7 +33,7 @@ private:
 	ID2D1SolidColorBrush* m_pWhiteBrush;
 
 	void InitializeTextAndScore();
-	void DrawTextAndScore();
+	HRESULT DrawTextAndScore();
 	HRESULT DrawJpgImage(ID2D1RenderTarget* pRenderTarget, IWICImagingFactory* pWICFactory, const wchar_t* filename, float x, float y, float width, float height);
 
 	Stack* stack;
