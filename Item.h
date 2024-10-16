@@ -1,11 +1,6 @@
 #pragma once
+extern int ItemGet;
+extern int ItemGet2;
 
-extern bool ItemGet;
-extern bool ItemGet2;
-extern bool SItemGet;
-extern bool SItemGet2;
-
-extern int scorecheck;
-
-extern int ItemUse;
-extern int ItemUse2;
+extern int Item[6];
+extern int Item2[6];

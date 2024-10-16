@@ -46,8 +46,8 @@ private:
 	int fcheck;
 	int scheck;
 
-	double Speed;
-	double Speed2;
+	double fall;
+	double fall2;
 
 	bool gameOver = false;
 	bool gameOver2 = false;

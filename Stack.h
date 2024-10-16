@@ -24,19 +24,20 @@ private:
 
 	ID2D1SolidColorBrush* m_pBlueBrush;
 	ID2D1SolidColorBrush* m_pSelectedBrush;
-	ID2D1SolidColorBrush* m_pBrushes[8];
+	ID2D1SolidColorBrush* m_pBrushes[9];
 	ID2D1SolidColorBrush* m_pYellowBrush;
 	ID2D1SolidColorBrush* m_pBlackBrush;
 	// 블럭을 그리는 색깔 정의
-	D2D1_COLOR_F colors[8] = {
-		D2D1::ColorF(D2D1::ColorF::Black),        // 0
+	D2D1_COLOR_F colors[9] = {
+		D2D1::ColorF(D2D1::ColorF::Black),      // 0
 		D2D1::ColorF(D2D1::ColorF::Blue),       // 1
 		D2D1::ColorF(D2D1::ColorF::Green),      // 2
 		D2D1::ColorF(D2D1::ColorF::Yellow),     // 3
 		D2D1::ColorF(D2D1::ColorF::Cyan),       // 4
 		D2D1::ColorF(D2D1::ColorF::Magenta),    // 5
 		D2D1::ColorF(D2D1::ColorF::Orange),     // 6
-		D2D1::ColorF(D2D1::ColorF::Red)        // 7
+		D2D1::ColorF(D2D1::ColorF::Red),        // 7
+		D2D1::ColorF(D2D1::ColorF::White)       // 8
 	};
 };
 

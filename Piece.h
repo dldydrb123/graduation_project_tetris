@@ -29,7 +29,7 @@ public:
 	Matrix* GetCells();
 
 	// 블럭을 그리는 색깔 정의
-	D2D1_COLOR_F colors[8] = {
+	D2D1_COLOR_F colors[9] = {
 		D2D1::ColorF(D2D1::ColorF::Black),      // 0
 		D2D1::ColorF(D2D1::ColorF::Blue),       // 1
 		D2D1::ColorF(D2D1::ColorF::Green),      // 2
@@ -37,7 +37,8 @@ public:
 		D2D1::ColorF(D2D1::ColorF::Cyan),       // 4
 		D2D1::ColorF(D2D1::ColorF::Magenta),    // 5
 		D2D1::ColorF(D2D1::ColorF::Orange),     // 6
-		D2D1::ColorF(D2D1::ColorF::Red)         // 7
+		D2D1::ColorF(D2D1::ColorF::Red),        // 7
+		D2D1::ColorF(D2D1::ColorF::White)       // 8
 	};
 private:
 	Point2D position;
@@ -82,7 +83,44 @@ private:
 						  { 0, 0, 0, 0 } }
 	};
 
-	ID2D1SolidColorBrush* m_pBrushes[8];
+	int Itemcells[7][4][4] = { // 아이템이 포함된 블럭
+						{ { 0, 0, 0, 0 },
+						  { 0, 0, 0, 0 },
+						  { 1, 2, 1, 1 },
+						  { 0, 0, 0, 0 } },
+
+						{ { 0, 0, 0, 0 },
+						  { 0, 1, 2, 1 },
+						  { 0, 1, 0, 0 },
+						  { 0, 0, 0, 0 } },
+
+						{ { 0, 0, 0, 0 },
+						  { 0, 2, 0, 0 },
+						  { 0, 1, 1, 1 },
+						  { 0, 0, 0, 0 } },
+
+						{ { 0, 0, 0, 0 },
+						  { 0, 1, 2, 1 },
+						  { 0, 0, 1, 0 },
+						  { 0, 0, 0, 0 } },
+
+						{ { 0, 0, 0, 0 },
+						  { 0, 1, 1, 0 },
+						  { 0, 2, 1, 0 },
+						  { 0, 0, 0, 0 } },
+
+						{ { 0, 0, 0, 0 },
+						  { 0, 1, 2, 0 },
+						  { 0, 0, 1, 1 },
+						  { 0, 0, 0, 0 } },
+
+						{ { 0, 0, 0, 0 },
+						  { 0, 0, 1, 1 },
+						  { 0, 2, 1, 0 },
+						  { 0, 0, 0, 0 } }
+	};
+
+	ID2D1SolidColorBrush* m_pBrushes[9];
 	ID2D1SolidColorBrush* m_pSelectedBrush;
 };
 

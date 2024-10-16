@@ -34,7 +34,7 @@ void Stack::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 		&m_pBlackBrush
 	);
 	// 각 브러쉬 초기화
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 9; i++)
 	{
 		m_pRenderTarget->CreateSolidColorBrush(colors[i], &m_pBrushes[i]);
 	}
@@ -60,13 +60,13 @@ int Stack::RemoveLines(Matrix* stackCells)
 			}
 		}
 
-		// 만약 아이템이 사용되었다면 entireLine을 true로 바꿔 줄을 지웁니다.
-		if (i == STACK_HEIGHT - 1 && ItemUse == true)
-		{
-			entireLine = true;
-			ItemUse = 0;
-			ItemGet = false;
-		}
+		//// 만약 아이템이 사용되었다면 entireLine을 true로 바꿔 줄을 지웁니다.
+		//if (i == STACK_HEIGHT - 1 && ItemUse == true)
+		//{
+		//	entireLine = true;
+		//	ItemUse = 0;
+		//	ItemGet = false;
+		//}
 
 		// 꽉찬 줄을 지우고 스택을 한칸씩 내립니다.
 		// 스택을 내렸으니 i 값을 하나 내려 내려온 스택에 맞게 검사합니다.
@@ -77,6 +77,10 @@ int Stack::RemoveLines(Matrix* stackCells)
 			{
 				for (int j = 0; j < STACK_WIDTH; j++)
 				{
+					if (stackCells->Get(j, k) == 8)
+					{
+						ItemGet = rand() % 7;
+					}
 					stackCells->Set(j, k, stackCells->Get(j, k - 1));
 				}
 			}
@@ -106,13 +110,13 @@ int Stack::RemoveLines2(Matrix* stackCells)
 			}
 		}
 
-		// 만약 아이템이 사용되었다면 entireLine을 true로 바꿔 줄을 지웁니다.
-		if (i == STACK_HEIGHT - 1 && ItemUse2 == true)
-		{
-			entireLine = true;
-			ItemUse2 = 0;
-			ItemGet2 = false;
-		}
+		//// 만약 아이템이 사용되었다면 entireLine을 true로 바꿔 줄을 지웁니다.
+		//if (i == STACK_HEIGHT - 1 && ItemUse2 == true)
+		//{
+		//	entireLine = true;
+		//	ItemUse2 = 0;
+		//	ItemGet2 = false;
+		//}
 
 		// 꽉찬 줄을 지우고 스택을 한칸씩 내립니다.
 		// 스택을 내렸으니 i 값을 하나 내려 내려온 스택에 맞게 검사합니다.
@@ -123,6 +127,10 @@ int Stack::RemoveLines2(Matrix* stackCells)
 			{
 				for (int j = 0; j < STACK_WIDTH; j++)
 				{
+					if (stackCells->Get(j, k) == 8)
+					{
+						ItemGet2 = rand() % 6;
+					}
 					stackCells->Set(j, k, stackCells->Get(j, k - 1));
 				}
 			}
@@ -238,13 +246,7 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	); 
 	m_pRenderTarget->FillRectangle(&rectangle5, m_pBlackBrush);
 	*/
-	for (int i = 0; i < STACK_HEIGHT; i++)
-	{
-		for (int j = 0; j < STACK_WIDTH; j++)
-		{
 
-		}
-	}
 	//블럭을 그리는 부분입니다.
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
@@ -263,17 +265,17 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 		// 라인에 있는 모든 셀을 그리기
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
+			//테트리스 한칸 그려지는 부분
+			D2D1_RECT_F rightrectangle4 = D2D1::RectF(
+				(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + (j + 1) * CELL_SIZE + 1 + shiftX, padding + i * CELL_SIZE + 1 + shiftY,
+				(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + (j + 2) * CELL_SIZE - 1 + shiftX, padding + (i + 1) * CELL_SIZE - 1 + shiftY
+			);
+
 			if (cells->Get(j, i) > 0)
 			{
 				m_pSelectedBrush = m_pBrushes[cells->Get(j, i)];
 
-				//테트리스 한칸 그려지는 부분
-				D2D1_RECT_F rightrectangle4 = D2D1::RectF(
-					(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + (j + 1) * CELL_SIZE + 1 + shiftX, padding + i * CELL_SIZE + 1 + shiftY,
-					(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + (j + 2) * CELL_SIZE - 1 + shiftX, padding + (i + 1) * CELL_SIZE - 1 + shiftY
-				);
-
-				//열이 채워져있으면 없어질 스택을 노란색으로, 열이 비어있다면 초록색으로 칠합니다.
+				//열이 채워져있으면 없어질 스택을 노란색으로 칠합니다.
 				if (entireLine)
 				{
 					m_pRenderTarget->FillRectangle(&rightrectangle4, m_pYellowBrush);

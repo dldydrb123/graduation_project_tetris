@@ -20,11 +20,20 @@ Piece::Piece() : m_pSelectedBrush(NULL)
 	int pieceType = rand() % 7;
 	BrushIndex = pieceType + 1;
 
+	//랜덤으로 아이템 블럭인지 정하는 함수, 0~19
+	int Item = rand() % 20;
+
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			cells->Set(j, i, cellsTemplates[pieceType][i][j]);
+			//1/20 의 확률로 아이템 블럭으로 결정됨
+			if (Item > 2) {
+				cells->Set(j, i, cellsTemplates[pieceType][i][j]);
+			}
+			else {
+				cells->Set(j, i, Itemcells[pieceType][i][j]);
+			}
 		}
 	}
 }
@@ -33,7 +42,7 @@ Piece::~Piece()
 {
 	delete cells;
 	// 각 브러쉬 COM 객체 해제
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 9; i++)
 	{
 		SafeRelease(&m_pBrushes[i]); // 배열의 각 브러쉬 해제
 	}
@@ -42,7 +51,7 @@ Piece::~Piece()
 void Piece::InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
 	// 각 브러쉬 초기화
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 9; i++)
 	{
 		m_pRenderTarget->CreateSolidColorBrush(colors[i], &m_pBrushes[i]);
 	}
@@ -208,7 +217,7 @@ bool Piece::StackCollision(Matrix* stackCells)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (cells->Get(j, i) > 0)
 			{
 				int realx = position.x + j;
 				int realy = position.y + i;
@@ -250,12 +259,16 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) >= 1)
+			D2D1_RECT_F rectangle4 = D2D1::RectF(
+				center_x + j * CELL_SIZE + 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + i * CELL_SIZE + 1,
+				center_x + (j + 1) * CELL_SIZE - 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + (i + 1) * CELL_SIZE - 1
+			);
+
+			if (cells->Get(j, i) == 2)
 			{
-				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					center_x + j * CELL_SIZE + 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + i * CELL_SIZE + 1,
-					center_x + (j + 1) * CELL_SIZE - 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + (i + 1) * CELL_SIZE - 1
-				);
+				m_pRenderTarget->FillRectangle(&rectangle4, m_pBrushes[8]);
+			}
+			else if (cells->Get(j, i) == 1) {
 				m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
 			}
 		}
@@ -284,12 +297,16 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) >= 1)
+			D2D1_RECT_F rectangle4 = D2D1::RectF(
+				center_x + j * CELL_SIZE + 1 + RESOLUTION_X / 5, center_y + i * CELL_SIZE + 1,
+				center_x + (j + 1) * CELL_SIZE - 1 + RESOLUTION_X / 5, center_y + (i + 1) * CELL_SIZE - 1
+			);
+			if (cells->Get(j, i) == 2)
 			{
-				D2D1_RECT_F rectangle4 = D2D1::RectF(
-					center_x + j * CELL_SIZE + 1 + RESOLUTION_X / 5, center_y + i * CELL_SIZE + 1,
-					center_x + (j + 1) * CELL_SIZE - 1 + RESOLUTION_X / 5, center_y + (i + 1) * CELL_SIZE - 1
-				);
+				m_pRenderTarget->FillRectangle(&rectangle4, m_pBrushes[8]);
+			}
+			else if (cells->Get(j, i) == 1)
+			{
 				m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
 			}
 		}
