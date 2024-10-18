@@ -130,6 +130,28 @@ int Stack::RemoveLines2(Matrix* stackCells)
 					if (stackCells->Get(j, k) == 8)
 					{
 						ItemGet2 = rand() % 6;
+
+						switch (ItemGet2)
+						{
+						case 1:
+							Item2[0] += 1;
+							break;
+						case 2:
+							Item2[1] += 1;
+							break;
+						case 3:
+							Item2[2] += 1;
+							break;
+						case 4:
+							Item2[3] += 1;
+							break;
+						case 5:
+							Item2[4] += 1;
+							break;
+						case 6:
+							Item2[5] += 1;
+							break;
+						}
 					}
 					stackCells->Set(j, k, stackCells->Get(j, k - 1));
 				}

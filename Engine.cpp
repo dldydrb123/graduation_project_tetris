@@ -379,7 +379,6 @@ void Engine::Logic(double elapsedTime)
 
         // 블럭 즉시 하강을 위해 속도를 증가시킵니다.
         if (enteringPressed) {
-            fall = autoFallDelay;
             autoFallDelay = 0.001;
         }
 
@@ -430,7 +429,6 @@ void Engine::Logic(double elapsedTime)
 
         // 블럭 즉시 하강을 위해 속도를 증가시킵니다.
         if (enteringPressed2) {
-            fall2 = autoFallDelay2;
             autoFallDelay2 = 0.001;
         }
 
@@ -515,7 +513,7 @@ void Engine::Logic(double elapsedTime)
                 fcheck++;
 
             if (fcheck == 1) {
-                autoFallDelay = fall;
+                autoFallDelay = 0.7;
                 fcheck = 0;
                 enteringPressed = false;
             }
@@ -549,28 +547,6 @@ void Engine::Logic(double elapsedTime)
             //위와 마찬가지로 지워지면 점수를 증가시키고 속도를 증가시킵니다.
             score2 += pow(2, removed) * 100;
             autoFallDelay2 = autoFallDelay2 * 0.98;
-
-            switch (ItemGet2)
-            {
-            case 1:
-                Item2[0] += 1;
-                break;
-            case 2:
-                Item2[1] += 1;
-                break;
-            case 3:
-                Item2[2] += 1;
-                break;
-            case 4:
-                Item2[3] += 1;
-                break;
-            case 5:
-                Item2[4] += 1;
-                break;
-            case 6:
-                Item2[5] += 1;
-                break;
-            }
         }
 
         // Advance 함수를 호출해 자동으로 블럭을 떨어트리는 부분입니다.
@@ -604,7 +580,7 @@ void Engine::Logic(double elapsedTime)
                 scheck++;
 
             if (scheck == 1) {
-                autoFallDelay2 = fall2;
+                autoFallDelay2 = 0.7;
                 scheck = 0;
                 enteringPressed2 = false;
             }
@@ -804,12 +780,82 @@ HRESULT Engine::DrawTextAndScore()
         m_pWhiteBrush
     );*/
 
-
-    //각 아이템을 소지했는지, 사용했는지 표시하는 부분입니다.
-    D2D1_RECT_F TestView = D2D1::RectF(20, 20, 100, 100);
+    D2D1_RECT_F TestView1_1 = D2D1::RectF(550, 15, 560, 50);
+    D2D1_RECT_F TestView1_2 = D2D1::RectF(570, 15, 590, 50);
+    D2D1_RECT_F TestView1_3 = D2D1::RectF(590, 15, 610, 50);
+    D2D1_RECT_F TestView1_4 = D2D1::RectF(610, 15, 630, 50);
+    D2D1_RECT_F TestView1_5 = D2D1::RectF(630, 15, 650, 50);
+    D2D1_RECT_F TestView1_6 = D2D1::RectF(650, 15, 670, 50);
     for (int i = 0; i < 6; i++) {
-        if (Item[i] > 0) {
-            TestView
+        switch (i) {
+        case 0:
+            if (Item[0] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"1",
+                    1,
+                    m_pTextFormat,
+                    TestView1_1,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 1:
+            if (Item[1] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"2",
+                    1,
+                    m_pTextFormat,
+                    TestView1_2,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 2:
+            if (Item[2] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"3",
+                    1,
+                    m_pTextFormat,
+                    TestView1_3,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 3:
+            if (Item[3] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"4",
+                    1,
+                    m_pTextFormat,
+                    TestView1_4,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 4:
+            if (Item[4] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"5",
+                    1,
+                    m_pTextFormat,
+                    TestView1_5,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 5:
+            if (Item[5] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"6",
+                    1,
+                    m_pTextFormat,
+                    TestView1_6,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        default:
+            break;
         }
     }
 
@@ -819,62 +865,78 @@ HRESULT Engine::DrawTextAndScore()
     D2D1_RECT_F TestView2_4 = D2D1::RectF(610, 15, 630, 50);
     D2D1_RECT_F TestView2_5 = D2D1::RectF(630, 15, 650, 50);
     D2D1_RECT_F TestView2_6 = D2D1::RectF(650, 15, 670, 50);
-    switch (ItemGet2) {
-    case 1:
-        m_pRenderTarget->DrawText(
-            L"1",
-            1,
-            m_pTextFormat,
-            TestView2_1,
-            m_pWhiteBrush
-        );
-        break;
-    case 2:
-        m_pRenderTarget->DrawText(
-            L"2",
-            1,
-            m_pTextFormat,
-            TestView2_2,
-            m_pWhiteBrush
-        );
-        break;
-    case 3:
-        m_pRenderTarget->DrawText(
-            L"3",
-            1,
-            m_pTextFormat,
-            TestView2_3,
-            m_pWhiteBrush
-        );
-        break;
-    case 4:
-        m_pRenderTarget->DrawText(
-            L"4",
-            1,
-            m_pTextFormat,
-            TestView2_4,
-            m_pWhiteBrush
-        );
-        break;
-    case 5:
-        m_pRenderTarget->DrawText(
-            L"5",
-            1,
-            m_pTextFormat,
-            TestView2_5,
-            m_pWhiteBrush
-        );
-        break;
-    case 6:
-        m_pRenderTarget->DrawText(
-            L"6",
-            1,
-            m_pTextFormat,
-            TestView2_6,
-            m_pWhiteBrush
-        );
-        break;
-    };
+    for (int i = 0; i < 6; i++) {
+        switch (i) {
+        case 0:
+            if (Item2[0] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"1",
+                    1,
+                    m_pTextFormat,
+                    TestView2_1,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 1:
+            if (Item2[1] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"2",
+                    1,
+                    m_pTextFormat,
+                    TestView2_2,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 2:
+            if (Item2[2] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"3",
+                    1,
+                    m_pTextFormat,
+                    TestView2_3,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 3:
+            if (Item2[3] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"4",
+                    1,
+                    m_pTextFormat,
+                    TestView2_4,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 4:
+            if (Item2[4] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"5",
+                    1,
+                    m_pTextFormat,
+                    TestView2_5,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        case 5:
+            if (Item2[5] > 0) {
+                m_pRenderTarget->DrawText(
+                    L"6",
+                    1,
+                    m_pTextFormat,
+                    TestView2_6,
+                    m_pWhiteBrush
+                );
+            }
+            break;
+        default:
+            break;
+        }
+    }
 
     HRESULT hr;
     //게임 오버시 나타나는 부분입니다.
