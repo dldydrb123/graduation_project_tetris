@@ -3,6 +3,7 @@
 #include "resource.h"
 #include "Piece.h"
 #include "Stack.h"
+#include "Item.h"
 
 #define RESOLUTION_X 900
 #define RESOLUTION_Y 800
@@ -42,6 +43,8 @@ private:
 	Stack* stack2;
 	Piece* activePiece2;
 	Piece* waitingPiece2;
+	Item* item;
+	Item* item2;
 
 	int fcheck;
 	int scheck;

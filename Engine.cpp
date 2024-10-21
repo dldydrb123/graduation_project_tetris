@@ -13,7 +13,7 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "dwrite")
 #pragma comment(lib, "Windowscodecs.lib")
 
-#define SOLO_PLAY 0
+#define SOLO_PLAY 1
 
 // 전역 변수
 ComPtr<ID2D1Factory> d2dFactory;
@@ -101,6 +101,9 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     activePiece2 = new Piece();
     activePiece2->Activate();
     waitingPiece2 = new Piece();
+
+    item = new Item();
+    item2 = new Item();
 
     // autoFall 자동으로 블럭이 떨어지는 속도.
     // 0.7 이 기본값입니다.
@@ -296,13 +299,22 @@ void Engine::KeyDown(WPARAM wParam)
     // 아이템 사용 확인
     // 1p는 키보드 상단 1, 2
     if (wParam == 49);
-
+    {
+        item1_1 = true;
+    }
     if (wParam == 50);
-
+    {
+        item1_2 = true;
+    }
     //2p는 키보드 우측 1, 2
-    if (wParam == VK_NUMPAD1);
-
-    if (wParam == VK_NUMPAD2);
+    if (wParam == VK_NUMPAD1 && Itemarr2[0] > 0)
+    {
+        item2_1 = true;
+    }
+    if (wParam == VK_NUMPAD2)
+    {
+        item2_2 = true;
+    }
 }
 
 // 마우스 관련 함수들인데 사용할지 말지 고민중
@@ -411,6 +423,8 @@ void Engine::Logic(double elapsedTime)
                 else {
                     autoFallDelay2 = 0.175;
                 }
+
+                
             }
         }
 
@@ -462,22 +476,22 @@ void Engine::Logic(double elapsedTime)
             switch (ItemGet)
             {
             case 1:
-                Item[0] += 1;
+                Itemarr[0] += 1;
                 break;
             case 2:
-                Item[1] += 1;
+                Itemarr[1] += 1;
                 break;
             case 3:
-                Item[2] += 1;
+                Itemarr[2] += 1;
                 break;
             case 4:
-                Item[3] += 1;
+                Itemarr[3] += 1;
                 break;
             case 5:
-                Item[4] += 1;
+                Itemarr[4] += 1;
                 break;
             case 6:
-                Item[5] += 1;
+                Itemarr[5] += 1;
                 break;
             }
         }
@@ -786,10 +800,16 @@ HRESULT Engine::DrawTextAndScore()
     D2D1_RECT_F TestView1_4 = D2D1::RectF(610, 15, 630, 50);
     D2D1_RECT_F TestView1_5 = D2D1::RectF(630, 15, 650, 50);
     D2D1_RECT_F TestView1_6 = D2D1::RectF(650, 15, 670, 50);
+    D2D1_RECT_F TestView1_01 = D2D1::RectF(550, 40, 560, 50);
+    D2D1_RECT_F TestView1_02 = D2D1::RectF(570, 40, 590, 50);
+    D2D1_RECT_F TestView1_03 = D2D1::RectF(590, 40, 610, 50);
+    D2D1_RECT_F TestView1_04 = D2D1::RectF(610, 40, 630, 50);
+    D2D1_RECT_F TestView1_05 = D2D1::RectF(630, 40, 650, 50);
+    D2D1_RECT_F TestView1_06 = D2D1::RectF(650, 40, 670, 50);
     for (int i = 0; i < 6; i++) {
         switch (i) {
         case 0:
-            if (Item[0] > 0) {
+            if (Itemarr[0] > 0) {
                 m_pRenderTarget->DrawText(
                     L"1",
                     1,
@@ -800,7 +820,7 @@ HRESULT Engine::DrawTextAndScore()
             }
             break;
         case 1:
-            if (Item[1] > 0) {
+            if (Itemarr[1] > 0) {
                 m_pRenderTarget->DrawText(
                     L"2",
                     1,
@@ -811,7 +831,7 @@ HRESULT Engine::DrawTextAndScore()
             }
             break;
         case 2:
-            if (Item[2] > 0) {
+            if (Itemarr[2] > 0) {
                 m_pRenderTarget->DrawText(
                     L"3",
                     1,
@@ -822,7 +842,7 @@ HRESULT Engine::DrawTextAndScore()
             }
             break;
         case 3:
-            if (Item[3] > 0) {
+            if (Itemarr[3] > 0) {
                 m_pRenderTarget->DrawText(
                     L"4",
                     1,
@@ -833,7 +853,7 @@ HRESULT Engine::DrawTextAndScore()
             }
             break;
         case 4:
-            if (Item[4] > 0) {
+            if (Itemarr[4] > 0) {
                 m_pRenderTarget->DrawText(
                     L"5",
                     1,
@@ -844,7 +864,7 @@ HRESULT Engine::DrawTextAndScore()
             }
             break;
         case 5:
-            if (Item[5] > 0) {
+            if (Itemarr[5] > 0) {
                 m_pRenderTarget->DrawText(
                     L"6",
                     1,
@@ -865,10 +885,16 @@ HRESULT Engine::DrawTextAndScore()
     D2D1_RECT_F TestView2_4 = D2D1::RectF(610, 15, 630, 50);
     D2D1_RECT_F TestView2_5 = D2D1::RectF(630, 15, 650, 50);
     D2D1_RECT_F TestView2_6 = D2D1::RectF(650, 15, 670, 50);
+    D2D1_RECT_F TestView2_01 = D2D1::RectF(550, 40, 560, 50);
+    D2D1_RECT_F TestView2_02 = D2D1::RectF(570, 40, 590, 50);
+    D2D1_RECT_F TestView2_03 = D2D1::RectF(590, 40, 610, 50);
+    D2D1_RECT_F TestView2_04 = D2D1::RectF(610, 40, 630, 50);
+    D2D1_RECT_F TestView2_05 = D2D1::RectF(630, 40, 650, 50);
+    D2D1_RECT_F TestView2_06 = D2D1::RectF(650, 40, 670, 50);
     for (int i = 0; i < 6; i++) {
         switch (i) {
         case 0:
-            if (Item2[0] > 0) {
+            if (Itemarr2[0] > 0) {
                 m_pRenderTarget->DrawText(
                     L"1",
                     1,
@@ -876,10 +902,22 @@ HRESULT Engine::DrawTextAndScore()
                     TestView2_1,
                     m_pWhiteBrush
                 );
+                if (Itemarr2[0] > 1) {
+                    WCHAR scoreStr[64];
+                    swprintf_s(scoreStr, L"%d", Itemarr2[0]);
+                    m_pRenderTarget->DrawText(
+                        scoreStr,
+                        2,
+                        m_pTextFormat,
+                        TestView2_01,
+                        m_pWhiteBrush
+                    );
+                }
+
             }
             break;
         case 1:
-            if (Item2[1] > 0) {
+            if (Itemarr2[1] > 0) {
                 m_pRenderTarget->DrawText(
                     L"2",
                     1,
@@ -887,10 +925,21 @@ HRESULT Engine::DrawTextAndScore()
                     TestView2_2,
                     m_pWhiteBrush
                 );
+                if (Itemarr2[1] > 1) {
+                    WCHAR scoreStr[64];
+                    swprintf_s(scoreStr, L"%d", Itemarr2[0]);
+                    m_pRenderTarget->DrawText(
+                        scoreStr,
+                        2,
+                        m_pTextFormat,
+                        TestView2_02,
+                        m_pWhiteBrush
+                    );
+                }
             }
             break;
         case 2:
-            if (Item2[2] > 0) {
+            if (Itemarr2[2] > 0) {
                 m_pRenderTarget->DrawText(
                     L"3",
                     1,
@@ -898,10 +947,21 @@ HRESULT Engine::DrawTextAndScore()
                     TestView2_3,
                     m_pWhiteBrush
                 );
+                if (Itemarr2[2] > 1) {
+                    WCHAR scoreStr[64];
+                    swprintf_s(scoreStr, L"%d", Itemarr2[0]);
+                    m_pRenderTarget->DrawText(
+                        scoreStr,
+                        2,
+                        m_pTextFormat,
+                        TestView2_03,
+                        m_pWhiteBrush
+                    );
+                }
             }
             break;
         case 3:
-            if (Item2[3] > 0) {
+            if (Itemarr2[3] > 0) {
                 m_pRenderTarget->DrawText(
                     L"4",
                     1,
@@ -909,10 +969,21 @@ HRESULT Engine::DrawTextAndScore()
                     TestView2_4,
                     m_pWhiteBrush
                 );
+                if (Itemarr2[3] > 1) {
+                    WCHAR scoreStr[64];
+                    swprintf_s(scoreStr, L"%d", Itemarr2[0]);
+                    m_pRenderTarget->DrawText(
+                        scoreStr,
+                        2,
+                        m_pTextFormat,
+                        TestView2_04,
+                        m_pWhiteBrush
+                    );
+                }
             }
             break;
         case 4:
-            if (Item2[4] > 0) {
+            if (Itemarr2[4] > 0) {
                 m_pRenderTarget->DrawText(
                     L"5",
                     1,
@@ -920,10 +991,21 @@ HRESULT Engine::DrawTextAndScore()
                     TestView2_5,
                     m_pWhiteBrush
                 );
+                if (Itemarr2[5] > 1) {
+                    WCHAR scoreStr[64];
+                    swprintf_s(scoreStr, L"%d", Itemarr2[0]);
+                    m_pRenderTarget->DrawText(
+                        scoreStr,
+                        2,
+                        m_pTextFormat,
+                        TestView2_05,
+                        m_pWhiteBrush
+                    );
+                }
             }
             break;
         case 5:
-            if (Item2[5] > 0) {
+            if (Itemarr2[5] > 0) {
                 m_pRenderTarget->DrawText(
                     L"6",
                     1,
@@ -931,6 +1013,17 @@ HRESULT Engine::DrawTextAndScore()
                     TestView2_6,
                     m_pWhiteBrush
                 );
+                if (Itemarr2[5] > 1) {
+                    WCHAR scoreStr[64];
+                    swprintf_s(scoreStr, L"%d", Itemarr2[0]);
+                    m_pRenderTarget->DrawText(
+                        scoreStr,
+                        2,
+                        m_pTextFormat,
+                        TestView2_06,
+                        m_pWhiteBrush
+                    );
+                }
             }
             break;
         default:

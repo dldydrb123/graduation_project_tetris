@@ -58,6 +58,33 @@ int Stack::RemoveLines(Matrix* stackCells)
 			{
 				entireLine = false;
 			}
+
+			if (stackCells->Get(j, i) == 8 && entireLine == true)
+			{
+				ItemGet = rand() % 6;
+
+				switch (ItemGet)
+				{
+				case 1:
+					Itemarr[0] += 1;
+					break;
+				case 2:
+					Itemarr[1] += 1;
+					break;
+				case 3:
+					Itemarr[2] += 1;
+					break;
+				case 4:
+					Itemarr[3] += 1;
+					break;
+				case 5:
+					Itemarr[4] += 1;
+					break;
+				case 6:
+					Itemarr[5] += 1;
+					break;
+				}
+			}
 		}
 
 		//// 만약 아이템이 사용되었다면 entireLine을 true로 바꿔 줄을 지웁니다.
@@ -77,10 +104,6 @@ int Stack::RemoveLines(Matrix* stackCells)
 			{
 				for (int j = 0; j < STACK_WIDTH; j++)
 				{
-					if (stackCells->Get(j, k) == 8)
-					{
-						ItemGet = rand() % 7;
-					}
 					stackCells->Set(j, k, stackCells->Get(j, k - 1));
 				}
 			}
@@ -100,23 +123,56 @@ int Stack::RemoveLines2(Matrix* stackCells)
 	for (int i = STACK_HEIGHT - 1; i >= 0; i--)
 	{
 		bool entireLine = true;
+		bool check = false;
 
 		//모든 칸을 확인하면서 빈칸이 있다면 entrieLine을 false로 바꿔 줄을 넘어갑니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
-			if (stackCells->Get(j, i) == 0)
+			if (stackCells->Get(j, i) == 0 && check == false)
 			{
 				entireLine = false;
 			}
+
+			if (j == 9 && check == false) {
+				check = true;
+				j = 0;
+			}
+
+			if (stackCells->Get(j, i) == 8 && check == true && entireLine == true)
+			{
+				ItemGet2 = rand() % 6;
+
+				switch (ItemGet2)
+				{
+				case 1:
+					Itemarr2[0] += 1;
+					break;
+				case 2:
+					Itemarr2[1] += 1;
+					break;
+				case 3:
+					Itemarr2[2] += 1;
+					break;
+				case 4:
+					Itemarr2[3] += 1;
+					break;
+				case 5:
+					Itemarr2[4] += 1;
+					break;
+				case 6:
+					Itemarr2[5] += 1;
+					break;
+				}
+			}
 		}
 
-		//// 만약 아이템이 사용되었다면 entireLine을 true로 바꿔 줄을 지웁니다.
-		//if (i == STACK_HEIGHT - 1 && ItemUse2 == true)
-		//{
-		//	entireLine = true;
-		//	ItemUse2 = 0;
-		//	ItemGet2 = false;
-		//}
+		// 만약 아이템이 사용되었다면 entireLine을 true로 바꿔 줄을 지웁니다.
+		if (i == STACK_HEIGHT - 1 && item2_1 == true)
+		{
+			entireLine = true;
+			item2_1 = false;
+			Itemarr2[0] -= 1;
+		}
 
 		// 꽉찬 줄을 지우고 스택을 한칸씩 내립니다.
 		// 스택을 내렸으니 i 값을 하나 내려 내려온 스택에 맞게 검사합니다.
@@ -127,32 +183,6 @@ int Stack::RemoveLines2(Matrix* stackCells)
 			{
 				for (int j = 0; j < STACK_WIDTH; j++)
 				{
-					if (stackCells->Get(j, k) == 8)
-					{
-						ItemGet2 = rand() % 6;
-
-						switch (ItemGet2)
-						{
-						case 1:
-							Item2[0] += 1;
-							break;
-						case 2:
-							Item2[1] += 1;
-							break;
-						case 3:
-							Item2[2] += 1;
-							break;
-						case 4:
-							Item2[3] += 1;
-							break;
-						case 5:
-							Item2[4] += 1;
-							break;
-						case 6:
-							Item2[5] += 1;
-							break;
-						}
-					}
 					stackCells->Set(j, k, stackCells->Get(j, k - 1));
 				}
 			}
