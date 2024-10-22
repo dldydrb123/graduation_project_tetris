@@ -40,14 +40,17 @@ private:
 	Stack* stack;
 	Piece* activePiece;
 	Piece* waitingPiece;
+	Piece* changePiece;
 	Stack* stack2;
 	Piece* activePiece2;
 	Piece* waitingPiece2;
-	Item* item;
-	Item* item2;
+	Piece* changePiece2;
 
 	int fcheck;
 	int scheck;
+
+	int blindcheck;
+	int blindcheck2;
 
 	double fall;
 	double fall2;

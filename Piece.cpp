@@ -3,6 +3,7 @@
 #include "Matrix.h"
 #include "Piece.h"
 #include "Engine.h"
+#include "Item.h"
 
 Piece::Piece() : m_pSelectedBrush(NULL)
 {
@@ -18,7 +19,18 @@ Piece::Piece() : m_pSelectedBrush(NULL)
 	// 랜덤으로 블럭을 선택해서 불러옵니다.
 	// 블럭 목록은 Piece.h에 있습니다.
 	int pieceType = rand() % 7;
+	
+	// 블럭 체인지 아이템 사용시 블럭을 I자 블럭으로 변경시킵니다.
+	if (item1_4 || item2_4) {
+		pieceType = 0;
+	}
 	BrushIndex = pieceType + 1;
+
+	// 폭탄 블럭 아이템 사용시 블럭을 폭탄 블럭으로 변경시킵니다.
+	if (item1_5 || item2_5) {
+		pieceType = 7;
+		BrushIndex = 8;
+	}
 
 	//랜덤으로 아이템 블럭인지 정하는 함수, 0~19
 	int Item = rand() % 20;
@@ -27,13 +39,14 @@ Piece::Piece() : m_pSelectedBrush(NULL)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			//1/20 의 확률로 아이템 블럭으로 결정됨
-			if (Item > 2) {
-				cells->Set(j, i, cellsTemplates[pieceType][i][j]);
-			}
-			else {
+			//1/10 의 확률로 아이템 블럭으로 결정됨
+			if (Item < 2 && pieceType != 7) {
 				cells->Set(j, i, Itemcells[pieceType][i][j]);
 			}
+			else {
+				cells->Set(j, i, cellsTemplates[pieceType][i][j]);
+			}
+			
 		}
 	}
 }
@@ -264,7 +277,7 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 				center_x + (j + 1) * CELL_SIZE - 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + (i + 1) * CELL_SIZE - 1
 			);
 
-			if (cells->Get(j, i) == 2)
+			if (cells->Get(j, i) == 2 || cells->Get(j, i) == 3)
 			{
 				m_pRenderTarget->FillRectangle(&rectangle4, m_pBrushes[8]);
 			}
@@ -301,7 +314,7 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 				center_x + j * CELL_SIZE + 1 + RESOLUTION_X / 5, center_y + i * CELL_SIZE + 1,
 				center_x + (j + 1) * CELL_SIZE - 1 + RESOLUTION_X / 5, center_y + (i + 1) * CELL_SIZE - 1
 			);
-			if (cells->Get(j, i) == 2)
+			if (cells->Get(j, i) == 2 || cells->Get(j, i) == 3)
 			{
 				m_pRenderTarget->FillRectangle(&rectangle4, m_pBrushes[8]);
 			}
