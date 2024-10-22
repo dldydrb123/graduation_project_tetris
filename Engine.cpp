@@ -839,6 +839,8 @@ HRESULT Engine::Draw()
         return hr;
     }
 
+
+
     stack->Draw(m_pRenderTarget);
     if (gameOver != true) {
         activePiece->Draw(m_pRenderTarget);
@@ -954,7 +956,7 @@ HRESULT Engine::DrawTextAndScore()
     //실 스코어가 표시되는 부분입니다.
     D2D1_RECT_F PScore2 = D2D1::RectF(centerRight, padding + 300, centerRight + 170, padding + 420);
     WCHAR scoreStr2[64];
-    swprintf_s(scoreStr2, L"%d        ", score);
+    swprintf_s(scoreStr2, L"%d        ", score2);
     m_pRenderTarget->DrawText(
         scoreStr2,
         7,
