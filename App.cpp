@@ -149,31 +149,40 @@ HRESULT MainApp::Initialize()
         this
     );
     hr = m_hwnd ? S_OK : E_FAIL;
-
-    RECT rect1;
-    GetWindowRect(m_hwnd, &rect1);
-    RECT rect2;
-    GetClientRect(m_hwnd, &rect2);
-
-    SetWindowPos(
-        m_hwnd,
-        NULL,
-        rect1.left,
-        rect1.top,
-        RESOLUTION_X + ((rect1.right - rect1.left) - (rect2.right - rect2.left)),
-        RESOLUTION_Y + ((rect1.bottom - rect1.top) - (rect2.bottom - rect2.top)),
-        NULL
-    );
-
-    if (SUCCEEDED(hr))
+    // m_hwnd가 유효한지 확인
+    if (m_hwnd)
     {
+        // GetWindowRect와 GetClientRect 호출
+        RECT rect1;
+        GetWindowRect(m_hwnd, &rect1);
+        RECT rect2;
+        GetClientRect(m_hwnd, &rect2);
+
+        // 창 크기 조정
+        SetWindowPos(
+            m_hwnd,
+            NULL,
+            rect1.left,
+            rect1.top,
+            RESOLUTION_X + ((rect1.right - rect1.left) - (rect2.right - rect2.left)),
+            RESOLUTION_Y + ((rect1.bottom - rect1.top) - (rect2.bottom - rect2.top)),
+            NULL
+        );
+
+        // Direct2D 초기화
         engine->InitializeD2D(m_hwnd);
 
+        // 윈도우 표시
         ShowWindow(m_hwnd, SW_SHOWNORMAL);
         UpdateWindow(m_hwnd);
 
-        std::thread gameThread(&MainApp::GameLoop, this); // 멤버 함수 호출
+        // 게임 루프 실행
+        std::thread gameThread(&MainApp::GameLoop, this);
         gameThread.detach(); // 메인 스레드와 분리
+    }
+    else
+    {
+        hr = E_FAIL; // 윈도우 생성 실패 시 E_FAIL 반환
     }
 
     return hr;

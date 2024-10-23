@@ -86,10 +86,13 @@ HRESULT Engine::DrawJpgImage(ID2D1RenderTarget* pRenderTarget, IWICImagingFactor
 }
 Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
 {
+    m_pWhiteBrush = nullptr;
+    m_pDWriteFactory = nullptr;
+    m_pTextFormat = nullptr;
     // 생성자입니다.
 	// Engine.cpp 안에서 사용되는 변수들을 선언하는 공간입니다.
 
-    srand(time(NULL));
+    srand(static_cast<unsigned int>(time(NULL)));
 	
     stack = new Stack();
     stack2 = new Stack();
@@ -97,10 +100,12 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     activePiece = new Piece();
     activePiece->Activate();
     waitingPiece = new Piece();
+    changePiece = new Piece();
 
     activePiece2 = new Piece();
     activePiece2->Activate();
     waitingPiece2 = new Piece();
+    changePiece2 = new Piece();
 
     // autoFall 자동으로 블럭이 떨어지는 속도.
     // 0.7 이 기본값입니다.
@@ -141,9 +146,12 @@ Engine::~Engine()
     delete stack;
     delete waitingPiece;
     delete activePiece;
+    delete changePiece;
+
     delete stack2;
     delete waitingPiece2;
     delete activePiece2;
+    delete changePiece2;
 }
 
 HRESULT Engine::InitializeD2D(HWND m_hwnd)
@@ -298,8 +306,6 @@ void Engine::KeyDown(WPARAM wParam)
         Itemarr2[5]++;
     }
 
-    if (wParam == VK_END);
-
     if (wParam == VK_INSERT)
     {
         Itemarr[0]++;
@@ -309,8 +315,6 @@ void Engine::KeyDown(WPARAM wParam)
         Itemarr[4]++;
         Itemarr[5]++;
     }
-
-    if (wParam == VK_DELETE);
 
     // 아이템 사용 확인
     // 1p는 키보드 상단 1 ~ 6
@@ -459,7 +463,7 @@ void Engine::Logic(double elapsedTime)
             {
                 //줄이 삭제되면 한 줄당 200점 씩 획득하고, 자동으로 블럭이 떨어지는 속도를 증가시킵니다.
                 //autoFallDelay가 낮아질수록 빨리 떨어짐
-                score += pow(2, removed) * 100;
+                score += static_cast<int>(pow(2, removed) * 100);
                 if (autoFallDelay > 0.175) {
                     autoFallDelay = autoFallDelay * 0.98;
                 }
@@ -509,7 +513,7 @@ void Engine::Logic(double elapsedTime)
             {
                 //줄이 삭제되면 한 줄당 200점 씩 획득하고, 자동으로 블럭이 떨어지는 속도를 증가시킵니다.
                 //autoFallDelay가 낮아질수록 빨리 떨어짐
-                score2 += pow(2, removed) * 100;
+                score2 += static_cast<int>(pow(2, removed) * 100);
                 if (autoFallDelay2 > 0.175) {
                     autoFallDelay2 = autoFallDelay2 * 0.98;
                 }
@@ -558,7 +562,7 @@ void Engine::Logic(double elapsedTime)
         if (removed > 0)
         {
             //위와 마찬가지로 지워지면 점수를 증가시키고 속도를 증가시킵니다.
-            score += pow(2, removed) * 100;
+            score += static_cast<int>(pow(2, removed) * 100);
             if (autoFallDelay > 0.175) {
                 autoFallDelay = autoFallDelay * 0.98;
             }
@@ -602,14 +606,14 @@ void Engine::Logic(double elapsedTime)
                 {
                     if (activePiece->GetCells()->Get(j, i) == 2)
                     {
-                        int realx = activePiece->GetPosition().x + j;
-                        int realy = activePiece->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece->GetPosition().y + i);
                         stackCells->Set(realx, realy, 8);
                     }
                     else if (activePiece->GetCells()->Get(j, i) > 0)
                     {
-                        int realx = activePiece->GetPosition().x + j;
-                        int realy = activePiece->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece->GetPosition().y + i);
                         stackCells->Set(realx, realy, brushIndex);
                     }
                 }
@@ -664,7 +668,7 @@ void Engine::Logic(double elapsedTime)
         if (removed > 0)
         {
             //위와 마찬가지로 지워지면 점수를 증가시키고 속도를 증가시킵니다.
-            score2 += pow(2, removed) * 100;
+            score2 += static_cast<int>(pow(2, removed) * 100);
             autoFallDelay2 = autoFallDelay2 * 0.98;
         }
 
@@ -681,8 +685,8 @@ void Engine::Logic(double elapsedTime)
                 {
                     if (activePiece2->GetCells()->Get(j, i) == 3) 
                     {
-                        int realx = activePiece2->GetPosition().x + j;
-                        int realy = activePiece2->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece2->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece2->GetPosition().y + i);
                         for (int x = 0; x < 3; x++) {
                             for (int y = 0; y < 3; y++) {
                                 if(realy + (y-1) >= STACK_HEIGHT)
@@ -695,14 +699,14 @@ void Engine::Logic(double elapsedTime)
                     }
                     else if (activePiece2->GetCells()->Get(j, i) == 2)
                     {
-                        int realx = activePiece2->GetPosition().x + j;
-                        int realy = activePiece2->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece2->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece2->GetPosition().y + i);
                         stackCells2->Set(realx, realy, 8);
                     }
                     else if (activePiece2->GetCells()->Get(j, i) > 0)
                     {
-                        int realx = activePiece2->GetPosition().x + j;
-                        int realy = activePiece2->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece2->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece2->GetPosition().y + i);
                         stackCells2->Set(realx, realy, brushIndex);
                     }
                 }
@@ -892,12 +896,15 @@ HRESULT Engine::Draw()
 
 HRESULT Engine::DrawTextAndScore()
 {
+
+    HRESULT hr = S_OK;
+
     // 글씨와 점수를 그리는 부분입니다.
 
     // 위치 조정용 변수들
-    int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
-    int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
-    int centerLeft = (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
+    float padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
+    float centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
+    float centerLeft = (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
 
 
     // RECT_F를 이용해 글씨 상자를 만들고, 해당 크기만큼 생성된 글씨 상자안에 글씨가 적힙니다.
@@ -1268,7 +1275,6 @@ HRESULT Engine::DrawTextAndScore()
         }
     }
 
-    HRESULT hr;
     //게임 오버시 나타나는 부분입니다.
     if (over == true) {
        /* D2D1_RECT_F Over = D2D1::RectF(RESOLUTION_X / 2 - 50, RESOLUTION_Y / 2 + 50, RESOLUTION_X / 2 + 50, RESOLUTION_Y / 2 - 50);
@@ -1292,4 +1298,5 @@ HRESULT Engine::DrawTextAndScore()
             return hr;
         }
     }
+    return hr;  // 모든 경로에서 hr 반환
 }
