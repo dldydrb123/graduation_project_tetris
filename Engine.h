@@ -36,6 +36,7 @@ private:
 	void InitializeTextAndScore();
 	HRESULT DrawTextAndScore();
 	HRESULT DrawJpgImage(ID2D1RenderTarget* pRenderTarget, IWICImagingFactory* pWICFactory, const wchar_t* filename, float x, float y, float width, float height);
+	HRESULT DrawImage();
 
 	Stack* stack;
 	Piece* activePiece;

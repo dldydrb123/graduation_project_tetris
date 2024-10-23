@@ -70,7 +70,7 @@ int Stack::RemoveLines(Matrix* stackCells)
 			// 아이템이 있는 확인후 랜덤함수로 아이템 지급
 			if (stackCells->Get(j, i) == 8 && check == true)
 			{
-				ItemGet = rand() % 6;
+				ItemGet = rand() % 7;
 
 				switch (ItemGet)
 				{
@@ -151,7 +151,7 @@ int Stack::RemoveLines2(Matrix* stackCells)
 			// 아이템이 있는 확인후 랜덤함수로 아이템 지급
 			if (stackCells->Get(j, i) == 8 && check == true)
 			{
-				ItemGet2 = rand() % 6;
+				ItemGet2 = rand() % 7;
 
 				switch (ItemGet2)
 				{
