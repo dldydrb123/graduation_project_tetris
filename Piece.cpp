@@ -188,7 +188,7 @@ bool Piece::LeftWallCollision()
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (cells->Get(j, i) == 1)
 			{
 				int realx = position.x + j;
 				if (realx < 0)
@@ -209,9 +209,9 @@ bool Piece::RightWallCollision()
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (cells->Get(j, i) == true)
+			if (cells->Get(j, i) == 1)
 			{
-				int realx = position.x + j;
+				double realx = position.x + j;
 				if (realx >= STACK_WIDTH)
 				{
 					return true;
@@ -232,8 +232,8 @@ bool Piece::StackCollision(Matrix* stackCells)
 		{
 			if (cells->Get(j, i) > 0)
 			{
-				int realx = position.x + j;
-				int realy = position.y + i;
+				double realx = position.x + j;
+				double realy = position.y + i;
 				// 밑바닥과 충돌이 일어났는지 확인합니다.
 				if (realy >= STACK_HEIGHT)
 				{
@@ -253,12 +253,12 @@ bool Piece::StackCollision(Matrix* stackCells)
 // 블럭을 그리는 부분입니다.
 void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
-	int shiftX = 30;  // x축 이동 값
-	int shiftY = 30;  // y축 이동 값
+	double padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
+	double shiftX = 30;  // x축 이동 값
+	double shiftY = 30;  // y축 이동 값
 
-	int center_x = padding + (position.x + 1) * CELL_SIZE + shiftX-76;
-	int center_y = padding + position.y * CELL_SIZE + shiftY;
+	double center_x = padding + (position.x + 1) * CELL_SIZE + shiftX-76;
+	double center_y = padding + position.y * CELL_SIZE + shiftY;
 
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
@@ -291,12 +291,12 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 // 2p 블럭을 그리는 부분
 void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
-	int shiftX = 30;  // x축 이동 값
-	int shiftY = 30;  // y축 이동 값
+	double padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
+	double shiftX = 30;  // x축 이동 값
+	double shiftY = 30;  // y축 이동 값
 
-	int center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE + shiftX-60;
-	int center_y = padding + position.y * CELL_SIZE + shiftY;
+	double center_x = padding + ((position.x + STACK_WIDTH + 4) + 1) * CELL_SIZE + shiftX-60;
+	double center_y = padding + position.y * CELL_SIZE + shiftY;
 
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)

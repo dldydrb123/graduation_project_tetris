@@ -90,8 +90,11 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
 {
     // 생성자입니다.
 	// Engine.cpp 안에서 사용되는 변수들을 선언하는 공간입니다.
+    m_pWhiteBrush = nullptr;
+    m_pDWriteFactory = nullptr;
+    m_pTextFormat = nullptr;
 
-    srand(time(NULL));
+    srand(static_cast<unsigned int>(time(NULL)));
 	
     stack = new Stack();
     stack2 = new Stack();
@@ -99,12 +102,11 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     activePiece = new Piece();
     activePiece->Activate();
     waitingPiece = new Piece();
+    changePiece = new Piece();
 
     activePiece2 = new Piece();
     activePiece2->Activate();
     waitingPiece2 = new Piece();
-
-    changePiece = new Piece();
     changePiece2 = new Piece();
 
     // autoFall 자동으로 블럭이 떨어지는 속도.
@@ -118,21 +120,34 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     keyPressDelay = 0.07;
     keyPressAccumulated = 0;
 
-    autoFallDelay2 = 0.4;
+    autoFallDelay2 = 0.7;
     autoFallAccumulated2 = 0;
     keyPressDelay2 = 0.07;
     keyPressAccumulated2 = 0;
 
+    // 낙하 확인용 변수
     fcheck = 0;
     scheck = 0;
+
+    // 블라인드 아이템용 변수
+    height = 0;
+    height2 = 0;
 
     // 아이템 사용을 확인하는 변수
     blindcheck = 0;
     blindcheck2 = 0;
 
-    //즉시 하강용 변수
+    // 즉시 하강용 변수
     fall = 0;
-    fall2 = 0;
+    fall2 = 0; 
+
+    // 즉시 하강 아이템용 변수
+    itemfall = 0;
+    itemfall2 = 0; 
+
+    // 공격용 변수
+    atk = 0;
+    atk2 = 0;
 }
 
 Engine::~Engine()
@@ -303,7 +318,6 @@ void Engine::KeyDown(WPARAM wParam)
         Itemarr2[5]++;
     }
 
-    if (wParam == VK_END);
 
     if (wParam == VK_INSERT)
     {
@@ -315,29 +329,28 @@ void Engine::KeyDown(WPARAM wParam)
         Itemarr[5]++;
     }
 
-    if (wParam == VK_DELETE);
 
     // 아이템 사용 확인
     // 1p는 키보드 상단 1 ~ 6
     if (wParam == 49 && Itemarr[0] > 0)
     {
         item1_1 = true;
-        Itemarr[0]--;
     }
     if (wParam == 50 && Itemarr[1] > 0)
     {
         item1_2 = true;
-        Itemarr[1]--;
     }
     if (wParam == 51 && Itemarr[2] > 0)
     {
         item1_3 = true;
-        Itemarr[2]--;
+        if (Itemarr[2] > 0) {
+            ItemGet = 0;
+            Itemarr[2]--;
+        }
     }
     if (wParam == 52 && Itemarr[3] > 0)
     {
         item1_4 = true;
-        Itemarr[3]--;
     }
     if (wParam == 53 && Itemarr[4] > 0)
     {
@@ -346,23 +359,23 @@ void Engine::KeyDown(WPARAM wParam)
     if (wParam == 54 && Itemarr[5] > 0)
     {
         item1_6 = true;
-        Itemarr[5]--;
     }
     //2p는 키보드 우측 1 ~ 6
     if (wParam == VK_NUMPAD1 && Itemarr2[0] > 0)
     {
         item2_1 = true;
-        Itemarr2[0]--;
     }
     if (wParam == VK_NUMPAD2 && Itemarr2[1] > 0)
     {
         item2_2 = true;
-        Itemarr2[1]--;
     }
     if (wParam == VK_NUMPAD3 && Itemarr2[2] > 0)
     {
         item2_3 = true;
-        Itemarr2[2]--;
+        if (Itemarr2[2] > 0) {
+            Itemarr2[2]--;
+            ItemGet2 = 0;
+        }
     }
     if (wParam == VK_NUMPAD4 && Itemarr2[3] > 0)
     {
@@ -375,7 +388,6 @@ void Engine::KeyDown(WPARAM wParam)
     if (wParam == VK_NUMPAD6 && Itemarr2[5] > 0)
     {
         item2_6 = true;
-        Itemarr2[5]--;
     }
 }
 
@@ -413,6 +425,39 @@ void Engine::Logic(double elapsedTime)
     Matrix* stackCells2 = stack2->GetCells();
 
 
+    for (int i = STACK_HEIGHT - 1; i >= 0; i--) {
+        int k = 0;
+        for (int j = 0; j < STACK_WIDTH; j++) {
+            if (stackCells->Get(j, i) > 0) {
+                break;
+            }
+            else
+            {
+                k++;
+            }
+        }
+        if (k == 10) {
+            break;
+        }
+        height = 25 - i;
+    }
+
+    for (int i = STACK_HEIGHT - 1; i >= 0; i--) {
+        int k = 0;
+        for (int j = 0; j < STACK_WIDTH; j++) {
+            if (stackCells2->Get(j, i) > 0) {
+                break;
+            }
+            else {
+                k++;
+            }
+        }
+        if (k == 10) {
+            break;
+        }
+        height2 = 25 - i;
+    }
+
     // 4번 아이템 사용되는 부분
     if (item1_4) {
         delete waitingPiece;
@@ -421,6 +466,7 @@ void Engine::Logic(double elapsedTime)
         waitingPiece->InitializeD2D(m_pRenderTarget);
         Itemarr[3]--;
         item1_4 = false;
+        ItemGet = 0;
     }
 
     if (item2_4) {
@@ -430,6 +476,7 @@ void Engine::Logic(double elapsedTime)
         waitingPiece2->InitializeD2D(m_pRenderTarget);
         Itemarr2[3]--;
         item2_4 = false;
+        ItemGet2 = 0;
     }
     
     // 5번 아이템 사용되는 부분
@@ -440,6 +487,7 @@ void Engine::Logic(double elapsedTime)
         waitingPiece->InitializeD2D(m_pRenderTarget);
         Itemarr[4]--;
         item1_5 = false;
+        ItemGet = 0;
     }
 
     if (item2_5) {
@@ -449,6 +497,7 @@ void Engine::Logic(double elapsedTime)
         waitingPiece2->InitializeD2D(m_pRenderTarget);
         Itemarr2[4]--;
         item2_5 = false;
+        ItemGet2 = 0;
     }
 
 
@@ -466,6 +515,8 @@ void Engine::Logic(double elapsedTime)
             }
         }
         item1_6 = false;
+        Itemarr[5]--;
+        ItemGet = 0;
     }
 
     if (item2_6) {
@@ -481,6 +532,8 @@ void Engine::Logic(double elapsedTime)
             }
         }
         item2_6 = false;
+        Itemarr2[5]--;
+        ItemGet2 = 0;
     }
 
     // 키보드를 눌러서 임의로 하강시키는 코드
@@ -506,6 +559,7 @@ void Engine::Logic(double elapsedTime)
                 else {
                     autoFallDelay = 0.175;
                 }
+                atk += removed;
             }
         }
 
@@ -524,7 +578,22 @@ void Engine::Logic(double elapsedTime)
 
         // 블럭 즉시 하강을 위해 속도를 증가시킵니다.
         if (enteringPressed) {
+            if (dualcheck == false) {
+                fall = autoFallDelay;
+            }
             autoFallDelay = 0.001;
+            dualcheck = true;
+        }
+
+        // 2번 아이템을 사용해 상대방의 블럭을 즉시낙하 시킵니다.
+        if (item1_2) {
+            if (fallcheck2 == false) {
+                itemfall2 = autoFallDelay2;
+            }
+            autoFallDelay2 = 0.001;
+            fallcheck2 = true;
+            ItemGet = 0;
+            Itemarr[1]--;
         }
 
         // 하강
@@ -556,8 +625,7 @@ void Engine::Logic(double elapsedTime)
                 else {
                     autoFallDelay2 = 0.175;
                 }
-
-                
+                atk2 += removed;
             }
         }
 
@@ -576,7 +644,22 @@ void Engine::Logic(double elapsedTime)
 
         // 블럭 즉시 하강을 위해 속도를 증가시킵니다.
         if (enteringPressed2) {
+            if (dualcheck2 == false) {
+                fall2 = autoFallDelay2;
+            }
             autoFallDelay2 = 0.001;
+            dualcheck2 = true;
+        }
+
+        // 2번 아이템을 사용해 상대방의 블럭을 즉시낙하 시킵니다.
+        if(item2_2){
+            if (fallcheck == false) {
+                itemfall = autoFallDelay;
+            }
+            autoFallDelay = 0.001;
+            fallcheck = true;
+            ItemGet2 = 0;
+            Itemarr2[1]--;
         }
 
         // 하강
@@ -605,28 +688,7 @@ void Engine::Logic(double elapsedTime)
             else {
                 autoFallDelay = 0.175;
             }
-
-            switch (ItemGet)
-            {
-            case 1:
-                Itemarr[0] += 1;
-                break;
-            case 2:
-                Itemarr[1] += 1;
-                break;
-            case 3:
-                Itemarr[2] += 1;
-                break;
-            case 4:
-                Itemarr[3] += 1;
-                break;
-            case 5:
-                Itemarr[4] += 1;
-                break;
-            case 6:
-                Itemarr[5] += 1;
-                break;
-            }
+            atk += removed;
         }
 
         // Advance 함수를 호출해 자동으로 블럭을 떨어트리는 부분입니다.
@@ -642,8 +704,8 @@ void Engine::Logic(double elapsedTime)
                 {
                     if (activePiece->GetCells()->Get(j, i) == 3)
                     {
-                        int realx = activePiece->GetPosition().x + j;
-                        int realy = activePiece->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece->GetPosition().y + i);
                         for (int x = 0; x < 3; x++) {
                             for (int y = 0; y < 3; y++) {
                                 if (realy + (y - 1) >= STACK_HEIGHT)
@@ -656,14 +718,14 @@ void Engine::Logic(double elapsedTime)
                     }
                     else if (activePiece->GetCells()->Get(j, i) == 2)
                     {
-                        int realx = activePiece->GetPosition().x + j;
-                        int realy = activePiece->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece->GetPosition().y + i);
                         stackCells->Set(realx, realy, 8);
                     }
                     else if (activePiece->GetCells()->Get(j, i) > 0)
                     {
-                        int realx = activePiece->GetPosition().x + j;
-                        int realy = activePiece->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece->GetPosition().y + i);
                         stackCells->Set(realx, realy, brushIndex);
                     }
                 }
@@ -672,22 +734,25 @@ void Engine::Logic(double elapsedTime)
             // 블라인드 아이템의 사용을 확인하고 지속시간을 체크합니다.
             if (item2_3) {
                 blindcheck++;
-                Itemarr2[2]--;
                 if (blindcheck == 3) {
                     blindcheck = 0;
                     item2_3 = false;
                 }
             }
 
+            // 낙하 아이템의 사용을 확인, 속도를 다시 복구시킵니다.
+            if (item2_2) {
+                autoFallDelay = itemfall;
+                item2_2 = false;
+                fallcheck = false;
+            }
+
             // 즉시 하강이 작동되는 부분입니다.
             // 즉시 하강시 바닥에 착지를 감지하고 바닥에 착지될시 속도를 원래의 값으로 되돌립니다.
-            if (enteringPressed == true)
-                fcheck++;
-
-            if (fcheck == 1) {
-                autoFallDelay = 0.7;
-                fcheck = 0;
+            if (enteringPressed == true) {
+                autoFallDelay = fall;
                 enteringPressed = false;
+                dualcheck = false;
             }
 
 
@@ -718,8 +783,14 @@ void Engine::Logic(double elapsedTime)
         if (removed > 0)
         {
             //위와 마찬가지로 지워지면 점수를 증가시키고 속도를 증가시킵니다.
-            score2 += pow(2, removed) * 100;
-            autoFallDelay2 = autoFallDelay2 * 0.98;
+            score2 += static_cast<int>(pow(2, removed) * 100);
+            if (autoFallDelay2 > 0.175) {
+                    autoFallDelay2 = autoFallDelay2 * 0.98;
+            }
+            else {
+                autoFallDelay2 = 0.175;
+            }
+            atk2 += removed;
         }
 
         // Advance 함수를 호출해 자동으로 블럭을 떨어트리는 부분입니다.
@@ -735,8 +806,8 @@ void Engine::Logic(double elapsedTime)
                 {
                     if (activePiece2->GetCells()->Get(j, i) == 3) 
                     {
-                        int realx = activePiece2->GetPosition().x + j;
-                        int realy = activePiece2->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece2->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece2->GetPosition().y + i);
                         for (int x = 0; x < 3; x++) {
                             for (int y = 0; y < 3; y++) {
                                 if(realy + (y-1) >= STACK_HEIGHT)
@@ -749,14 +820,14 @@ void Engine::Logic(double elapsedTime)
                     }
                     else if (activePiece2->GetCells()->Get(j, i) == 2)
                     {
-                        int realx = activePiece2->GetPosition().x + j;
-                        int realy = activePiece2->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece2->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece2->GetPosition().y + i);
                         stackCells2->Set(realx, realy, 8);
                     }
                     else if (activePiece2->GetCells()->Get(j, i) > 0)
                     {
-                        int realx = activePiece2->GetPosition().x + j;
-                        int realy = activePiece2->GetPosition().y + i;
+                        int realx = static_cast<int>(activePiece2->GetPosition().x + j);
+                        int realy = static_cast<int>(activePiece2->GetPosition().y + i);
                         stackCells2->Set(realx, realy, brushIndex);
                     }
                 }
@@ -771,15 +842,36 @@ void Engine::Logic(double elapsedTime)
                 }
             }
 
+            // 낙하 아이템의 사용을 확인, 속도를 다시 복구시킵니다.
+            if (item1_2) {
+                autoFallDelay2 = itemfall2;
+                item1_2 = false;
+                fallcheck2 = false;
+            }
+
             // 즉시 하강이 작동되는 부분입니다.
             // 즉시 하강시 바닥에 착지를 감지하고 바닥에 착지될시 속도를 원래의 값으로 되돌립니다.
-            if (enteringPressed2 == true)
-                scheck++;
-
-            if (scheck == 1) {
-                autoFallDelay2 = 0.7;
-                scheck = 0;
+            if (enteringPressed2 == true) {
+                autoFallDelay2 = fall2;
                 enteringPressed2 = false;
+                dualcheck2 = false;
+            }
+
+            // 공격 받는 부분입니다.
+            Matrix* attackCells2 = stack->GetCells();
+            if (atk > 0) {
+                for (int k = 0; k < atk; k++) {
+                    for (int i = STACK_HEIGHT - 1; i >= 0; i--)
+                    {
+                        for (int j = 0; j < STACK_WIDTH; j++)
+                        {
+                            attackCells2->Set(j, i - 1, stackCells2->Get(j, i));
+                            //stackCells2->Set(j, i, 0);
+                            //stackCells2->Set(j, i - 1, attackCells2->Get(j, i - 1));
+                        }
+                    }
+                }
+                atk = 0;
             }
             
             // 블럭을 스택에 쌓았으니 사용한 블럭을 제거하고
@@ -830,11 +922,10 @@ HRESULT Engine::Draw()
     }
     waitingPiece2->Draw2(m_pRenderTarget);
 
-    
     //1p Blind Item
     //1p가 사용하는 거라서 2p의 보드를 가립니다.
     if (item1_3) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 542.0f, 383.5f, 202.0f, 240.5f);
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 542.0f, 624.0f, 202.0f, -(CELL_SIZE * height2));
         if (FAILED(hr)) {
             // JPG 이미지 로드 및 그리기 실패
             return hr;
@@ -842,9 +933,9 @@ HRESULT Engine::Draw()
     }
 
     //2p Blind Item
-    //2p가 사용하는 거라서 1p의 보드를 가립니다. 
+    //2p가 사용하는 거라서 1p의 보드를 가립니다.
     if (item2_3) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 198.0f, 383.5f, 202.0f, 240.5f);
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 198.0f, 624.0f, 202.0f, -(CELL_SIZE * height));
         if (FAILED(hr)) {
             // JPG 이미지 로드 및 그리기 실패
             return hr;
@@ -879,7 +970,7 @@ HRESULT Engine::DrawImage()
     }
 
     //1p score
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 70.0f, 380.0f, 145.0f, 120.0f);
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 70.0f, 300.0f, 145.0f, 120.0f);
     if (FAILED(hr)) {
         // JPG 이미지 로드 및 그리기 실패
         return hr;
@@ -887,7 +978,7 @@ HRESULT Engine::DrawImage()
 
 
     //2p score
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score2.png", 720.0f, 380.0f, 145.0f, 120.0f);
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score2.png", 720.0f, 300.0f, 145.0f, 120.0f);
     if (FAILED(hr)) {
         // JPG 이미지 로드 및 그리기 실패
         return hr;
@@ -1015,6 +1106,7 @@ HRESULT Engine::DrawImage()
             return hr;
         }
     }
+
 }
 
 HRESULT Engine::DrawTextAndScore()
@@ -1031,7 +1123,7 @@ HRESULT Engine::DrawTextAndScore()
     // ""안의 내용(Next Piece)들을 그리는데 바로 아래있는 숫자(15)만큼 그립니다.
     // 
     //실 스코어가 표시되는 부분입니다.
-    D2D1_RECT_F PScore = D2D1::RectF(centerLeft -265, padding + 300, centerLeft+175, padding + 420);
+    D2D1_RECT_F PScore = D2D1::RectF(centerLeft -265, padding + 220, centerLeft+175, padding + 340);
     WCHAR scoreStr[64];
     swprintf_s(scoreStr, L"%d        ", score);
     m_pRenderTarget->DrawText(
@@ -1043,7 +1135,7 @@ HRESULT Engine::DrawTextAndScore()
     );
 
     //실 스코어가 표시되는 부분입니다.
-    D2D1_RECT_F PScore2 = D2D1::RectF(centerRight, padding + 300, centerRight + 170, padding + 420);
+    D2D1_RECT_F PScore2 = D2D1::RectF(centerRight, padding + 220, centerRight + 170, padding + 340);
     WCHAR scoreStr2[64];
     swprintf_s(scoreStr2, L"%d        ", score2);
     m_pRenderTarget->DrawText(
@@ -1054,18 +1146,28 @@ HRESULT Engine::DrawTextAndScore()
         m_pWhiteBrush
     );
 
-    D2D1_RECT_F TestView1_1 = D2D1::RectF(190, 15, 200, 30);
-    D2D1_RECT_F TestView1_2 = D2D1::RectF(210, 15, 220, 30);
-    D2D1_RECT_F TestView1_3 = D2D1::RectF(230, 15, 240, 30);
-    D2D1_RECT_F TestView1_4 = D2D1::RectF(250, 15, 260, 30);
-    D2D1_RECT_F TestView1_5 = D2D1::RectF(270, 15, 280, 30);
-    D2D1_RECT_F TestView1_6 = D2D1::RectF(290, 15, 300, 30);
-    D2D1_RECT_F TestView1_01 = D2D1::RectF(190, 50, 200, 60);
-    D2D1_RECT_F TestView1_02 = D2D1::RectF(210, 50, 220, 60);
-    D2D1_RECT_F TestView1_03 = D2D1::RectF(230, 50, 240, 60);
-    D2D1_RECT_F TestView1_04 = D2D1::RectF(250, 50, 260, 60);
-    D2D1_RECT_F TestView1_05 = D2D1::RectF(270, 50, 280, 60);
-    D2D1_RECT_F TestView1_06 = D2D1::RectF(290, 50, 300, 60);
+    /*D2D1_RECT_F ItemT = D2D1::RectF(centerRight, padding + 220, centerRight + 170, padding + 340);
+    WCHAR scoreStr2[64];
+    swprintf_s(scoreStr2, L"%d        ", score2);
+    m_pRenderTarget->DrawText(
+        scoreStr2,
+        7,
+        m_pTextFormat,
+        ItemT,
+        m_pWhiteBrush
+    );
+
+    D2D1_RECT_F ItemT2 = D2D1::RectF(centerRight, padding + 220, centerRight + 170, padding + 340);
+    WCHAR scoreStr2[64];
+    swprintf_s(scoreStr2, L"%d        ", score2);
+    m_pRenderTarget->DrawText(
+        scoreStr2,
+        7,
+        m_pTextFormat,
+        ItemT2,
+        m_pWhiteBrush
+    );*/
+
     for (int i = 0; i < 6; i++) {
         switch (i) {
         case 0:
@@ -1074,7 +1176,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"1",
                     1,
                     m_pTextFormat,
-                    TestView1_1,
+                    D2D1::RectF(190, 15, 200, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr[0] > 1) {
@@ -1084,7 +1186,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView1_01,
+                        D2D1::RectF(190, 50, 200, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1096,7 +1198,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"2",
                     1,
                     m_pTextFormat,
-                    TestView1_2,
+                    D2D1::RectF(210, 15, 220, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr[1] > 1) {
@@ -1106,7 +1208,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView1_02,
+                        D2D1::RectF(210, 50, 220, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1118,7 +1220,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"3",
                     1,
                     m_pTextFormat,
-                    TestView1_3,
+                    D2D1::RectF(230, 15, 240, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr[2] > 1) {
@@ -1128,7 +1230,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView1_03,
+                        D2D1::RectF(230, 50, 240, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1140,7 +1242,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"4",
                     1,
                     m_pTextFormat,
-                    TestView1_4,
+                    D2D1::RectF(250, 15, 260, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr[3] > 1) {
@@ -1150,7 +1252,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView1_04,
+                        D2D1::RectF(250, 50, 260, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1162,7 +1264,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"5",
                     1,
                     m_pTextFormat,
-                    TestView1_5,
+                    D2D1::RectF(270, 15, 280, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr[4] > 1) {
@@ -1172,7 +1274,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView1_05,
+                        D2D1::RectF(270, 50, 280, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1184,7 +1286,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"6",
                     1,
                     m_pTextFormat,
-                    TestView1_6,
+                    D2D1::RectF(290, 15, 300, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr[5] > 1) {
@@ -1194,7 +1296,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView1_06,
+                        D2D1::RectF(290, 50, 300, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1205,18 +1307,6 @@ HRESULT Engine::DrawTextAndScore()
         }
     }
 
-    D2D1_RECT_F TestView2_1 = D2D1::RectF(550, 15, 560, 30);
-    D2D1_RECT_F TestView2_2 = D2D1::RectF(570, 15, 590, 30);
-    D2D1_RECT_F TestView2_3 = D2D1::RectF(590, 15, 610, 30);
-    D2D1_RECT_F TestView2_4 = D2D1::RectF(610, 15, 630, 30);
-    D2D1_RECT_F TestView2_5 = D2D1::RectF(630, 15, 650, 30);
-    D2D1_RECT_F TestView2_6 = D2D1::RectF(650, 15, 670, 30);
-    D2D1_RECT_F TestView2_01 = D2D1::RectF(550, 50, 560, 60);
-    D2D1_RECT_F TestView2_02 = D2D1::RectF(570, 50, 590, 60);
-    D2D1_RECT_F TestView2_03 = D2D1::RectF(590, 50, 610, 60);
-    D2D1_RECT_F TestView2_04 = D2D1::RectF(610, 50, 630, 60);
-    D2D1_RECT_F TestView2_05 = D2D1::RectF(630, 50, 650, 60);
-    D2D1_RECT_F TestView2_06 = D2D1::RectF(650, 50, 670, 60);
     for (int i = 0; i < 6; i++) {
         switch (i) {
         case 0:
@@ -1225,7 +1315,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"1",
                     1,
                     m_pTextFormat,
-                    TestView2_1,
+                    D2D1::RectF(550, 15, 560, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr2[0] > 1) {
@@ -1235,7 +1325,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView2_01,
+                        D2D1::RectF(550, 50, 560, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1248,7 +1338,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"2",
                     1,
                     m_pTextFormat,
-                    TestView2_2,
+                    D2D1::RectF(570, 15, 590, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr2[1] > 1) {
@@ -1258,7 +1348,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView2_02,
+                        D2D1::RectF(570, 50, 590, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1270,7 +1360,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"3",
                     1,
                     m_pTextFormat,
-                    TestView2_3,
+                    D2D1::RectF(590, 15, 610, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr2[2] > 1) {
@@ -1280,7 +1370,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView2_03,
+                        D2D1::RectF(590, 50, 610, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1292,7 +1382,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"4",
                     1,
                     m_pTextFormat,
-                    TestView2_4,
+                    D2D1::RectF(610, 15, 630, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr2[3] > 1) {
@@ -1302,7 +1392,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView2_04,
+                        D2D1::RectF(610, 50, 630, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1314,7 +1404,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"5",
                     1,
                     m_pTextFormat,
-                    TestView2_5,
+                    D2D1::RectF(630, 15, 650, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr2[4] > 1) {
@@ -1324,7 +1414,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView2_05,
+                        D2D1::RectF(630, 50, 650, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1336,7 +1426,7 @@ HRESULT Engine::DrawTextAndScore()
                     L"6",
                     1,
                     m_pTextFormat,
-                    TestView2_6,
+                    D2D1::RectF(650, 15, 670, 30),
                     m_pWhiteBrush
                 );
                 if (Itemarr2[5] > 1) {
@@ -1346,7 +1436,7 @@ HRESULT Engine::DrawTextAndScore()
                         scoreStr,
                         2,
                         m_pTextFormat,
-                        TestView2_06,
+                        D2D1::RectF(650, 50, 670, 60),
                         m_pWhiteBrush
                     );
                 }
@@ -1360,22 +1450,8 @@ HRESULT Engine::DrawTextAndScore()
     HRESULT hr;
     //게임 오버시 나타나는 부분입니다.
     if (over == true) {
-       /* D2D1_RECT_F Over = D2D1::RectF(RESOLUTION_X / 2 - 50, RESOLUTION_Y / 2 + 50, RESOLUTION_X / 2 + 50, RESOLUTION_Y / 2 - 50);
-        m_pRenderTarget->DrawText(
-            L"Game Over!!",
-            15,
-            m_pTextFormat,
-            Over,
-            m_pWhiteBrush
-          
-        );*/
-
         //gameover
-        float x7 = 325.0f;
-        float y7 = 230.0f;
-        float width7 = 300.0f;
-        float height7 = 300.0f;
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\gameover.png", x7, y7, width7, height7);
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\gameover.png", 325.0f, 230.0f, 300.0f, 300.0f);
         if (FAILED(hr)) {
             // JPG 이미지 로드 및 그리기 실패
             return hr;

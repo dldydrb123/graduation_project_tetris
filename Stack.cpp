@@ -3,10 +3,14 @@
 #include "Stack.h"
 #include "Engine.h"
 #include "item.h"
-//TODO 일정 확률로 아이템 블록이 떨어져서 그 줄을 채우면 아이템을 가져가게 하기
+
 Stack::Stack() : m_pBlueBrush(NULL), m_pSelectedBrush(NULL), m_pYellowBrush(NULL), m_pBlackBrush(NULL)
 {
 	cells = new Matrix(STACK_WIDTH, STACK_HEIGHT);
+	for (int i = 0; i < 9; i++)
+	{
+		m_pBrushes[i] = nullptr;
+	}
 }
 
 Stack::~Stack()
@@ -101,6 +105,8 @@ int Stack::RemoveLines(Matrix* stackCells)
 		{
 			entireLine = true;
 			item1_1 = false;
+			Itemarr[0]--;
+			ItemGet = 0;
 		}
 
 		// 꽉찬 줄을 지우고 스택을 한칸씩 내립니다.
@@ -182,6 +188,8 @@ int Stack::RemoveLines2(Matrix* stackCells)
 		{
 			entireLine = true;
 			item2_1 = false;
+			Itemarr2[0]--;
+			ItemGet2 = 0;
 		}
 
 		// 꽉찬 줄을 지우고 스택을 한칸씩 내립니다.
@@ -207,32 +215,7 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 	int shiftX = -46; // x축 이동 값
 	int shiftY = 30; // y축 이동 값
-	/*
-	// 벽을 그리는 부분입니다.
-	D2D1_RECT_F rectangle1 = D2D1::RectF(
-		(padding + RESOLUTION_X / 8) + shiftX + CELL_SIZE, padding + shiftY,
-		(padding + RESOLUTION_X / 8) + CELL_SIZE + CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
-	);
-	m_pRenderTarget->FillRectangle(&rectangle1, m_pBlueBrush);
-
-	D2D1_RECT_F rectangle2 = D2D1::RectF(
-		(padding + RESOLUTION_X / 8) + shiftX + CELL_SIZE, padding + STACK_HEIGHT * CELL_SIZE + shiftY,
-		(padding + RESOLUTION_X / 8) + (STACK_WIDTH + 2) * CELL_SIZE + CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
-	);
-	m_pRenderTarget->FillRectangle(&rectangle2, m_pBlueBrush);
-
-	D2D1_RECT_F rectangle3 = D2D1::RectF(
-		(padding + RESOLUTION_X / 8) + (STACK_WIDTH + 1) * CELL_SIZE + shiftX + CELL_SIZE, padding + shiftY,
-		(padding + RESOLUTION_X / 8) + (STACK_WIDTH + 2) * CELL_SIZE + CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
-	);
-	m_pRenderTarget->FillRectangle(&rectangle3, m_pBlueBrush);
-
-	D2D1_RECT_F rectangle5 = D2D1::RectF(
-		(padding + RESOLUTION_X / 8) + 2 * CELL_SIZE + shiftX, padding + shiftY,
-		(padding + RESOLUTION_X / 8) + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + STACK_HEIGHT * CELL_SIZE + shiftY
-	);
-	m_pRenderTarget->FillRectangle(&rectangle5, m_pBlackBrush);
-	*/
+	
 	// 블럭을 그리는 부분입니다.
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{
@@ -281,34 +264,8 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 	int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 	int shiftX = -30; // x축 이동 값
 	int shiftY = 30; // y축 이동 값
-	int rightPadding = padding + (STACK_WIDTH + 3) * CELL_SIZE; // 새 벽의 시작점
-	/*
-	// 벽을 그리는 부분입니다.
-	D2D1_RECT_F rightRectangle1 = D2D1::RectF(
-		(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + shiftX, padding + shiftY,
-		(rightPadding + RESOLUTION_X / 5) + CELL_SIZE * 2 + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
-	);
-	m_pRenderTarget->FillRectangle(&rightRectangle1, m_pBlueBrush);
-
-	D2D1_RECT_F rightRectangle2 = D2D1::RectF(
-		(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + shiftX, padding + STACK_HEIGHT * CELL_SIZE + shiftY,
-		(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
-	);
-	m_pRenderTarget->FillRectangle(&rightRectangle2, m_pBlueBrush);
-
-	D2D1_RECT_F rightRectangle3 = D2D1::RectF(
-		(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + (STACK_WIDTH + 1) * CELL_SIZE + shiftX, padding + shiftY,
-		(rightPadding + RESOLUTION_X / 5) + CELL_SIZE + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + (STACK_HEIGHT + 1) * CELL_SIZE + shiftY
-	);
-	m_pRenderTarget->FillRectangle(&rightRectangle3, m_pBlueBrush);
-
-	D2D1_RECT_F rectangle5 = D2D1::RectF(
-		(rightPadding + RESOLUTION_X / 5) + 2 * CELL_SIZE + shiftX, padding + shiftY,
-		(rightPadding + RESOLUTION_X / 5) + (STACK_WIDTH + 2) * CELL_SIZE + shiftX, padding + STACK_HEIGHT * CELL_SIZE + shiftY
-	); 
-	m_pRenderTarget->FillRectangle(&rectangle5, m_pBlackBrush);
-	*/
-
+	int rightPadding = padding + (STACK_WIDTH + 3) * CELL_SIZE;
+	
 	//블럭을 그리는 부분입니다.
 	for (int i = 0; i < STACK_HEIGHT; i++)
 	{

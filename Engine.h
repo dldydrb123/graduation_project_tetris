@@ -42,6 +42,7 @@ private:
 	Piece* activePiece;
 	Piece* waitingPiece;
 	Piece* changePiece;
+
 	Stack* stack2;
 	Piece* activePiece2;
 	Piece* waitingPiece2;
@@ -49,13 +50,23 @@ private:
 
 	int fcheck;
 	int scheck;
-
+	int height;
+	int height2;
 	int blindcheck;
 	int blindcheck2;
 
+	int atk;
+	int atk2;
+
 	double fall;
 	double fall2;
+	double itemfall;
+	double itemfall2;
 
+	bool dualcheck = false;
+	bool dualcheck2 = false;
+	bool fallcheck = false;
+	bool fallcheck2 = false;
 	bool gameOver = false;
 	bool gameOver2 = false;
 
