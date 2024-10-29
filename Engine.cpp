@@ -103,11 +103,15 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     activePiece->Activate();
     waitingPiece = new Piece();
     changePiece = new Piece();
+    shadowPiece = new Piece();
+    shadowPiece->Shadow();
 
     activePiece2 = new Piece();
     activePiece2->Activate();
     waitingPiece2 = new Piece();
     changePiece2 = new Piece();
+    shadowPiece2 = new Piece();
+    shadowPiece2->Shadow();
 
     // autoFall 자동으로 블럭이 떨어지는 속도.
     // 0.7 이 기본값입니다.
@@ -144,10 +148,6 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     // 즉시 하강 아이템용 변수
     itemfall = 0;
     itemfall2 = 0; 
-
-    // 공격용 변수
-    atk = 0;
-    atk2 = 0;
 }
 
 Engine::~Engine()
@@ -306,88 +306,65 @@ void Engine::KeyDown(WPARAM wParam)
     if (wParam == VK_SPACE)
         enteringPressed = true;
 
-    // 테스트용 아이템 획득
-    // 각각 방향키 위의 Home, End, Insert, Delete
-    if (wParam == VK_HOME)
-    {
-        Itemarr2[0]++;
-        Itemarr2[1]++;
-        Itemarr2[2]++;
-        Itemarr2[3]++;
-        Itemarr2[4]++;
-        Itemarr2[5]++;
-    }
-
-
-    if (wParam == VK_INSERT)
-    {
-        Itemarr[0]++;
-        Itemarr[1]++;
-        Itemarr[2]++;
-        Itemarr[3]++;
-        Itemarr[4]++;
-        Itemarr[5]++;
-    }
-
-
     // 아이템 사용 확인
     // 1p는 키보드 상단 1 ~ 6
-    if (wParam == 49 && Itemarr[0] > 0)
+    if (wParam == 49 && ItemGet > 0)
     {
-        item1_1 = true;
-    }
-    if (wParam == 50 && Itemarr[1] > 0)
-    {
-        item1_2 = true;
-    }
-    if (wParam == 51 && Itemarr[2] > 0)
-    {
-        item1_3 = true;
-        if (Itemarr[2] > 0) {
-            ItemGet = 0;
-            Itemarr[2]--;
+        switch (ItemGet)
+        {
+        case 1:
+            item1_1 = true;
+            break;
+        case 2:
+            item1_2 = true;
+            break;
+        case 3:
+            item1_3 = true;
+            if (Itemarr[2] > 0) {
+                ItemGet = 0;
+                Itemarr[2]--;
+            }
+            break;
+        case 4:
+            item1_4 = true;
+            break;
+        case 5:
+            item1_5 = true;
+            break;
+        case 6:
+            item1_6 = true;
+            break;
         }
     }
-    if (wParam == 52 && Itemarr[3] > 0)
-    {
-        item1_4 = true;
-    }
-    if (wParam == 53 && Itemarr[4] > 0)
-    {
-        item1_5 = true;
-    }
-    if (wParam == 54 && Itemarr[5] > 0)
-    {
-        item1_6 = true;
-    }
+     
     //2p는 키보드 우측 1 ~ 6
-    if (wParam == VK_NUMPAD1 && Itemarr2[0] > 0)
+    if (wParam == VK_NUMPAD1 && ItemGet2 > 0)
     {
-        item2_1 = true;
-    }
-    if (wParam == VK_NUMPAD2 && Itemarr2[1] > 0)
-    {
-        item2_2 = true;
-    }
-    if (wParam == VK_NUMPAD3 && Itemarr2[2] > 0)
-    {
-        item2_3 = true;
-        if (Itemarr2[2] > 0) {
-            Itemarr2[2]--;
-            ItemGet2 = 0;
+        switch (ItemGet2)
+        {
+        case 1:
+            item2_1 = true;
+            break;
+        case 2:
+            item2_2 = true;
+            break;
+        case 3:
+            item2_3 = true;
+            if (Itemarr2[2] > 0) {
+                Itemarr2[2]--;
+                ItemGet2 = 0;
+            }
+            break;
+        case 4:
+            item2_4 = true;
+            break;
+        case 5:
+            item2_5 = true;
+            break;
+        case 6:
+            item2_6 = true;
+            break;
         }
-    }
-    if (wParam == VK_NUMPAD4 && Itemarr2[3] > 0)
-    {
-        item2_4 = true;
-    }
-    if (wParam == VK_NUMPAD5 && Itemarr2[4] > 0)
-    {
-        item2_5 = true;
-    }
-    if (wParam == VK_NUMPAD6 && Itemarr2[5] > 0)
-    {
-        item2_6 = true;
     }
 }
 
@@ -422,7 +399,9 @@ void Engine::Logic(double elapsedTime)
 
     // Stack을 Metrix랑 연결해서 게임판을 만들어 냅니다. (테트리스 쌓이는 부분)
     Matrix* stackCells = stack->GetCells();
+    Matrix* changeCells = stack->GetCells();
     Matrix* stackCells2 = stack2->GetCells();
+    Matrix* changeCells2 = stack2->GetCells();
 
 
     for (int i = STACK_HEIGHT - 1; i >= 0; i--) {
@@ -503,14 +482,13 @@ void Engine::Logic(double elapsedTime)
 
     // 6번 아이템 사용되는 부분
     if (item1_6) {
-        Matrix* changeCells = stack->GetCells();
         for (int i = STACK_HEIGHT - 1; i >= 0; i--) {
-            for (int j = STACK_WIDTH - 1; j >= 0; j--) {
+            for (int j = STACK_WIDTH; j >= 0; j--) {
                 if (j == 0) {
-                    stackCells->Set(j, i, changeCells->Get(9, i));
+                    stackCells2->Set(j, i, changeCells2->Get(10, i));
                 }
                 else {
-                    stackCells->Set(j, i, stackCells->Get(j - 1, i));
+                    stackCells2->Set(j, i, stackCells2->Get(j - 1, i));
                 }
             }
         }
@@ -520,14 +498,13 @@ void Engine::Logic(double elapsedTime)
     }
 
     if (item2_6) {
-        Matrix* changeCells2 = stack2->GetCells();
         for (int i = STACK_HEIGHT - 1; i >= 0; i--) {
-            for (int j = STACK_WIDTH - 1; j >= 0; j--) {
+            for (int j = STACK_WIDTH; j >= 0; j--) {
                 if (j == 0) {
-                    stackCells2->Set(j, i, changeCells2->Get(9, i));
+                    stackCells->Set(j, i, changeCells->Get(10, i));
                 }
                 else {
-                    stackCells2->Set(j, i, stackCells2->Get(j - 1, i));
+                    stackCells->Set(j, i, stackCells->Get(j - 1, i));
                 }
             }
         }
@@ -559,7 +536,6 @@ void Engine::Logic(double elapsedTime)
                 else {
                     autoFallDelay = 0.175;
                 }
-                atk += removed;
             }
         }
 
@@ -625,7 +601,6 @@ void Engine::Logic(double elapsedTime)
                 else {
                     autoFallDelay2 = 0.175;
                 }
-                atk2 += removed;
             }
         }
 
@@ -688,7 +663,6 @@ void Engine::Logic(double elapsedTime)
             else {
                 autoFallDelay = 0.175;
             }
-            atk += removed;
         }
 
         // Advance 함수를 호출해 자동으로 블럭을 떨어트리는 부분입니다.
@@ -755,6 +729,35 @@ void Engine::Logic(double elapsedTime)
                 dualcheck = false;
             }
 
+            try
+            {
+                // 공격 받는 부분입니다.
+                Matrix* attackCells = stack->GetCells();
+                if (atk2 > 0) {
+                    for (int k = 0; k < atk2; k++) {
+                        for (int i = 1; i < STACK_HEIGHT; i++) {
+                            for (int j = STACK_WIDTH - 1; j >= 0; j--) {
+                                stackCells->Set(j, i - 1, stackCells->Get(j, i));
+                            }
+                        }
+                    }
+                    for (int i = STACK_HEIGHT - 1; i >= STACK_HEIGHT - atk2; i--) {
+                        int hole = rand() % 10;
+                        for (int j = 0; j < STACK_WIDTH; j++) {
+                            if (j == hole) {
+                                stackCells->Set(j, i, 0);
+                                continue;
+                            }
+                            stackCells->Set(j, i, 10);
+                        }
+                    }
+                    atk2 = 0;
+                }
+            }
+            catch (int msg)
+            {
+                printf("%d\n", msg);
+            }
 
             // 블럭을 스택에 쌓았으니 사용한 블럭을 제거하고
             // 다음 블럭을 가져와 사용 블럭으로 변경,
@@ -790,7 +793,6 @@ void Engine::Logic(double elapsedTime)
             else {
                 autoFallDelay2 = 0.175;
             }
-            atk2 += removed;
         }
 
         // Advance 함수를 호출해 자동으로 블럭을 떨어트리는 부분입니다.
@@ -857,21 +859,35 @@ void Engine::Logic(double elapsedTime)
                 dualcheck2 = false;
             }
 
-            // 공격 받는 부분입니다.
-            Matrix* attackCells2 = stack->GetCells();
-            if (atk > 0) {
-                for (int k = 0; k < atk; k++) {
-                    for (int i = STACK_HEIGHT - 1; i >= 0; i--)
-                    {
-                        for (int j = 0; j < STACK_WIDTH; j++)
-                        {
-                            attackCells2->Set(j, i - 1, stackCells2->Get(j, i));
-                            //stackCells2->Set(j, i, 0);
-                            //stackCells2->Set(j, i - 1, attackCells2->Get(j, i - 1));
+
+            try
+            {
+                // 공격 받는 부분입니다.
+                Matrix* attackCells2 = stack2->GetCells();
+                if (atk > 0) {
+                    for (int k = 0; k < atk; k++) {
+                        for (int i = 1; i < STACK_HEIGHT; i++) {
+                            for (int j = STACK_WIDTH - 1; j >= 0; j--) {
+                                stackCells2->Set(j, i - 1, stackCells2->Get(j, i));
+                            }
                         }
                     }
+                    for (int i = STACK_HEIGHT - 1; i >= STACK_HEIGHT - atk; i--) {
+                        int hole = rand() % 10;
+                        for (int j = 0; j < STACK_WIDTH; j++) {
+                            if (j == hole) {
+                                stackCells2->Set(j, i, 0);
+                                continue;
+                            }
+                            stackCells2->Set(j, i, 10);
+                        }
+                    }
+                    atk = 0;
                 }
-                atk = 0;
+            }
+            catch (int msg)
+            {
+                printf("%d\n", msg);
             }
             
             // 블럭을 스택에 쌓았으니 사용한 블럭을 제거하고
@@ -913,12 +929,14 @@ HRESULT Engine::Draw()
     stack->Draw(m_pRenderTarget);
     if (gameOver != true) {
         activePiece->Draw(m_pRenderTarget);
+        //shadowPiece->Draw(m_pRenderTarget);
     }
     waitingPiece->Draw(m_pRenderTarget);
 
     stack2->Draw2(m_pRenderTarget);
     if (gameOver2 != true) {
         activePiece2->Draw2(m_pRenderTarget);
+        //shadowPiece2->Draw2(m_pRenderTarget);
     }
     waitingPiece2->Draw2(m_pRenderTarget);
 
@@ -1071,7 +1089,7 @@ HRESULT Engine::DrawImage()
 
     //2p 키눌림
     if (leftPressed2 == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 538, 691, 65, 50);
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 538, 691, 70, 50);
         if (FAILED(hr)) {
             // JPG 이미지 로드 및 그리기 실패
             return hr;
@@ -1146,306 +1164,102 @@ HRESULT Engine::DrawTextAndScore()
         m_pWhiteBrush
     );
 
-    /*D2D1_RECT_F ItemT = D2D1::RectF(centerRight, padding + 220, centerRight + 170, padding + 340);
-    WCHAR scoreStr2[64];
-    swprintf_s(scoreStr2, L"%d        ", score2);
+    WCHAR ItemStr[64];
+    swprintf_s(ItemStr, L"아이템없음");
+    
+    for (int i = 0; i < 6; i++) {
+        switch (i) {
+        case 0:
+            if (Itemarr[0] > 0) {
+                swprintf_s(ItemStr, L"한줄삭제");
+            }
+            break;
+        case 1:
+            if (Itemarr[1] > 0) {
+                swprintf_s(ItemStr, L"강제낙하");
+            }
+            break;
+        case 2:
+            if (Itemarr[2] > 0) {
+                swprintf_s(ItemStr, L"블라인드");
+            }
+            break;
+        case 3:
+            if (Itemarr[3] > 0) {
+                swprintf_s(ItemStr, L"I 자변환");
+            }
+            break;
+        case 4:
+            if (Itemarr[4] > 0) {
+                swprintf_s(ItemStr, L"폭탄변환");
+            }
+            break;
+        case 5:
+            if (Itemarr[5] > 0) {
+                swprintf_s(ItemStr, L"상대밀기");
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    D2D1_RECT_F ItemT = D2D1::RectF(centerLeft - 265, padding + 380, centerLeft + 175, padding + 450);
     m_pRenderTarget->DrawText(
-        scoreStr2,
-        7,
+        ItemStr,
+        5,
         m_pTextFormat,
         ItemT,
         m_pWhiteBrush
     );
 
-    D2D1_RECT_F ItemT2 = D2D1::RectF(centerRight, padding + 220, centerRight + 170, padding + 340);
-    WCHAR scoreStr2[64];
-    swprintf_s(scoreStr2, L"%d        ", score2);
-    m_pRenderTarget->DrawText(
-        scoreStr2,
-        7,
-        m_pTextFormat,
-        ItemT2,
-        m_pWhiteBrush
-    );*/
-
-    for (int i = 0; i < 6; i++) {
-        switch (i) {
-        case 0:
-            if (Itemarr[0] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"1",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(190, 15, 200, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr[0] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr[0]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(190, 50, 200, 60),
-                        m_pWhiteBrush
-                    );
-                }
-            }
-            break;
-        case 1:
-            if (Itemarr[1] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"2",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(210, 15, 220, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr[1] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr[1]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(210, 50, 220, 60),
-                        m_pWhiteBrush
-                    );
-                }
-            }
-            break;
-        case 2:
-            if (Itemarr[2] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"3",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(230, 15, 240, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr[2] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr[2]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(230, 50, 240, 60),
-                        m_pWhiteBrush
-                    );
-                }
-            }
-            break;
-        case 3:
-            if (Itemarr[3] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"4",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(250, 15, 260, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr[3] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr[3]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(250, 50, 260, 60),
-                        m_pWhiteBrush
-                    );
-                }
-            }
-            break;
-        case 4:
-            if (Itemarr[4] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"5",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(270, 15, 280, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr[4] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr[4]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(270, 50, 280, 60),
-                        m_pWhiteBrush
-                    );
-                }
-            }
-            break;
-        case 5:
-            if (Itemarr[5] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"6",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(290, 15, 300, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr[5] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr[5]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(290, 50, 300, 60),
-                        m_pWhiteBrush
-                    );
-                }
-            }
-            break;
-        default:
-            break;
-        }
-    }
-
+    WCHAR ItemStr2[64];
+    swprintf_s(ItemStr2, L"아이템없음");
     for (int i = 0; i < 6; i++) {
         switch (i) {
         case 0:
             if (Itemarr2[0] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"1",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(550, 15, 560, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr2[0] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr2[0]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(550, 50, 560, 60),
-                        m_pWhiteBrush
-                    );
-                }
-
+                swprintf_s(ItemStr2, L"한줄삭제");
             }
             break;
         case 1:
             if (Itemarr2[1] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"2",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(570, 15, 590, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr2[1] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr2[1]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(570, 50, 590, 60),
-                        m_pWhiteBrush
-                    );
-                }
+                swprintf_s(ItemStr2, L"강제낙하");
             }
             break;
         case 2:
             if (Itemarr2[2] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"3",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(590, 15, 610, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr2[2] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr2[2]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(590, 50, 610, 60),
-                        m_pWhiteBrush
-                    );
-                }
+                swprintf_s(ItemStr2, L"블라인드");
             }
             break;
         case 3:
             if (Itemarr2[3] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"4",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(610, 15, 630, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr2[3] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr2[3]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(610, 50, 630, 60),
-                        m_pWhiteBrush
-                    );
-                }
+                swprintf_s(ItemStr2, L"I 자변환");
             }
             break;
         case 4:
             if (Itemarr2[4] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"5",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(630, 15, 650, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr2[4] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr2[4]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(630, 50, 650, 60),
-                        m_pWhiteBrush
-                    );
-                }
+                swprintf_s(ItemStr2, L"폭탄변환");
             }
             break;
         case 5:
             if (Itemarr2[5] > 0) {
-                m_pRenderTarget->DrawText(
-                    L"6",
-                    1,
-                    m_pTextFormat,
-                    D2D1::RectF(650, 15, 670, 30),
-                    m_pWhiteBrush
-                );
-                if (Itemarr2[5] > 1) {
-                    WCHAR scoreStr[64];
-                    swprintf_s(scoreStr, L"%d", Itemarr2[5]);
-                    m_pRenderTarget->DrawText(
-                        scoreStr,
-                        2,
-                        m_pTextFormat,
-                        D2D1::RectF(650, 50, 670, 60),
-                        m_pWhiteBrush
-                    );
-                }
+                swprintf_s(ItemStr2, L"상대밀기");
             }
             break;
         default:
             break;
         }
     }
+
+    D2D1_RECT_F ItemT2 = D2D1::RectF(centerRight, padding + 380, centerRight + 170, padding + 450);
+    m_pRenderTarget->DrawText(
+        ItemStr2,
+        5,
+        m_pTextFormat,
+        ItemT2,
+        m_pWhiteBrush
+    );
 
     HRESULT hr;
     //게임 오버시 나타나는 부분입니다.

@@ -14,6 +14,7 @@ public:
 	int GetRandomBrushIndex();
 	void InitializeD2D(ID2D1HwndRenderTarget* m_pRenderTarget);
 	void Activate();
+	void Shadow();
 	bool Advance(Matrix* stackCells);
 	void GoLeft(Matrix* stackCells);
 	void GoRight(Matrix* stackCells);
@@ -44,6 +45,7 @@ private:
 	Point2D position;
 	Matrix* cells;
 
+	bool shadow;
 	bool waiting;
 
 	int cellsTemplates[8][4][4] = { // 블럭들이 저장되어있습니다.

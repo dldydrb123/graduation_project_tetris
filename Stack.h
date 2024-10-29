@@ -29,7 +29,7 @@ private:
 	ID2D1SolidColorBrush* m_pBlackBrush;
 	// 블럭을 그리는 색깔 정의
 	D2D1_COLOR_F colors[9] = {
-		D2D1::ColorF(D2D1::ColorF::Black),      // 0
+		D2D1::ColorF(D2D1::ColorF::Gray),      // 0
 		D2D1::ColorF(D2D1::ColorF::Blue),       // 1
 		D2D1::ColorF(D2D1::ColorF::Green),      // 2
 		D2D1::ColorF(D2D1::ColorF::Yellow),     // 3

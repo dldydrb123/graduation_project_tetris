@@ -1,11 +1,12 @@
 #pragma once
-#include "Matrix.h"
 extern int ItemGet;
 extern int ItemGet2;
 
 extern int Itemarr[6];
 extern int Itemarr2[6];
 
+extern int atk;
+extern int atk2;
 
 extern bool item1_1;
 extern bool item1_2;

@@ -78,6 +78,10 @@ void Piece::Activate()
 	waiting = false;
 }
 
+void Piece::Shadow() {
+	shadow = true;
+}
+
 bool Piece::Advance(Matrix* stackCells)
 {
 	// 블럭이 떨어지는 부분입니다.
@@ -291,6 +295,7 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 // 2p 블럭을 그리는 부분
 void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
+
 	double padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
 	double shiftX = 30;  // x축 이동 값
 	double shiftY = 30;  // y축 이동 값

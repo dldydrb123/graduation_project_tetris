@@ -55,6 +55,8 @@ int Stack::RemoveLines(Matrix* stackCells)
 	{
 		bool entireLine = true;
 		bool check = false;
+		bool attack = false;
+		bool useitem = false;
 
 		// 모든 칸을 확인하면서 빈칸이 있다면 entrieLine을 false로 바꿔 줄을 넘어갑니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
@@ -65,6 +67,12 @@ int Stack::RemoveLines(Matrix* stackCells)
 				entireLine = false;
 			}
 
+			// 공격 받은 스택인지 확인합니다.
+			// 공격받은 스택은 상대에게 공격이 안됩니다.
+			if (stackCells->Get(j, i) == 10) {
+				attack = true;
+			}
+
 			// 줄을 지우게 될시 해당 줄에 아이템 블럭이 있는지 재확인용으로 줄 재검사
 			if (j == 9 && check == false && entireLine == true) {
 				check = true;
@@ -72,9 +80,9 @@ int Stack::RemoveLines(Matrix* stackCells)
 			}
 
 			// 아이템이 있는 확인후 랜덤함수로 아이템 지급
-			if (stackCells->Get(j, i) == 8 && check == true)
+			if (stackCells->Get(j, i) == 8 && check == true && ItemGet == 0)
 			{
-				ItemGet = rand() % 7;
+				ItemGet = rand() % 6 + 1;
 
 				switch (ItemGet)
 				{
@@ -104,6 +112,7 @@ int Stack::RemoveLines(Matrix* stackCells)
 		if (i == STACK_HEIGHT - 1 && item1_1 == true)
 		{
 			entireLine = true;
+			useitem = true;
 			item1_1 = false;
 			Itemarr[0]--;
 			ItemGet = 0;
@@ -114,6 +123,11 @@ int Stack::RemoveLines(Matrix* stackCells)
 		if (entireLine)
 		{
 			removed++;
+
+			if (attack == false && useitem == false) {
+				atk++;
+			}
+
 			for (int k = i; k > 0; k--)
 			{
 				for (int j = 0; j < STACK_WIDTH; j++)
@@ -138,14 +152,23 @@ int Stack::RemoveLines2(Matrix* stackCells)
 	{
 		bool entireLine = true;
 		bool check = false;
+		bool attack = false;
+		bool useitem = false;
 
 		// 모든 칸을 확인하면서 빈칸이 있다면 entrieLine을 false로 바꿔 줄을 넘어갑니다.
 		for (int j = 0; j < STACK_WIDTH; j++)
 		{
+			
 			// 비어 있는 칸이 있는지 확인, 비어있다면 줄을 지우지 않음
 			if (stackCells->Get(j, i) == 0 && check == false)
 			{
 				entireLine = false;
+			}
+			
+			// 공격 받은 스택인지 확인합니다.
+			// 공격받은 스택은 상대에게 공격이 안됩니다.
+			if (stackCells->Get(j, i) == 10) {
+				attack = true;
 			}
 			
 			// 줄을 지우게 될시 해당 줄에 아이템 블럭이 있는지 재확인용으로 줄 재검사
@@ -155,9 +178,9 @@ int Stack::RemoveLines2(Matrix* stackCells)
 			}
 
 			// 아이템이 있는 확인후 랜덤함수로 아이템 지급
-			if (stackCells->Get(j, i) == 8 && check == true)
+			if (stackCells->Get(j, i) == 8 && check == true && ItemGet2 == 0)
 			{
-				ItemGet2 = rand() % 7;
+				ItemGet2 = rand() % 6 + 1;
 
 				switch (ItemGet2)
 				{
@@ -187,6 +210,7 @@ int Stack::RemoveLines2(Matrix* stackCells)
 		if (i == STACK_HEIGHT - 1 && item2_1 == true)
 		{
 			entireLine = true;
+			useitem = true;
 			item2_1 = false;
 			Itemarr2[0]--;
 			ItemGet2 = 0;
@@ -197,6 +221,11 @@ int Stack::RemoveLines2(Matrix* stackCells)
 		if (entireLine)
 		{
 			removed++;
+
+			if (attack == false && useitem == false) {
+				atk2++;
+			}
+
 			for (int k = i; k > 0; k--)
 			{
 				for (int j = 0; j < STACK_WIDTH; j++)
@@ -243,6 +272,10 @@ void Stack::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 			if (cells->Get(j, i) > 0)
 			{
 				m_pSelectedBrush = m_pBrushes[cells->Get(j, i)];
+
+				if (cells->Get(j, i) == 10) {
+					m_pSelectedBrush = m_pBrushes[0];
+				}
 
 				//열이 채워져있으면 없어질 스택을 노란색으로, 열이 비어있다면 초록색으로 칠합니다.
 				if (entireLine)
@@ -293,6 +326,10 @@ void Stack::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 			if (cells->Get(j, i) > 0)
 			{
 				m_pSelectedBrush = m_pBrushes[cells->Get(j, i)];
+
+				if (cells->Get(j, i) == 10) {
+					m_pSelectedBrush = m_pBrushes[0];
+				}
 
 				//열이 채워져있으면 없어질 스택을 노란색으로 칠합니다.
 				if (entireLine)

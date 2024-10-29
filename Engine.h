@@ -42,11 +42,13 @@ private:
 	Piece* activePiece;
 	Piece* waitingPiece;
 	Piece* changePiece;
+	Piece* shadowPiece;
 
 	Stack* stack2;
 	Piece* activePiece2;
 	Piece* waitingPiece2;
 	Piece* changePiece2;
+	Piece* shadowPiece2;
 
 	int fcheck;
 	int scheck;
@@ -54,9 +56,6 @@ private:
 	int height2;
 	int blindcheck;
 	int blindcheck2;
-
-	int atk;
-	int atk2;
 
 	double fall;
 	double fall2;
