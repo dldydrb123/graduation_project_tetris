@@ -996,7 +996,7 @@ HRESULT Engine::DrawImage()
 
 
     //2p score
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score2.png", 720.0f, 300.0f, 145.0f, 120.0f);
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 720.0f, 300.0f, 145.0f, 120.0f);
     if (FAILED(hr)) {
         // JPG 이미지 로드 및 그리기 실패
         return hr;
@@ -1004,6 +1004,20 @@ HRESULT Engine::DrawImage()
 
     //2p next
     hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", 720.0f, 140.0f, 150.0f, 120.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+      //2p item
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 720.0f, 450.0f, 150.0f, 120.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //1p item
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 70.0f, 450.0f, 150.0f, 120.0f);
     if (FAILED(hr)) {
         // JPG 이미지 로드 및 그리기 실패
         return hr;
@@ -1045,6 +1059,13 @@ HRESULT Engine::DrawImage()
 
     //2p space
     hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space.png", 538.0f, 750.0f, 210.0f, 30.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //logo
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\logo.png", 170.0f, 10.0f, 600.0f, 120.0f);
     if (FAILED(hr)) {
         // JPG 이미지 로드 및 그리기 실패
         return hr;
