@@ -80,7 +80,6 @@ private:
 	bool spacePressed2 = false;
 	bool enteringPressed = false;
 	bool enteringPressed2 = false;
-	bool over = false;
 
 	int score = 0;
 	int score2 = 0;

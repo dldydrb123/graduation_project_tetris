@@ -22,3 +22,5 @@ extern bool item2_4;
 extern bool item2_5;
 extern bool item2_6;
 
+extern bool Gover;
+extern bool reset;

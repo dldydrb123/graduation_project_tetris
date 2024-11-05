@@ -104,15 +104,15 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     activePiece->Activate();
     waitingPiece = new Piece();
     changePiece = new Piece();
-    shadowPiece = new Piece();
-    shadowPiece->Shadow();
+    /*shadowPiece = new Piece();
+    shadowPiece->Shadow();*/
 
     activePiece2 = new Piece();
     activePiece2->Activate();
     waitingPiece2 = new Piece();
     changePiece2 = new Piece();
-    shadowPiece2 = new Piece();
-    shadowPiece2->Shadow();
+    /*shadowPiece2 = new Piece();
+    shadowPiece2->Shadow();*/
 
     // autoFall 자동으로 블럭이 떨어지는 속도.
     // 0.7 이 기본값입니다.
@@ -154,6 +154,7 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
 Engine::~Engine()
 {
     // 닫힘
+    m_pRenderTarget = 0;
 
     SafeRelease(&m_pDirect2dFactory);
     SafeRelease(&m_pRenderTarget);
@@ -273,6 +274,11 @@ void Engine::KeyUp(WPARAM wParam)
 
     if (wParam == 87)
         spacePressed = false;
+
+
+    if (wParam == VK_NUMPAD0)
+    {
+    }
 }
 
 void Engine::KeyDown(WPARAM wParam)
@@ -372,6 +378,10 @@ void Engine::KeyDown(WPARAM wParam)
             break;
         }
     }
+
+    if (wParam == VK_NUMPAD0)
+    {
+    }
 }
 
 // 마우스 관련 함수들인데 사용할지 말지 고민중
@@ -396,10 +406,8 @@ void Engine::Logic(double elapsedTime)
 
     // 게임오버 체크
     // 둘 중 하나라도 게임오버시 over를 true로 바꾸고 리턴합니다.
-    if (gameOver || gameOver2) 
+    if (Gover) 
     {
-        over = true;
-
         return;
     }
 
@@ -409,7 +417,20 @@ void Engine::Logic(double elapsedTime)
     Matrix* stackCells2 = stack2->GetCells();
     Matrix* changeCells2 = stack2->GetCells();
 
+    // 게임 오버후 재시작하는 부분
+    /*if (over == true && (enteringPressed == true || enteringPressed2 == true)) {
+        for (int i = 0; i < STACK_HEIGHT; i++) {
+            for (int j = 0; j < STACK_WIDTH; j++) {
+                stackCells->Set(j, i, 0);
+                stackCells2->Set(j, i, 0);
+            }
+        }
 
+        gameOver = false;
+        gameOver2 = false;
+        over = false;
+    }*/
+    /*// 떨어질 위치 예측용 코드, 작동안함
     for (int i = STACK_HEIGHT - 1; i >= 0; i--) {
         int k = 0;
         for (int j = 0; j < STACK_WIDTH; j++) {
@@ -441,7 +462,7 @@ void Engine::Logic(double elapsedTime)
             break;
         }
         height2 = 25 - i;
-    }
+    }*/
 
     // 4번 아이템 사용되는 부분
     if (item1_4) {
@@ -777,7 +798,10 @@ void Engine::Logic(double elapsedTime)
             // 활성 블럭이 스택과 바로 충돌이 일어났는지 확인합니다.
             // 활성 되자마자 스택과 충돌이 일어난거기 때문에 곧 게임 오버를 뜻합니다.
             if (activePiece->StackCollision(stackCells))
+            {
                 gameOver = true;
+                Gover = true;
+            }
         }
     }
 
@@ -909,6 +933,7 @@ void Engine::Logic(double elapsedTime)
             // 스택에 충돌은 게임오버를 뜻합니다.
             if (activePiece2->StackCollision(stackCells2)) {
                 gameOver2 = true;
+                Gover = true;
             }
         }
     }
@@ -921,9 +946,11 @@ HRESULT Engine::Draw()
     HRESULT hr;
 
     // 그림 그릴 붓 만들고 색상을 정하는 부분입니다.
-    m_pRenderTarget->BeginDraw();
-    m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-    m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+    if (m_pRenderTarget != NULL) {
+        m_pRenderTarget->BeginDraw();
+        m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+        m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+    }
 
 
     // 게임 내의 각 요소들(스택, 활성 블럭, 대기 블럭)을 실질적으로 그리는 부분입니다.
@@ -946,23 +973,26 @@ HRESULT Engine::Draw()
     }
     waitingPiece2->Draw2(m_pRenderTarget);
 
-    //1p Blind Item
-    //1p가 사용하는 거라서 2p의 보드를 가립니다.
-    if (item1_3) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 542.0f, 624.0f, 202.0f, -(CELL_SIZE * height2));
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-    }
 
-    //2p Blind Item
-    //2p가 사용하는 거라서 1p의 보드를 가립니다.
-    if (item2_3) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 198.0f, 624.0f, 202.0f, -(CELL_SIZE * height));
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
+    if (wicFactory != NULL) {
+        //1p Blind Item
+        //1p가 사용하는 거라서 2p의 보드를 가립니다.
+        if (item1_3) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 542.0f, 624.0f, 202.0f, -(CELL_SIZE * height2));
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+
+        //2p Blind Item
+        //2p가 사용하는 거라서 1p의 보드를 가립니다.
+        if (item2_3) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 198.0f, 624.0f, 202.0f, -(CELL_SIZE * height));
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
         }
     }
 
@@ -978,180 +1008,181 @@ HRESULT Engine::Draw()
 HRESULT Engine::DrawImage() 
 {
     HRESULT hr;
+    if (wicFactory != NULL) {
 
-    //배경화면
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\tetris wall paper.png", 0.0f, 0.0f, 900.0f, 800.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //1p next
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", 70.0f, 140.0f, 150.0f, 120.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //1p score
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 70.0f, 300.0f, 145.0f, 120.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-
-    //2p score
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 720.0f, 300.0f, 145.0f, 120.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //2p next
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", 720.0f, 140.0f, 150.0f, 120.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-      //2p item
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 720.0f, 450.0f, 150.0f, 120.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //1p item
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 70.0f, 450.0f, 150.0f, 120.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //2p black
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", 538.0f, 138.0f, 210.0f, 491.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-    //1p black
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", 194.0f, 138.0f, 210.0f, 491.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //1p button
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\button.png", 194.0f, 640.0f, 210.0f, 100.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //2p button
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\button.png", 538.0f, 640.0f, 210.0f, 100.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //1p space
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space.png", 194.0f, 750.0f, 210.0f, 30.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //2p space
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space.png", 538.0f, 750.0f, 210.0f, 30.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //logo
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\logo.png", 170.0f, 10.0f, 600.0f, 120.0f);
-    if (FAILED(hr)) {
-        // JPG 이미지 로드 및 그리기 실패
-        return hr;
-    }
-
-    //1p 키눌림
-    if (leftPressed == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 194, 690, 70, 50);
+        //배경화면
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\tetris wall paper.png", 0.0f, 0.0f, 900.0f, 800.0f);
         if (FAILED(hr)) {
             // JPG 이미지 로드 및 그리기 실패
             return hr;
         }
-    }
-    if (rightPressed == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\right.png", 335, 690, 70, 50);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-    }
-    if (spacePressed == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\up.png", 264, 640, 70, 50);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-    }
-    if (downPressed == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\down.png", 264, 690, 70, 50);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-    }
-    if (enteringPressed == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space2.png", 194, 750, 210, 30);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-    }
 
-    //2p 키눌림
-    if (leftPressed2 == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 538, 691, 70, 50);
+        //1p next
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", 70.0f, 140.0f, 150.0f, 120.0f);
         if (FAILED(hr)) {
             // JPG 이미지 로드 및 그리기 실패
             return hr;
         }
-    }
-    if (rightPressed2 == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\right.png", 679, 690, 70, 50);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-    }
-    if (spacePressed2 == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\up.png", 608, 640, 70, 50);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-    }
 
-    if (downPressed2 == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\down.png", 608, 690, 68, 50);
+        //1p score
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 70.0f, 300.0f, 145.0f, 120.0f);
         if (FAILED(hr)) {
             // JPG 이미지 로드 및 그리기 실패
             return hr;
         }
-    }
-    if (enteringPressed2 == true) {
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space2.png", 538, 750, 210, 30);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-    }
 
+
+        //2p score
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 720.0f, 300.0f, 145.0f, 120.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //2p next
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", 720.0f, 140.0f, 150.0f, 120.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //2p item
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 720.0f, 450.0f, 150.0f, 120.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //1p item
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 70.0f, 450.0f, 150.0f, 120.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //2p black
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", 538.0f, 138.0f, 210.0f, 491.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+        //1p black
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", 194.0f, 138.0f, 210.0f, 491.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //1p button
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\button.png", 194.0f, 640.0f, 210.0f, 100.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //2p button
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\button.png", 538.0f, 640.0f, 210.0f, 100.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //1p space
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space.png", 194.0f, 750.0f, 210.0f, 30.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //2p space
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space.png", 538.0f, 750.0f, 210.0f, 30.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //logo
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\logo.png", 170.0f, 10.0f, 600.0f, 120.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+
+        //1p 키눌림
+        if (leftPressed == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 194, 690, 70, 50);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+        if (rightPressed == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\right.png", 335, 690, 70, 50);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+        if (spacePressed == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\up.png", 264, 640, 70, 50);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+        if (downPressed == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\down.png", 264, 690, 70, 50);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+        if (enteringPressed == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space2.png", 194, 750, 210, 30);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+
+        //2p 키눌림
+        if (leftPressed2 == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 538, 691, 70, 50);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+        if (rightPressed2 == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\right.png", 679, 690, 70, 50);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+        if (spacePressed2 == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\up.png", 608, 640, 70, 50);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+
+        if (downPressed2 == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\down.png", 608, 690, 68, 50);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+        if (enteringPressed2 == true) {
+            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space2.png", 538, 750, 210, 30);
+            if (FAILED(hr)) {
+                // JPG 이미지 로드 및 그리기 실패
+                return hr;
+            }
+        }
+    }
 }
 
 HRESULT Engine::DrawTextAndScore()
@@ -1310,7 +1341,7 @@ HRESULT Engine::DrawTextAndScore()
     
     HRESULT hr;
     //게임 오버시 나타나는 부분입니다.
-    if (over == true) {
+    if (Gover == true) {
         //gameover
         hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\gameover.png", 325.0f, 230.0f, 300.0f, 300.0f);
         if (FAILED(hr)) {

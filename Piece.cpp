@@ -78,9 +78,9 @@ void Piece::Activate()
 	waiting = false;
 }
 
-void Piece::Shadow() {
+/*void Piece::Shadow() {
 	shadow = true;
-}
+}*/
 
 bool Piece::Advance(Matrix* stackCells)
 {
@@ -157,6 +157,10 @@ void Piece::Rotate(Matrix* stackCells)
 		for (int j = 0; j < 4; j++)
 		{
 			cells->Set(j, i, temp->Get(i, 3 - j));
+
+			if (i==0 && cells->Get(j,i) == 1) {
+				position.y += 1;
+			}
 		}
 	}
 

@@ -26,6 +26,9 @@ bool item2_4 = false;
 bool item2_5 = false;
 bool item2_6 = false;
 
+bool Gover = false;
+bool reset = false;
+
 int atk = 0;
 int atk2 = 0;
 

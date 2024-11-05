@@ -69,30 +69,43 @@ void MainApp::GameLoop()
 {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
     int frames = 0;
     double framesTime = 0;
 
-    while (running)
+    while(true)
     {
-        end = std::chrono::steady_clock::now();
-        double elapsed_secs = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0;
-        begin = end;
-
-        // FPS 표시
-        framesTime += elapsed_secs;
-        frames++;
-        if (framesTime > 1)
+        while (running)
         {
-            WCHAR fpsText[32];
-            swprintf(fpsText, 32, L"Game: %d FPS", frames);
-            SetWindowText(m_hwnd, fpsText); // app 대신 m_hwnd 사용
-            frames = 0;
-            framesTime = 0;
+            end = std::chrono::steady_clock::now();
+            double elapsed_secs = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0;
+            begin = end;
+
+            // FPS 표시
+            framesTime += elapsed_secs;
+            frames++;
+            if (framesTime > 1)
+            {
+                WCHAR fpsText[32];
+                swprintf(fpsText, 32, L"Game: %d FPS", frames);
+                SetWindowText(m_hwnd, fpsText); // app 대신 m_hwnd 사용
+                frames = 0;
+                framesTime = 0;
+            }
+
+            // 게임 로직 업데이트 및 그리기
+            engine->Logic(elapsed_secs);
+            engine->Draw();
+            if (Gover == true) {
+                break;
+            }
+        }
+        if (Gover == true && reset == true) {
+            engine->~Engine();
+
+            engine = new Engine();
         }
 
-        // 게임 로직 업데이트 및 그리기
-        engine->Logic(elapsed_secs);
-        engine->Draw();
     }
 }
 
@@ -232,6 +245,10 @@ LRESULT CALLBACK MainApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
             case WM_KEYDOWN:
             {
                 pMainApp->engine->KeyDown(wParam);
+
+                if (wParam == VK_NUMPAD0) {
+                    reset = true;
+                }
             }
             result = 0;
             wasHandled = true;
