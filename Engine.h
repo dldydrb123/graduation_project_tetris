@@ -32,6 +32,7 @@ private:
 	IDWriteFactory* m_pDWriteFactory;
 	IDWriteTextFormat* m_pTextFormat;
 	ID2D1SolidColorBrush* m_pWhiteBrush;
+	ID2D1SolidColorBrush* m_pItemBrush;
 
 	void InitializeTextAndScore();
 	HRESULT DrawTextAndScore();

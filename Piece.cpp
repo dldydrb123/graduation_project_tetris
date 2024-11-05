@@ -40,7 +40,7 @@ Piece::Piece() : m_pSelectedBrush(NULL)
 		for (int j = 0; j < 4; j++)
 		{
 			//1/10 의 확률로 아이템 블럭으로 결정됨
-			if (Item < 5 && pieceType != 7) {
+			if (Item < 2 && pieceType != 7) {
 				cells->Set(j, i, Itemcells[pieceType][i][j]);
 			}
 			else {

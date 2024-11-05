@@ -13,7 +13,7 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "dwrite")
 #pragma comment(lib, "Windowscodecs.lib")
 
-#define SOLO_PLAY 1
+#define SOLO_PLAY 0 
 
 // 전역 변수
 ComPtr<ID2D1Factory> d2dFactory;
@@ -91,6 +91,7 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     // 생성자입니다.
 	// Engine.cpp 안에서 사용되는 변수들을 선언하는 공간입니다.
     m_pWhiteBrush = nullptr;
+    m_pItemBrush = nullptr;
     m_pDWriteFactory = nullptr;
     m_pTextFormat = nullptr;
 
@@ -234,6 +235,11 @@ void Engine::InitializeTextAndScore()
     m_pRenderTarget->CreateSolidColorBrush(
         D2D1::ColorF(D2D1::ColorF::White),
         &m_pWhiteBrush
+    );
+
+    m_pRenderTarget->CreateSolidColorBrush(
+        D2D1::ColorF(D2D1::ColorF::Purple),
+        &m_pItemBrush
     );
 }
 
@@ -1187,101 +1193,121 @@ HRESULT Engine::DrawTextAndScore()
 
     WCHAR ItemStr[64];
     swprintf_s(ItemStr, L"아이템없음");
-    
-    for (int i = 0; i < 6; i++) {
-        switch (i) {
-        case 0:
-            if (Itemarr[0] > 0) {
-                swprintf_s(ItemStr, L"한줄삭제");
-            }
-            break;
-        case 1:
-            if (Itemarr[1] > 0) {
-                swprintf_s(ItemStr, L"강제낙하");
-            }
-            break;
-        case 2:
-            if (Itemarr[2] > 0) {
-                swprintf_s(ItemStr, L"블라인드");
-            }
-            break;
-        case 3:
-            if (Itemarr[3] > 0) {
-                swprintf_s(ItemStr, L"I 자변환");
-            }
-            break;
-        case 4:
-            if (Itemarr[4] > 0) {
-                swprintf_s(ItemStr, L"폭탄변환");
-            }
-            break;
-        case 5:
-            if (Itemarr[5] > 0) {
-                swprintf_s(ItemStr, L"상대밀기");
-            }
-            break;
-        default:
-            break;
-        }
-    }
-
     D2D1_RECT_F ItemT = D2D1::RectF(centerLeft - 265, padding + 380, centerLeft + 175, padding + 450);
-    m_pRenderTarget->DrawText(
-        ItemStr,
-        5,
-        m_pTextFormat,
-        ItemT,
-        m_pWhiteBrush
-    );
+    if (ItemGet == 0) {
+        m_pRenderTarget->DrawText(
+            ItemStr,
+            5,
+            m_pTextFormat,
+            ItemT,
+            m_pWhiteBrush
+        );
+    }
+    else {
+        for (int i = 0; i < 6; i++) {
+            switch (i) {
+            case 0:
+                if (Itemarr[0] > 0) {
+                    swprintf_s(ItemStr, L"한줄삭제");
+                }
+                break;
+            case 1:
+                if (Itemarr[1] > 0) {
+                    swprintf_s(ItemStr, L"강제낙하");
+                }
+                break;
+            case 2:
+                if (Itemarr[2] > 0) {
+                    swprintf_s(ItemStr, L"블라인드");
+                }
+                break;
+            case 3:
+                if (Itemarr[3] > 0) {
+                    swprintf_s(ItemStr, L"I 자변환");
+                }
+                break;
+            case 4:
+                if (Itemarr[4] > 0) {
+                    swprintf_s(ItemStr, L"폭탄변환");
+                }
+                break;
+            case 5:
+                if (Itemarr[5] > 0) {
+                    swprintf_s(ItemStr, L"상대밀기");
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        m_pRenderTarget->DrawText(
+            ItemStr,
+            5,
+            m_pTextFormat,
+            ItemT,
+            m_pItemBrush
+        );
+    }
 
     WCHAR ItemStr2[64];
     swprintf_s(ItemStr2, L"아이템없음");
-    for (int i = 0; i < 6; i++) {
-        switch (i) {
-        case 0:
-            if (Itemarr2[0] > 0) {
-                swprintf_s(ItemStr2, L"한줄삭제");
-            }
-            break;
-        case 1:
-            if (Itemarr2[1] > 0) {
-                swprintf_s(ItemStr2, L"강제낙하");
-            }
-            break;
-        case 2:
-            if (Itemarr2[2] > 0) {
-                swprintf_s(ItemStr2, L"블라인드");
-            }
-            break;
-        case 3:
-            if (Itemarr2[3] > 0) {
-                swprintf_s(ItemStr2, L"I 자변환");
-            }
-            break;
-        case 4:
-            if (Itemarr2[4] > 0) {
-                swprintf_s(ItemStr2, L"폭탄변환");
-            }
-            break;
-        case 5:
-            if (Itemarr2[5] > 0) {
-                swprintf_s(ItemStr2, L"상대밀기");
-            }
-            break;
-        default:
-            break;
-        }
-    }
-
     D2D1_RECT_F ItemT2 = D2D1::RectF(centerRight, padding + 380, centerRight + 170, padding + 450);
-    m_pRenderTarget->DrawText(
-        ItemStr2,
-        5,
-        m_pTextFormat,
-        ItemT2,
-        m_pWhiteBrush
-    );
+    if (ItemGet2 == 0) {
+        m_pRenderTarget->DrawText(
+            ItemStr2,
+            5,
+            m_pTextFormat,
+            ItemT2,
+            m_pWhiteBrush
+        );
 
+    }
+    else {
+        for (int i = 0; i < 6; i++) {
+            switch (i) {
+            case 0:
+                if (Itemarr2[0] > 0) {
+                    swprintf_s(ItemStr2, L"한줄삭제");
+                }
+                break;
+            case 1:
+                if (Itemarr2[1] > 0) {
+                    swprintf_s(ItemStr2, L"강제낙하");
+                }
+                break;
+            case 2:
+                if (Itemarr2[2] > 0) {
+                    swprintf_s(ItemStr2, L"블라인드");
+                }
+                break;
+            case 3:
+                if (Itemarr2[3] > 0) {
+                    swprintf_s(ItemStr2, L"I 자변환");
+                }
+                break;
+            case 4:
+                if (Itemarr2[4] > 0) {
+                    swprintf_s(ItemStr2, L"폭탄변환");
+                }
+                break;
+            case 5:
+                if (Itemarr2[5] > 0) {
+                    swprintf_s(ItemStr2, L"상대밀기");
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        m_pRenderTarget->DrawText(
+            ItemStr2,
+            5,
+            m_pTextFormat,
+            ItemT2,
+            m_pItemBrush
+        );
+    }
+    
     HRESULT hr;
     //게임 오버시 나타나는 부분입니다.
     if (over == true) {
