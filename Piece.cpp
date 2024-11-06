@@ -40,7 +40,7 @@ Piece::Piece() : m_pSelectedBrush(NULL)
 		for (int j = 0; j < 4; j++)
 		{
 			//1/10 의 확률로 아이템 블럭으로 결정됨
-			if (Item < 5 && pieceType != 7) {
+			if (Item < 4 && pieceType != 7) {
 				cells->Set(j, i, Itemcells[pieceType][i][j]);
 			}
 			else {
@@ -78,9 +78,9 @@ void Piece::Activate()
 	waiting = false;
 }
 
-void Piece::Shadow() {
+/*void Piece::Shadow() {
 	shadow = true;
-}
+}*/
 
 bool Piece::Advance(Matrix* stackCells)
 {
@@ -157,6 +157,10 @@ void Piece::Rotate(Matrix* stackCells)
 		for (int j = 0; j < 4; j++)
 		{
 			cells->Set(j, i, temp->Get(i, 3 - j));
+
+			if (i==0 && cells->Get(j,i) == 1) {
+				position.y += 1;
+			}
 		}
 	}
 
@@ -280,13 +284,14 @@ void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 				center_x + j * CELL_SIZE + 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + i * CELL_SIZE + 1,
 				center_x + (j + 1) * CELL_SIZE - 1 + CELL_SIZE + RESOLUTION_X / 8, center_y + (i + 1) * CELL_SIZE - 1
 			);
-
-			if (cells->Get(j, i) == 2 || cells->Get(j, i) == 3)
-			{
-				m_pRenderTarget->FillRectangle(&rectangle4, m_pBrushes[8]);
-			}
-			else if (cells->Get(j, i) == 1) {
-				m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
+			if (m_pRenderTarget != NULL) {
+				if (cells->Get(j, i) == 2 || cells->Get(j, i) == 3)
+				{
+					m_pRenderTarget->FillRectangle(&rectangle4, m_pBrushes[8]);
+				}
+				else if (cells->Get(j, i) == 1) {
+					m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
+				}
 			}
 		}
 	}
@@ -319,13 +324,15 @@ void Piece::Draw2(ID2D1HwndRenderTarget* m_pRenderTarget)
 				center_x + j * CELL_SIZE + 1 + RESOLUTION_X / 5, center_y + i * CELL_SIZE + 1,
 				center_x + (j + 1) * CELL_SIZE - 1 + RESOLUTION_X / 5, center_y + (i + 1) * CELL_SIZE - 1
 			);
-			if (cells->Get(j, i) == 2 || cells->Get(j, i) == 3)
-			{
-				m_pRenderTarget->FillRectangle(&rectangle4, m_pBrushes[8]);
-			}
-			else if (cells->Get(j, i) == 1)
-			{
-				m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
+			if (m_pRenderTarget != NULL) {
+				if (cells->Get(j, i) == 2 || cells->Get(j, i) == 3)
+				{
+					m_pRenderTarget->FillRectangle(&rectangle4, m_pBrushes[8]);
+				}
+				else if (cells->Get(j, i) == 1)
+				{
+					m_pRenderTarget->FillRectangle(&rectangle4, m_pSelectedBrush);
+				}
 			}
 		}
 	}

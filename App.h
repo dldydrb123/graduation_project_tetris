@@ -1,7 +1,6 @@
 #pragma once
 
 #include "resource.h"
-#include <string>
 
 
 #ifndef Assert
@@ -35,12 +34,12 @@ public:
     void GameLoop();
 
     bool GameStart = false;
-
 private:
 
     HWND m_hwnd;
 
     Engine* engine;
+
 
     // The windows procedure.
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

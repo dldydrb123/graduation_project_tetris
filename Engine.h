@@ -38,8 +38,9 @@ private:
 	ID2D1HwndRenderTarget* m_pRenderTarget;
 
 	IDWriteFactory* m_pDWriteFactory;
-	IDWriteTextFormat* m_pTextFormat; 
+	IDWriteTextFormat* m_pTextFormat;
 	ID2D1SolidColorBrush* m_pWhiteBrush;
+	ID2D1SolidColorBrush* m_pItemBrush;
 
 	void InitializeTextAndScore();
 	HRESULT DrawTextAndScore();
@@ -50,13 +51,11 @@ private:
 	Piece* activePiece;
 	Piece* waitingPiece;
 	Piece* changePiece;
-	Piece* shadowPiece;
 
 	Stack* stack2;
 	Piece* activePiece2;
 	Piece* waitingPiece2;
 	Piece* changePiece2;
-	Piece* shadowPiece2;
 
 	int fcheck;
 	int scheck;
@@ -87,12 +86,11 @@ private:
 	bool spacePressed2 = false;
 	bool enteringPressed = false;
 	bool enteringPressed2 = false;
-	bool over = false;
 	bool scoreSaved = false; // Declare this as a class member variable.
 
 	int score = 0;
 	int score2 = 0;
-	
+
 	double autoFallDelay;
 	double autoFallAccumulated;
 	double keyPressDelay;
