@@ -33,13 +33,3 @@ void Matrix::Set(int x, int y, int value)
 {
     matrix[y][x] = value;
 }
-
-int Matrix::GetXSize()
-{
-    return xSize;
-}
-
-int Matrix::GetYSize()
-{
-    return ySize;
-}

@@ -7,28 +7,12 @@
 #include <thread>
 #include <atomic>
 #include <socketapi.h>
-#include <gdiplus.h>  // GDI+ 헤더 포함
-
-#pragma comment (lib,"Gdiplus.lib")  // GDI+ 라이브러리 링크
-
-// 전역 변수
-ULONG_PTR gdiplusToken;
-
-// GDI+ 초기화 함수
-void InitGDIPlus() {
-    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-}
-
-// GDI+ 종료 함수
-void ShutdownGDIPlus() {
-    Gdiplus::GdiplusShutdown(gdiplusToken);
-}
 
 
 
 // 게임 루프 실행 상태를 관리할 변수
 std::atomic<bool> running(true);
+HWND hEdit1P, hEdit2P;
 
 #pragma comment(lib, "d2d1")
 
@@ -36,10 +20,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 {
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
-    // GDI+ 초기화
-    InitGDIPlus();
-
-    if (SUCCEEDED(CoInitialize(NULL)))
+     if (SUCCEEDED(CoInitialize(NULL)))
     {
         MainApp app;
 
@@ -50,62 +31,56 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
         CoUninitialize();
     }
-    // GDI+ 종료
-    ShutdownGDIPlus();
-
     return 0;
 }
 
 MainApp::MainApp() : m_hwnd(NULL)
 {
-    engine = new Engine();
+        engine = new Engine();
+
 }
 
 MainApp::~MainApp()
 {
+    // 동적으로 할당한 객체 삭제
+    delete engine;
 }
 
 void MainApp::GameLoop()
 {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
     int frames = 0;
     double framesTime = 0;
 
-    while(true)
+    while (running)
     {
-        while (running)
+        end = std::chrono::steady_clock::now();
+        double elapsed_secs = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0;
+        begin = end;
+
+        // FPS 표시
+        framesTime += elapsed_secs;
+        frames++;
+        if (framesTime > 1)
         {
-            end = std::chrono::steady_clock::now();
-            double elapsed_secs = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0;
-            begin = end;
-
-            // FPS 표시
-            framesTime += elapsed_secs;
-            frames++;
-            if (framesTime > 1)
-            {
-                WCHAR fpsText[32];
-                swprintf(fpsText, 32, L"Game: %d FPS", frames);
-                SetWindowText(m_hwnd, fpsText); // app 대신 m_hwnd 사용
-                frames = 0;
-                framesTime = 0;
-            }
-
+            WCHAR fpsText[32];
+            swprintf(fpsText, 32, L"Game: %d FPS", frames);
+            SetWindowText(m_hwnd, fpsText); // app 대신 m_hwnd 사용
+            frames = 0;
+            framesTime = 0;
+        }
+        
+        if (GameStart)
+        {
             // 게임 로직 업데이트 및 그리기
             engine->Logic(elapsed_secs);
             engine->Draw();
-            if (Gover == true) {
-                break;
-            }
         }
-        if (Gover == true && reset == true) {
-            engine->~Engine();
-
-            engine = new Engine();
+        //else
+        {
+            //engine->Draw2();
         }
-
     }
 }
 
@@ -132,6 +107,7 @@ void MainApp::RunMessageLoop()
 HRESULT MainApp::Initialize()
 {
     HRESULT hr = S_OK;
+
 
     // 윈도우 창 만드는 부분
     WNDCLASSEX wcex = { sizeof(WNDCLASSEX) };
@@ -161,6 +137,34 @@ HRESULT MainApp::Initialize()
         HINST_THISCOMPONENT,
         this
     );
+
+        // 버튼 생성
+        HWND hButton = CreateWindow(
+            L"BUTTON", L"Start Game",
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+            100, 100, 100, 50, // 버튼 위치 및 크기
+            m_hwnd, (HMENU)ID_START_BUTTON, HINSTANCE(GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE)), NULL
+        );
+        if (!hButton) {
+            MessageBox(m_hwnd, L"Start Game 버튼 생성에 실패했습니다.", L"오류", MB_OK);
+            return HRESULT_FROM_WIN32(GetLastError());
+        }
+
+        // 1P 이름 입력 창
+        hEdit1P = CreateWindow(
+            L"EDIT", NULL,
+            WS_CHILD | WS_VISIBLE | WS_BORDER,
+            100, 50, 150, 20, // 위치와 크기
+            m_hwnd, NULL, HINSTANCE(GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE)), NULL
+        );
+
+        // 2P 이름 입력 창
+        hEdit2P = CreateWindow(
+            L"EDIT", NULL,
+            WS_CHILD | WS_VISIBLE | WS_BORDER,
+            100, 80, 150, 20, // 위치와 크기
+            m_hwnd, NULL, HINSTANCE(GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE)), NULL
+        );
     hr = m_hwnd ? S_OK : E_FAIL;
 
     // m_hwnd가 유효한지 확인
@@ -182,9 +186,9 @@ HRESULT MainApp::Initialize()
             RESOLUTION_Y + ((rect1.bottom - rect1.top) - (rect2.bottom - rect2.top)),
             NULL
         );
+            // Direct2D 초기화
+            engine->InitializeD2D(m_hwnd);
 
-        // Direct2D 초기화
-        engine->InitializeD2D(m_hwnd);
 
         // 윈도우 표시
         ShowWindow(m_hwnd, SW_SHOWNORMAL);
@@ -242,13 +246,36 @@ LRESULT CALLBACK MainApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
             wasHandled = true;
             break;
 
+            case WM_COMMAND:
+                // 버튼 클릭 이벤트 처리
+                if (LOWORD(wParam) == ID_START_BUTTON) {
+                    pMainApp -> GameStart = true; // GameStart 변수를 true로 설정
+                    
+                    // Start Game 버튼 클릭 시 동작
+                    wchar_t name1[100];
+                    GetWindowText(hEdit1P, name1, 100);
+                    pMainApp -> player1Name = name1;
+
+                    wchar_t name2[100];
+                    GetWindowText(hEdit2P, name2, 100);
+                    pMainApp-> player2Name = name2;
+
+                    pMainApp->engine->setPlayerName(1, name1);
+                    pMainApp->engine->setPlayerName(2, name2);
+
+                    // 입력 창과 버튼을 숨기고 게임 시작
+                    ShowWindow(hEdit1P, SW_HIDE);
+                    ShowWindow(hEdit2P, SW_HIDE);
+                    ShowWindow((HWND)lParam, SW_HIDE); // 버튼 숨기기
+                    EnableWindow((HWND)lParam, FALSE); // 버튼 비활성화
+
+                    // 버튼을 클릭한 후 메인 윈도우로 포커스 반환
+                    SetFocus(hwnd);
+                }
+                break;
             case WM_KEYDOWN:
             {
                 pMainApp->engine->KeyDown(wParam);
-
-                if (wParam == VK_NUMPAD0) {
-                    reset = true;
-                }
             }
             result = 0;
             wasHandled = true;
@@ -319,3 +346,4 @@ LRESULT CALLBACK MainApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
     }
     return result;
 }
+

@@ -24,15 +24,22 @@ public:
 	void MouseButtonDown(bool left, bool right);
 	void Logic(double elapsedTime);
 	HRESULT Draw();
+	HRESULT Draw2();
+
+	void SaveScore(const std::string& fileName, int score1, const std::wstring& player1Name, int score2, const std::wstring& player2Name);
+	int LoadScore(const std::string& fileName);
+
+	void setPlayerName(int playerIndex, const std::wstring& name); // 함수 선언
 
 private:
+	std::wstring player1Name, player2Name; // player1Name 변수 선언
+
 	ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
 
 	IDWriteFactory* m_pDWriteFactory;
-	IDWriteTextFormat* m_pTextFormat;
+	IDWriteTextFormat* m_pTextFormat; 
 	ID2D1SolidColorBrush* m_pWhiteBrush;
-	ID2D1SolidColorBrush* m_pItemBrush;
 
 	void InitializeTextAndScore();
 	HRESULT DrawTextAndScore();
@@ -80,10 +87,12 @@ private:
 	bool spacePressed2 = false;
 	bool enteringPressed = false;
 	bool enteringPressed2 = false;
+	bool over = false;
+	bool scoreSaved = false; // Declare this as a class member variable.
 
 	int score = 0;
 	int score2 = 0;
-
+	
 	double autoFallDelay;
 	double autoFallAccumulated;
 	double keyPressDelay;

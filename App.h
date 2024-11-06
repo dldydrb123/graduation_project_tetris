@@ -1,6 +1,7 @@
 #pragma once
 
 #include "resource.h"
+#include <string>
 
 
 #ifndef Assert
@@ -27,15 +28,19 @@ public:
 
     HRESULT Initialize();
 
+    std::wstring player1Name, player2Name;
+
     // Process and dispatch messages
     void RunMessageLoop();
     void GameLoop();
+
+    bool GameStart = false;
+
 private:
 
     HWND m_hwnd;
 
     Engine* engine;
-
 
     // The windows procedure.
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

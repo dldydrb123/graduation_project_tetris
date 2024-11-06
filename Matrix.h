@@ -7,8 +7,6 @@ public:
 
 	int Get(int x, int y);
 	void Set(int x, int y, int value);
-	int GetXSize();
-	int GetYSize();
 private:
 	int xSize;
 	int ySize;

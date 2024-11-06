@@ -40,7 +40,7 @@ Piece::Piece() : m_pSelectedBrush(NULL)
 		for (int j = 0; j < 4; j++)
 		{
 			//1/10 의 확률로 아이템 블럭으로 결정됨
-			if (Item < 2 && pieceType != 7) {
+			if (Item < 5 && pieceType != 7) {
 				cells->Set(j, i, Itemcells[pieceType][i][j]);
 			}
 			else {
@@ -78,9 +78,9 @@ void Piece::Activate()
 	waiting = false;
 }
 
-/*void Piece::Shadow() {
+void Piece::Shadow() {
 	shadow = true;
-}*/
+}
 
 bool Piece::Advance(Matrix* stackCells)
 {
@@ -157,10 +157,6 @@ void Piece::Rotate(Matrix* stackCells)
 		for (int j = 0; j < 4; j++)
 		{
 			cells->Set(j, i, temp->Get(i, 3 - j));
-
-			if (i==0 && cells->Get(j,i) == 1) {
-				position.y += 1;
-			}
 		}
 	}
 
