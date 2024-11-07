@@ -25,7 +25,8 @@
 #include <string>
 #include <sstream>
 #include <chrono>
-
+#include <fstream>
+#include <iostream>
 
 template<class Interface>
 inline void SafeRelease(Interface** ppInterfaceToRelease)

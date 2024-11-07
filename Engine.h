@@ -26,8 +26,9 @@ public:
 	HRESULT Draw();
 	HRESULT Draw2();
 
-	void SaveScore(const std::string& fileName, int score1, const std::wstring& player1Name, int score2, const std::wstring& player2Name);
-	int LoadScore(const std::string& fileName);
+	void SaveHighScore(const std::string& fileName, int score1, const std::wstring& player1Name, int score2, const std::wstring& player2Name);
+
+	void DisplayScores(ID2D1HwndRenderTarget* m_pRenderTarget, IDWriteTextFormat* m_pTextFormat, ID2D1SolidColorBrush* m_pWhiteBrush);
 
 	void setPlayerName(int playerIndex, const std::wstring& name); // 함수 선언
 
@@ -38,9 +39,8 @@ private:
 	ID2D1HwndRenderTarget* m_pRenderTarget;
 
 	IDWriteFactory* m_pDWriteFactory;
-	IDWriteTextFormat* m_pTextFormat;
+	IDWriteTextFormat* m_pTextFormat; 
 	ID2D1SolidColorBrush* m_pWhiteBrush;
-	ID2D1SolidColorBrush* m_pItemBrush;
 
 	void InitializeTextAndScore();
 	HRESULT DrawTextAndScore();
@@ -51,11 +51,13 @@ private:
 	Piece* activePiece;
 	Piece* waitingPiece;
 	Piece* changePiece;
+	Piece* shadowPiece;
 
 	Stack* stack2;
 	Piece* activePiece2;
 	Piece* waitingPiece2;
 	Piece* changePiece2;
+	Piece* shadowPiece2;
 
 	int fcheck;
 	int scheck;
@@ -86,11 +88,12 @@ private:
 	bool spacePressed2 = false;
 	bool enteringPressed = false;
 	bool enteringPressed2 = false;
+	bool over = false;
 	bool scoreSaved = false; // Declare this as a class member variable.
 
 	int score = 0;
 	int score2 = 0;
-
+	
 	double autoFallDelay;
 	double autoFallAccumulated;
 	double keyPressDelay;

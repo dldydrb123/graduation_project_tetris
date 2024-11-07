@@ -4,8 +4,8 @@
 #include "Piece.h"
 #include "Engine.h"
 #include "Item.h"
-#include <wincodec.h>
 #include <wrl.h> // For Microsoft::WRL::ComPtr
+#include <string>
 
 using namespace Microsoft::WRL;
 
@@ -13,7 +13,7 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "dwrite")
 #pragma comment(lib, "Windowscodecs.lib")
 
-#define SOLO_PLAY 0 
+#define SOLO_PLAY 1
 
 // 전역 변수
 ComPtr<ID2D1Factory> d2dFactory;
@@ -26,56 +26,89 @@ std::wstring StringToWString(const std::string& str) {
     MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
     return wstrTo;
 }
-
-void Engine::SaveScore(const std::string& fileName, int score1, const std::wstring& player1Name, int score2, const std::wstring& player2Name) {
-    // std::string을 std::wstring으로 변환
-    std::wstring wFileName = StringToWString(fileName);
-
-    // 파일을 열거나 없으면 새로 생성 (추가 모드로 열기)
-    HANDLE hFile = CreateFile(wFileName.c_str(), FILE_APPEND_DATA, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-    // 파일이 열리면
-    if (hFile != INVALID_HANDLE_VALUE) {
-        // 파일 끝으로 이동
-        SetFilePointer(hFile, 0, NULL, FILE_END);
-
-        // 플레이어 이름을 UTF-8 문자열로 변환
-        std::string player1NameStr(player1Name.begin(), player1Name.end());
-        std::string player2NameStr(player2Name.begin(), player2Name.end());
-
-        // "score,player1Name,score2,player2Name," 형식으로 문자열 생성
-        std::string entry = player1NameStr + "," + std::to_string(score1) + "," +
-            player2NameStr + "," + std::to_string(score2) + ",";
-
-        DWORD bytesWritten;
-        // 새 기록 추가
-        WriteFile(hFile, entry.c_str(), entry.size(), &bytesWritten, NULL);
-
-        // 파일 닫기
-        CloseHandle(hFile);
+// Direct2D 텍스트 출력 함수 (파일 내용 출력 예제)
+void Engine::DisplayScores(ID2D1HwndRenderTarget* m_pRenderTarget, IDWriteTextFormat* m_pTextFormat, ID2D1SolidColorBrush* m_pWhiteBrush) {
+    std::ifstream file("score.txt");
+    if (!file.is_open()) {
+        // 파일이 없거나 열 수 없으면 종료
+        return;
     }
+
+    std::string line;
+    float yPos = 255.0f; // 출력 시작 위치 (Y축)
+    const float xPosName = 270.0f; // 이름 X 위치
+    const float xPosScore = 530.0f; // 점수 X 위치
+    const float lineSpacing = 50.0f; // 행 간격
+
+    while (std::getline(file, line, ',')) {
+        std::string name;
+        int score;
+
+        // 이름을 읽음
+        name = line;
+
+        // 점수 부분 읽기
+        if (std::getline(file, line, ',')) {
+            score = std::stoi(line);
+        }
+        else {
+            break;
+        }
+
+        // 이름을 Wide 문자열로 변환하여 출력 준비
+        std::wstring nameWStr(name.begin(), name.end());
+        D2D1_RECT_F nameRect = D2D1::RectF(xPosName, yPos, xPosName + 75, yPos + 40);
+        m_pRenderTarget->DrawText(
+            nameWStr.c_str(),
+            static_cast<UINT32>(nameWStr.length()),     // Length() 를 UINT32로 변환
+            m_pTextFormat,
+            nameRect,
+            m_pWhiteBrush
+        );
+
+        // 점수를 Wide 문자열로 변환하여 출력 준비
+        WCHAR scoreStr[64];
+        swprintf_s(scoreStr, L"%d", score);
+        D2D1_RECT_F scoreRect = D2D1::RectF(xPosScore, yPos, xPosScore + 75, yPos + 40);
+        m_pRenderTarget->DrawText(
+            scoreStr,
+            static_cast<UINT32>(wcslen(scoreStr)),
+            m_pTextFormat,
+            scoreRect,
+            m_pWhiteBrush
+        );
+
+        // Y 위치 업데이트 (다음 줄로 이동)
+        yPos += lineSpacing;
+    }
+    file.close();
 }
 
-int Engine::LoadScore(const std::string& fileName) {
-    std::wstring wFileName = StringToWString(fileName);
+void Engine::SaveHighScore(const std::string& fileName, int score1, const std::wstring& player1Name, int score2, const std::wstring& player2Name) {
+    int highestScore;
+    std::wstring highestScorer;
 
-    HANDLE hFile = CreateFile(wFileName.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
-    if (hFile == INVALID_HANDLE_VALUE) {
-        return -1;
+    // 두 플레이어 점수 비교
+    if (score1 > score2) {
+        highestScore = score1;
+        highestScorer = player1Name;
+    }
+    else {
+        highestScore = score2;
+        highestScorer = player2Name;
     }
 
-    char buffer[256];
-    DWORD bytesRead;
-    if (!ReadFile(hFile, buffer, sizeof(buffer) - 1, &bytesRead, NULL)) {
-        CloseHandle(hFile);
-        return -1;
+    // 파일에 최고 점수와 플레이어 이름을 저장하기
+    std::ofstream file(fileName, std::ios::out | std::ios::trunc); // 기존 내용 덮어씌우기
+    if (file.is_open()) {
+        // UTF-8로 변환하여 저장
+        std::string scorerStr(highestScorer.begin(), highestScorer.end());
+        file << scorerStr << "," << highestScore << ",";
+        file.close();
     }
-
-    buffer[bytesRead] = '\0';
-    CloseHandle(hFile);
-
-    return std::stoi(buffer);
+    else {
+        std::cerr << "Unable to open file for writing: " << fileName << std::endl;
+    }
 }
 
 // DRAW 함수 내에서 실행될 코드
@@ -88,18 +121,16 @@ HRESULT Engine::DrawJpgImage(ID2D1RenderTarget* pRenderTarget, IWICImagingFactor
     ComPtr<ID2D1Bitmap> pBitmap;
 
     // JPG 이미지를 디코딩
-    if (pWICFactory != NULL) {
-        hr = pWICFactory->CreateDecoderFromFilename(
-            filename,                   // 이미지 파일 경로
-            nullptr,                    // GUID (자동 선택)
-            GENERIC_READ,               // 읽기 전용 모드
-            WICDecodeMetadataCacheOnLoad,   // 전체 메타데이터를 로드
-            &pDecoder                   // 출력 디코더
-        );
+    hr = pWICFactory->CreateDecoderFromFilename(
+        filename,                   // 이미지 파일 경로
+        nullptr,                    // GUID (자동 선택)
+        GENERIC_READ,               // 읽기 전용 모드
+        WICDecodeMetadataCacheOnLoad,   // 전체 메타데이터를 로드
+        &pDecoder                   // 출력 디코더
+    );
 
-        if (FAILED(hr)) {
-            return hr;
-        }
+    if (FAILED(hr)) {
+        return hr;
     }
 
     // 이미지의 첫 번째 프레임을 가져옵니다.
@@ -108,13 +139,10 @@ HRESULT Engine::DrawJpgImage(ID2D1RenderTarget* pRenderTarget, IWICImagingFactor
         return hr;
     }
 
-    // 포맷 변환기를 생성합니다.  
-    if (pWICFactory != NULL)
-    {
-        hr = pWICFactory->CreateFormatConverter(&pConverter);
-        if (FAILED(hr)) {
-            return hr;
-        }
+    // 포맷 변환기를 생성합니다.
+    hr = pWICFactory->CreateFormatConverter(&pConverter);
+    if (FAILED(hr)) {
+        return hr;
     }
 
     // 비트맵 포맷을 32bppPBGRA로 변환합니다. (Direct2D와 호환)
@@ -131,22 +159,21 @@ HRESULT Engine::DrawJpgImage(ID2D1RenderTarget* pRenderTarget, IWICImagingFactor
     }
 
     // WIC 비트맵을 Direct2D 비트맵으로 변환
-    if (pRenderTarget != NULL) {
-        hr = pRenderTarget->CreateBitmapFromWicBitmap(
-            pConverter.Get(),
-            nullptr,
-            &pBitmap
-        );
-        if (FAILED(hr)) {
-            return hr;
-        }
-
-        // 비트맵을 렌더 타겟에 그립니다. 고정된 좌표 값을 사용해 그릴 위치를 조정합니다.
-        pRenderTarget->DrawBitmap(
-            pBitmap.Get(),
-            D2D1::RectF(x, y, x + width, y + height)  // 고정된 위치와 크기
-        );
+    hr = pRenderTarget->CreateBitmapFromWicBitmap(
+        pConverter.Get(),
+        nullptr,
+        &pBitmap
+    );
+    if (FAILED(hr)) {
+        return hr;
     }
+
+    // 비트맵을 렌더 타겟에 그립니다. 고정된 좌표 값을 사용해 그릴 위치를 조정합니다.
+    pRenderTarget->DrawBitmap(
+        pBitmap.Get(),
+        D2D1::RectF(x, y, x + width, y + height)  // 고정된 위치와 크기
+    );
+
     return hr;
 }
 
@@ -157,7 +184,6 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     m_pWhiteBrush = nullptr;
     m_pDWriteFactory = nullptr;
     m_pTextFormat = nullptr;
-    m_pItemBrush = nullptr;
 
     srand(static_cast<unsigned int>(time(NULL)));
 	
@@ -168,15 +194,15 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
     activePiece->Activate();
     waitingPiece = new Piece();
     changePiece = new Piece();
-    /*shadowPiece = new Piece();
-    shadowPiece->Shadow();*/
+    shadowPiece = new Piece();
+    shadowPiece->Shadow();
 
     activePiece2 = new Piece();
     activePiece2->Activate();
     waitingPiece2 = new Piece();
     changePiece2 = new Piece();
-    /*shadowPiece2 = new Piece();
-    shadowPiece2->Shadow();*/
+    shadowPiece2 = new Piece();
+    shadowPiece2->Shadow();
 
     // autoFall 자동으로 블럭이 떨어지는 속도.
     // 0.7 이 기본값입니다.
@@ -217,6 +243,7 @@ Engine::Engine() : m_pDirect2dFactory(NULL), m_pRenderTarget(NULL)
 
 Engine::~Engine()
 {
+    // 닫힘
 
     SafeRelease(&m_pDirect2dFactory);
     SafeRelease(&m_pRenderTarget);
@@ -228,6 +255,7 @@ Engine::~Engine()
     delete stack2;
     delete waitingPiece2;
     delete activePiece2;
+
 }
 
 HRESULT Engine::InitializeD2D(HWND m_hwnd)
@@ -258,15 +286,16 @@ HRESULT Engine::InitializeD2D(HWND m_hwnd)
     }
 
     // WIC 팩토리 생성
-        hr = CoCreateInstance(
-            CLSID_WICImagingFactory,
-            nullptr,
-            CLSCTX_INPROC_SERVER,
-            IID_PPV_ARGS(&wicFactory)
-        );
-        if (FAILED(hr)) {
-            // 오류 처리
-        }
+    hr = CoCreateInstance(
+        CLSID_WICImagingFactory,
+        nullptr,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(&wicFactory)
+    );
+    if (FAILED(hr)) {
+        // 오류 처리
+    }
+
     return S_OK;
 }
 
@@ -295,13 +324,8 @@ void Engine::InitializeTextAndScore()
     m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     m_pRenderTarget->CreateSolidColorBrush(
-        D2D1::ColorF(D2D1::ColorF::White),
+        D2D1::ColorF(D2D1::ColorF::Black),
         &m_pWhiteBrush
-    );
-
-    m_pRenderTarget->CreateSolidColorBrush(
-        D2D1::ColorF(D2D1::ColorF::Purple),
-        &m_pItemBrush
     );
 }
 
@@ -335,11 +359,6 @@ void Engine::KeyUp(WPARAM wParam)
 
     if (wParam == 87)
         spacePressed = false;
-
-
-    if (wParam == VK_NUMPAD0)
-    {
-    }
 }
 
 void Engine::KeyDown(WPARAM wParam)
@@ -439,10 +458,6 @@ void Engine::KeyDown(WPARAM wParam)
             break;
         }
     }
-
-    if (wParam == VK_NUMPAD0)
-    {
-    }
 }
 
 // 마우스 관련 함수들인데 사용할지 말지 고민중
@@ -467,11 +482,12 @@ void Engine::Logic(double elapsedTime)
 
     // 게임오버 체크
     // 둘 중 하나라도 게임오버시 over를 true로 바꾸고 리턴합니다.
-    if (Gover) 
+
+
+    if (!scoreSaved && (gameOver||gameOver2))
     {
-        const std::string fileName = "score.txt";
-        // 점수 저장
-        SaveScore("score.txt", score, player1Name, score2, player2Name);
+        over = true;
+        SaveHighScore("score.txt", score, player1Name, score2, player2Name);
         scoreSaved = true;
 
         return;
@@ -482,6 +498,40 @@ void Engine::Logic(double elapsedTime)
     Matrix* changeCells = stack->GetCells();
     Matrix* stackCells2 = stack2->GetCells();
     Matrix* changeCells2 = stack2->GetCells();
+
+
+    for (int i = STACK_HEIGHT - 1; i >= 0; i--) {
+        int k = 0;
+        for (int j = 0; j < STACK_WIDTH; j++) {
+            if (stackCells->Get(j, i) > 0) {
+                break;
+            }
+            else
+            {
+                k++;
+            }
+        }
+        if (k == 10) {
+            break;
+        }
+        height = 25 - i;
+    }
+
+    for (int i = STACK_HEIGHT - 1; i >= 0; i--) {
+        int k = 0;
+        for (int j = 0; j < STACK_WIDTH; j++) {
+            if (stackCells2->Get(j, i) > 0) {
+                break;
+            }
+            else {
+                k++;
+            }
+        }
+        if (k == 10) {
+            break;
+        }
+        height2 = 25 - i;
+    }
 
     // 4번 아이템 사용되는 부분
     if (item1_4) {
@@ -575,7 +625,7 @@ void Engine::Logic(double elapsedTime)
             {
                 //줄이 삭제되면 한 줄당 200점 씩 획득하고, 자동으로 블럭이 떨어지는 속도를 증가시킵니다.
                 //autoFallDelay가 낮아질수록 빨리 떨어짐
-                score += pow(2, removed) * 100;
+                score += static_cast<int>(pow(2, removed) * 100);
                 if (autoFallDelay > 0.175) {
                     autoFallDelay = autoFallDelay * 0.98;
                 }
@@ -640,7 +690,7 @@ void Engine::Logic(double elapsedTime)
             {
                 //줄이 삭제되면 한 줄당 200점 씩 획득하고, 자동으로 블럭이 떨어지는 속도를 증가시킵니다.
                 //autoFallDelay가 낮아질수록 빨리 떨어짐
-                score2 += pow(2, removed) * 100;
+                score2 += static_cast<int>(pow(2, removed) * 100);
                 if (autoFallDelay2 > 0.175) {
                     autoFallDelay2 = autoFallDelay2 * 0.98;
                 }
@@ -702,7 +752,7 @@ void Engine::Logic(double elapsedTime)
         if (removed > 0)
         {
             //위와 마찬가지로 지워지면 점수를 증가시키고 속도를 증가시킵니다.
-            score += pow(2, removed) * 100;
+            score += static_cast<int>(pow(2, removed) * 100);
             if (autoFallDelay > 0.175) {
                 autoFallDelay = autoFallDelay * 0.98;
             }
@@ -817,10 +867,7 @@ void Engine::Logic(double elapsedTime)
             // 활성 블럭이 스택과 바로 충돌이 일어났는지 확인합니다.
             // 활성 되자마자 스택과 충돌이 일어난거기 때문에 곧 게임 오버를 뜻합니다.
             if (activePiece->StackCollision(stackCells))
-            {
                 gameOver = true;
-                Gover = true;
-            }
         }
     }
 
@@ -952,24 +999,20 @@ void Engine::Logic(double elapsedTime)
             // 스택에 충돌은 게임오버를 뜻합니다.
             if (activePiece2->StackCollision(stackCells2)) {
                 gameOver2 = true;
-                Gover = true;
             }
         }
     }
 
 }
-
 HRESULT Engine::Draw()
 {
     // 그림이 그려지는 부분입니다.
     HRESULT hr;
 
     // 그림 그릴 붓 만들고 색상을 정하는 부분입니다.
-    if (m_pRenderTarget != NULL) {
-        m_pRenderTarget->BeginDraw();
-        m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-        m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
-    }
+    m_pRenderTarget->BeginDraw();
+    m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+    m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 
 
     // 게임 내의 각 요소들(스택, 활성 블럭, 대기 블럭)을 실질적으로 그리는 부분입니다.
@@ -981,35 +1024,34 @@ HRESULT Engine::Draw()
     stack->Draw(m_pRenderTarget);
     if (gameOver != true) {
         activePiece->Draw(m_pRenderTarget);
+        //shadowPiece->Draw(m_pRenderTarget);
     }
     waitingPiece->Draw(m_pRenderTarget);
 
     stack2->Draw2(m_pRenderTarget);
     if (gameOver2 != true) {
         activePiece2->Draw2(m_pRenderTarget);
+        //shadowPiece2->Draw2(m_pRenderTarget);
     }
     waitingPiece2->Draw2(m_pRenderTarget);
 
-
-    if (wicFactory != NULL) {
-        //1p Blind Item
-        //1p가 사용하는 거라서 2p의 보드를 가립니다.
-        if (item1_3) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 542.0f, 624.0f, 202.0f, -(CELL_SIZE * height2));
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
+    //1p Blind Item
+    //1p가 사용하는 거라서 2p의 보드를 가립니다.
+    if (item1_3) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 542.0f, 624.0f, 202.0f, -static_cast<float>(CELL_SIZE * height2));
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
         }
+    }
 
-        //2p Blind Item
-        //2p가 사용하는 거라서 1p의 보드를 가립니다.
-        if (item2_3) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 198.0f, 624.0f, 202.0f, -(CELL_SIZE * height));
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
+    //2p Blind Item
+    //2p가 사용하는 거라서 1p의 보드를 가립니다.
+    if (item2_3) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\Blind.jpg", 198.0f, 624.0f, 202.0f, -static_cast<float>(CELL_SIZE * height));
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
         }
     }
 
@@ -1017,214 +1059,192 @@ HRESULT Engine::Draw()
     // 글씨와 각 점수를 그려줍니다.
     DrawTextAndScore();
 
-    if (m_pRenderTarget != NULL) {
-        hr = m_pRenderTarget->EndDraw();
-    }
+    hr = m_pRenderTarget->EndDraw();
 
     return S_OK;
 }
-
+//랭킹 출력 고칠 위치
 HRESULT Engine::Draw2()
 {
-    // 그림이 그려지는 부분입니다.
     HRESULT hr;
 
-    // 그림 그릴 붓 만들고 색상을 정하는 부분입니다.
-    if (m_pRenderTarget != NULL) {
-        m_pRenderTarget->BeginDraw();
-        m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-        m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+    // Begin drawing
+    m_pRenderTarget->BeginDraw();
+    m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+    m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+
+    // 배경화면 그리기
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\a.png", 0.0f, 0.0f, 900.0f, 800.0f);
+    if (FAILED(hr)) {
+        // 이미지 로드 실패
+        return hr;
     }
 
+    // 점수 출력 (DisplayScores 함수 호출)
+    DisplayScores(m_pRenderTarget, m_pTextFormat, m_pWhiteBrush);
+
+    // End drawing
+    hr = m_pRenderTarget->EndDraw();
+
+    return hr;
+}
+
+HRESULT Engine::DrawImage() 
+{
+    HRESULT hr;
+
     //배경화면
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\a.png", 0.0f, 0.0f, 900.0f, 800.0f);
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\tetris wall paper.png", 0.0f, 0.0f, 900.0f, 800.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //1p next
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", 70.0f, 140.0f, 150.0f, 120.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //1p score
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 70.0f, 300.0f, 145.0f, 120.0f);
     if (FAILED(hr)) {
         // JPG 이미지 로드 및 그리기 실패
         return hr;
     }
 
 
-    hr = m_pRenderTarget->EndDraw();
+    //2p score
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score2.png", 720.0f, 300.0f, 145.0f, 120.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
 
-    return S_OK;
-}
-HRESULT Engine::DrawImage() 
-{
-    HRESULT hr;
-    if (wicFactory.Get() != NULL) {
-        //배경화면
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\tetris wall paper.png", 0.0f, 0.0f, 900.0f, 800.0f);
+    //2p next
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", 720.0f, 140.0f, 150.0f, 120.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //2p black
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", 538.0f, 138.0f, 210.0f, 491.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+    //1p black
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", 194.0f, 138.0f, 210.0f, 491.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //1p button
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\button.png", 194.0f, 640.0f, 210.0f, 100.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //2p button
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\button.png", 538.0f, 640.0f, 210.0f, 100.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //1p space
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space.png", 194.0f, 750.0f, 210.0f, 30.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //2p space
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space.png", 538.0f, 750.0f, 210.0f, 30.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //1p 키눌림
+    if (leftPressed == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 194, 690, 70, 50);
         if (FAILED(hr)) {
             // JPG 이미지 로드 및 그리기 실패
             return hr;
-        }
-
-        //1p next
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", 70.0f, 140.0f, 150.0f, 120.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //1p score
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 70.0f, 300.0f, 145.0f, 120.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-
-        //2p score
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 720.0f, 300.0f, 145.0f, 120.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //2p next
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\next.png", 720.0f, 140.0f, 150.0f, 120.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //2p item
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 720.0f, 450.0f, 150.0f, 120.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //1p item
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 70.0f, 450.0f, 150.0f, 120.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //2p black
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", 538.0f, 138.0f, 210.0f, 491.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-        //1p black
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", 194.0f, 138.0f, 210.0f, 491.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //1p button
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\button.png", 194.0f, 640.0f, 210.0f, 100.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //2p button
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\button.png", 538.0f, 640.0f, 210.0f, 100.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //1p space
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space.png", 194.0f, 750.0f, 210.0f, 30.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //2p space
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space.png", 538.0f, 750.0f, 210.0f, 30.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //logo
-        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\logo.png", 170.0f, 10.0f, 600.0f, 120.0f);
-        if (FAILED(hr)) {
-            // JPG 이미지 로드 및 그리기 실패
-            return hr;
-        }
-
-        //1p 키눌림
-        if (leftPressed == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 194, 690, 70, 50);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
-        }
-        if (rightPressed == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\right.png", 335, 690, 70, 50);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
-        }
-        if (spacePressed == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\up.png", 264, 640, 70, 50);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
-        }
-        if (downPressed == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\down.png", 264, 690, 70, 50);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
-        }
-        if (enteringPressed == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space2.png", 194, 750, 210, 30);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
-        }
-
-        //2p 키눌림
-        if (leftPressed2 == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 538, 691, 70, 50);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
-        }
-        if (rightPressed2 == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\right.png", 679, 690, 70, 50);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
-        }
-        if (spacePressed2 == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\up.png", 608, 640, 70, 50);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
-        }
-
-        if (downPressed2 == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\down.png", 608, 690, 68, 50);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
-        }
-        if (enteringPressed2 == true) {
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space2.png", 538, 750, 210, 30);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
-            }
         }
     }
+    if (rightPressed == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\right.png", 335, 690, 70, 50);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+    }
+    if (spacePressed == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\up.png", 264, 640, 70, 50);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+    }
+    if (downPressed == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\down.png", 264, 690, 70, 50);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+    }
+    if (enteringPressed == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space2.png", 194, 750, 210, 30);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+    }
+
+    //2p 키눌림
+    if (leftPressed2 == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\left.png", 538, 691, 70, 50);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+    }
+    if (rightPressed2 == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\right.png", 679, 690, 70, 50);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+    }
+    if (spacePressed2 == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\up.png", 608, 640, 70, 50);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+    }
+
+    if (downPressed2 == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\down.png", 608, 690, 68, 50);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+    }
+    if (enteringPressed2 == true) {
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\space2.png", 538, 750, 210, 30);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
+        }
+    }
+
 }
 
 HRESULT Engine::DrawTextAndScore()
@@ -1241,187 +1261,164 @@ HRESULT Engine::DrawTextAndScore()
     // ""안의 내용(Next Piece)들을 그리는데 바로 아래있는 숫자(15)만큼 그립니다.
     // 
     //실 스코어가 표시되는 부분입니다.
-    if (m_pRenderTarget != NULL) {
-        D2D1_RECT_F PScore = D2D1::RectF(centerLeft - 265, padding + 220, centerLeft + 175, padding + 340);
-        WCHAR scoreStr[64];
-        swprintf_s(scoreStr, L"%d        ", score);
-        m_pRenderTarget->DrawText(
-            scoreStr,
-            7,
-            m_pTextFormat,
-            PScore,
-            m_pWhiteBrush
-        );
+    D2D1_RECT_F PScore = D2D1::RectF(centerLeft -265.0f, padding + 220.0f, centerLeft+175.0f, padding + 340.0f);
+    WCHAR scoreStr[64];
+    swprintf_s(scoreStr, L"%d        ", score);
+    m_pRenderTarget->DrawText(
+        scoreStr,
+        7,
+        m_pTextFormat,
+        PScore,
+        m_pWhiteBrush
+    );
 
-        //실 스코어가 표시되는 부분입니다.
-        D2D1_RECT_F PScore2 = D2D1::RectF(centerRight, padding + 220, centerRight + 170, padding + 340);
-        WCHAR scoreStr2[64];
-        swprintf_s(scoreStr2, L"%d        ", score2);
-        m_pRenderTarget->DrawText(
-            scoreStr2,
-            7,
-            m_pTextFormat,
-            PScore2,
-            m_pWhiteBrush
-        );
+    //실 스코어가 표시되는 부분입니다.
+    D2D1_RECT_F PScore2 = D2D1::RectF(static_cast<float>(centerRight), padding + 220.0f, centerRight + 170.0f, padding + 340.0f);
+    WCHAR scoreStr2[64];
+    swprintf_s(scoreStr2, L"%d        ", score2);
+    m_pRenderTarget->DrawText(
+        scoreStr2,
+        7,
+        m_pTextFormat,
+        PScore2,
+        m_pWhiteBrush
+    );
 
-        // 이름 출력 위치를 지정 (점수 출력 위치 오른쪽으로 설정)
-        D2D1_RECT_F PName1 = D2D1::RectF(centerRight + 50, padding + 220, centerRight + 270, padding + 340);
+    // 이름 출력 위치를 지정 (점수 출력 위치 오른쪽으로 설정)
+D2D1_RECT_F PName1 = D2D1::RectF(centerRight +50.0f, padding + 220.0f, centerRight + 270.0f, padding + 340.0f);
 
-        // 이름 문자열 생성 (name1을 사용)
-        WCHAR nameStr1[100];
-        swprintf_s(nameStr1, L"%s", player1Name.c_str()); // name1에 저장된 이름을 사용하여 문자열 생성
+// 이름 문자열 생성 (name1을 사용)
+WCHAR nameStr1[100];
+swprintf_s(nameStr1, L"%s", player1Name.c_str()); // name1에 저장된 이름을 사용하여 문자열 생성
 
-        // 이름 출력
-        m_pRenderTarget->DrawText(
-            nameStr1,
-            wcslen(nameStr1),
-            m_pTextFormat,
-            PName1,
-            m_pWhiteBrush
-        );
-        // 이름 출력 위치를 지정 (점수 출력 위치 오른쪽으로 설정)
-        D2D1_RECT_F PName2 = D2D1::RectF(centerRight - 315, padding + 220, centerRight + 175, padding + 340);
+// 이름 출력
+m_pRenderTarget->DrawText(
+    nameStr1,
+    static_cast<UINT32>(wcslen(nameStr1)),
+    m_pTextFormat,
+    PName1,
+    m_pWhiteBrush
+);
+// 이름 출력 위치를 지정 (점수 출력 위치 오른쪽으로 설정)
+D2D1_RECT_F PName2 = D2D1::RectF(centerRight - 315.0f, padding + 220.0f, centerRight + 175.0f, padding + 340.0f);
 
-        // 이름 문자열 생성 (name1을 사용)
-        WCHAR nameStr2[100];
-        swprintf_s(nameStr2, L"%s", player1Name.c_str()); // name1에 저장된 이름을 사용하여 문자열 생성
+// 이름 문자열 생성 (name1을 사용)
+WCHAR nameStr2[100];
+swprintf_s(nameStr2, L"%s", player1Name.c_str()); // name1에 저장된 이름을 사용하여 문자열 생성
 
-        // 이름 출력
-        m_pRenderTarget->DrawText(
-            nameStr2,
-            wcslen(nameStr2),
-            m_pTextFormat,
-            PName2,
-            m_pWhiteBrush
-        );
-
-        WCHAR ItemStr[64];
-        swprintf_s(ItemStr, L"아이템없음");
-        D2D1_RECT_F ItemT = D2D1::RectF(centerLeft - 265, padding + 380, centerLeft + 175, padding + 450);
-        if (ItemGet == 0) {
-            m_pRenderTarget->DrawText(
-                ItemStr,
-                5,
-                m_pTextFormat,
-                ItemT,
-                m_pWhiteBrush
-            );
-        }
-        else {
-            for (int i = 0; i < 6; i++) {
-                switch (i) {
-                case 0:
-                    if (Itemarr[0] > 0) {
-                        swprintf_s(ItemStr, L"한줄삭제");
-                    }
-                    break;
-                case 1:
-                    if (Itemarr[1] > 0) {
-                        swprintf_s(ItemStr, L"강제낙하");
-                    }
-                    break;
-                case 2:
-                    if (Itemarr[2] > 0) {
-                        swprintf_s(ItemStr, L"블라인드");
-                    }
-                    break;
-                case 3:
-                    if (Itemarr[3] > 0) {
-                        swprintf_s(ItemStr, L"I 자변환");
-                    }
-                    break;
-                case 4:
-                    if (Itemarr[4] > 0) {
-                        swprintf_s(ItemStr, L"폭탄변환");
-                    }
-                    break;
-                case 5:
-                    if (Itemarr[5] > 0) {
-                        swprintf_s(ItemStr, L"상대밀기");
-                    }
-                    break;
-                default:
-                    break;
-                }
+// 이름 출력
+m_pRenderTarget->DrawText(
+    nameStr2,
+    static_cast<UINT32>(wcslen(nameStr2)),
+    m_pTextFormat,
+    PName2,
+    m_pWhiteBrush
+);
+    WCHAR ItemStr[64];
+    swprintf_s(ItemStr, L"아이템없음");
+    
+    for (int i = 0; i < 6; i++) {
+        switch (i) {
+        case 0:
+            if (Itemarr[0] > 0) {
+                swprintf_s(ItemStr, L"한줄삭제");
             }
-            m_pRenderTarget->DrawText(
-                ItemStr,
-                5,
-                m_pTextFormat,
-                ItemT,
-                m_pItemBrush
-            );
-        }
-
-        WCHAR ItemStr2[64];
-        swprintf_s(ItemStr2, L"아이템없음");
-        D2D1_RECT_F ItemT2 = D2D1::RectF(centerRight, padding + 380, centerRight + 170, padding + 450);
-        if (ItemGet2 == 0) {
-            m_pRenderTarget->DrawText(
-                ItemStr2,
-                5,
-                m_pTextFormat,
-                ItemT2,
-                m_pWhiteBrush
-            );
-
-        }
-        else {
-            for (int i = 0; i < 6; i++) {
-                switch (i) {
-                case 0:
-                    if (Itemarr2[0] > 0) {
-                        swprintf_s(ItemStr2, L"한줄삭제");
-                    }
-                    break;
-                case 1:
-                    if (Itemarr2[1] > 0) {
-                        swprintf_s(ItemStr2, L"강제낙하");
-                    }
-                    break;
-                case 2:
-                    if (Itemarr2[2] > 0) {
-                        swprintf_s(ItemStr2, L"블라인드");
-                    }
-                    break;
-                case 3:
-                    if (Itemarr2[3] > 0) {
-                        swprintf_s(ItemStr2, L"I 자변환");
-                    }
-                    break;
-                case 4:
-                    if (Itemarr2[4] > 0) {
-                        swprintf_s(ItemStr2, L"폭탄변환");
-                    }
-                    break;
-                case 5:
-                    if (Itemarr2[5] > 0) {
-                        swprintf_s(ItemStr2, L"상대밀기");
-                    }
-                    break;
-                default:
-                    break;
-                }
+            break;
+        case 1:
+            if (Itemarr[1] > 0) {
+                swprintf_s(ItemStr, L"강제낙하");
             }
-            m_pRenderTarget->DrawText(
-                ItemStr2,
-                5,
-                m_pTextFormat,
-                ItemT2,
-                m_pItemBrush
-            );
-        }
-
-        HRESULT hr;
-        //게임 오버시 나타나는 부분입니다.
-        if (Gover == true) {
-            //gameover
-            hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\gameover.png", 325.0f, 230.0f, 300.0f, 300.0f);
-            if (FAILED(hr)) {
-                // JPG 이미지 로드 및 그리기 실패
-                return hr;
+            break;
+        case 2:
+            if (Itemarr[2] > 0) {
+                swprintf_s(ItemStr, L"블라인드");
             }
+            break;
+        case 3:
+            if (Itemarr[3] > 0) {
+                swprintf_s(ItemStr, L"I 자변환");
+            }
+            break;
+        case 4:
+            if (Itemarr[4] > 0) {
+                swprintf_s(ItemStr, L"폭탄변환");
+            }
+            break;
+        case 5:
+            if (Itemarr[5] > 0) {
+                swprintf_s(ItemStr, L"상대밀기");
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    D2D1_RECT_F ItemT = D2D1::RectF(centerLeft - 265.0f, padding + 380.0f, centerLeft + 175.0f, padding + 450.0f);
+    m_pRenderTarget->DrawText(
+        ItemStr,
+        5,
+        m_pTextFormat,
+        ItemT,
+        m_pWhiteBrush
+    );
+
+    WCHAR ItemStr2[64];
+    swprintf_s(ItemStr2, L"아이템없음");
+    for (int i = 0; i < 6; i++) {
+        switch (i) {
+        case 0:
+            if (Itemarr2[0] > 0) {
+                swprintf_s(ItemStr2, L"한줄삭제");
+            }
+            break;
+        case 1:
+            if (Itemarr2[1] > 0) {
+                swprintf_s(ItemStr2, L"강제낙하");
+            }
+            break;
+        case 2:
+            if (Itemarr2[2] > 0) {
+                swprintf_s(ItemStr2, L"블라인드");
+            }
+            break;
+        case 3:
+            if (Itemarr2[3] > 0) {
+                swprintf_s(ItemStr2, L"I 자변환");
+            }
+            break;
+        case 4:
+            if (Itemarr2[4] > 0) {
+                swprintf_s(ItemStr2, L"폭탄변환");
+            }
+            break;
+        case 5:
+            if (Itemarr2[5] > 0) {
+                swprintf_s(ItemStr2, L"상대밀기");
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    D2D1_RECT_F ItemT2 = D2D1::RectF(static_cast<float>(centerRight), padding + 380.0f, centerRight + 170.0f, padding + 450.0f);
+    m_pRenderTarget->DrawText(
+        ItemStr2,
+        5,
+        m_pTextFormat,
+        ItemT2,
+        m_pWhiteBrush
+    );
+
+    HRESULT hr;
+    //게임 오버시 나타나는 부분입니다.
+    if (over == true) {
+        //gameover
+        hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\gameover.png", 325.0f, 230.0f, 300.0f, 300.0f);
+        if (FAILED(hr)) {
+            // JPG 이미지 로드 및 그리기 실패
+            return hr;
         }
     }
 }
@@ -1434,3 +1431,4 @@ void Engine::setPlayerName(int playerIndex, const std::wstring& name) {
         player2Name = name;
     }
 }
+
