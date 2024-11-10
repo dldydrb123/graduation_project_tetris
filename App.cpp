@@ -142,7 +142,7 @@ HRESULT MainApp::Initialize()
         HWND hButton = CreateWindow(
             L"BUTTON", L"Start Game",
             WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-            100, 100, 100, 50, // 버튼 위치 및 크기
+            400, 420, 100, 50, // 버튼 위치 및 크기
             m_hwnd, (HMENU)ID_START_BUTTON, HINSTANCE(GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE)), NULL
         );
         if (!hButton) {
@@ -154,7 +154,7 @@ HRESULT MainApp::Initialize()
         hEdit1P = CreateWindow(
             L"EDIT", NULL,
             WS_CHILD | WS_VISIBLE | WS_BORDER,
-            100, 50, 150, 20, // 위치와 크기
+            375, 360, 150, 20, // 위치와 크기
             m_hwnd, NULL, HINSTANCE(GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE)), NULL
         );
 
@@ -162,7 +162,7 @@ HRESULT MainApp::Initialize()
         hEdit2P = CreateWindow(
             L"EDIT", NULL,
             WS_CHILD | WS_VISIBLE | WS_BORDER,
-            100, 80, 150, 20, // 위치와 크기
+            375, 390, 150, 20, // 위치와 크기
             m_hwnd, NULL, HINSTANCE(GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE)), NULL
         );
     hr = m_hwnd ? S_OK : E_FAIL;
