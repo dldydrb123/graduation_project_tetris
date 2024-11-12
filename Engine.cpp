@@ -1063,15 +1063,32 @@ HRESULT Engine::Draw()
 
     return S_OK;
 }
+
 //랭킹 출력 고칠 위치
 HRESULT Engine::Draw2()
 {
     HRESULT hr;
 
+    // 위치 조정용 변수들
+    int padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
+    int centerRight = RESOLUTION_X - (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
+    int centerLeft = (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
+
     // Begin drawing
     m_pRenderTarget->BeginDraw();
     m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
     m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+
+    
+
+    // 배경화면 그리기
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"\image\\a.png", 0.0f, 0.0f, 900.0f, 800.0f);
+    if (FAILED(hr)) {
+        // 이미지 로드 실패
+        return hr;
+    }
+
+    
 
     // 배경화면 그리기
     hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\a.png", 0.0f, 0.0f, 900.0f, 800.0f);
@@ -1079,6 +1096,71 @@ HRESULT Engine::Draw2()
         // 이미지 로드 실패
         return hr;
     }
+
+    //게임 스타트(Play 버튼)
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\play_2.png", 400.0f, 430.0f, 100.0f, 50.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //이름 입력받는 창 이미지
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\nameplate_1.png", 375.0f, 360.0f, 150.0f, 20.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+    //이름 입력받는 창 이미지
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\nameplate_1.png", 375.0f, 390.0f, 150.0f, 20.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    //player1 구별 마크
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\player1.png", 330.0f, 360.0f, 30.0f, 20.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+    //player2 구별 마크
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\player2.png", 330.0f, 390.0f, 30.0f, 20.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
+    // 이름 출력 위치를 지정 (점수 출력 위치 왼쪽으로 설정)
+    D2D1_RECT_F PName1 = D2D1::RectF(750.0f, 715.0f, 150.0f, 20.0f);
+
+    // 이름 문자열 생성 (name1을 사용)
+    WCHAR nameStr1[100];
+    swprintf_s(nameStr1, L"%s", player1Name.c_str()); // name1에 저장된 이름을 사용하여 문자열 생성
+
+    // 이름 출력
+    m_pRenderTarget->DrawText(
+        nameStr1,
+        static_cast<UINT32>(wcslen(nameStr1)),
+        m_pTextFormat,
+        PName1,
+        m_pWhiteBrush
+    );
+    // 이름 출력 위치를 지정 (점수 출력 위치 오른쪽으로 설정)
+    D2D1_RECT_F PName2 = D2D1::RectF(750.0f, 775.0f, 150.0f, 20.0f);
+
+    // 이름 문자열 생성 (name1을 사용)
+    WCHAR nameStr2[100];
+    swprintf_s(nameStr2, L"%s", player2Name.c_str()); // name2에 저장된 이름을 사용하여 문자열 생성
+
+    // 이름 출력
+    m_pRenderTarget->DrawText(
+        nameStr2,
+        static_cast<UINT32>(wcslen(nameStr2)),
+        m_pTextFormat,
+        PName2,
+        m_pWhiteBrush
+    );
+
 
     // 점수 출력 (DisplayScores 함수 호출)
     DisplayScores(m_pRenderTarget, m_pTextFormat, m_pWhiteBrush);
@@ -1093,6 +1175,7 @@ HRESULT Engine::DrawImage()
 {
     HRESULT hr;
 
+    
     //배경화면
     hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\tetris wall paper.png", 0.0f, 0.0f, 900.0f, 800.0f);
     if (FAILED(hr)) {
@@ -1116,7 +1199,7 @@ HRESULT Engine::DrawImage()
 
 
     //2p score
-    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score2.png", 720.0f, 300.0f, 145.0f, 120.0f);
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\score.png", 720.0f, 300.0f, 145.0f, 120.0f);
     if (FAILED(hr)) {
         // JPG 이미지 로드 및 그리기 실패
         return hr;
@@ -1128,6 +1211,20 @@ HRESULT Engine::DrawImage()
         // JPG 이미지 로드 및 그리기 실패
         return hr;
     }
+
+    //2p item
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 720.0f, 450.0f, 150.0f, 120.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+    //2p item
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\item.png", 70.0f, 450.0f, 150.0f, 120.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+
 
     //2p black
     hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\black.png", 538.0f, 138.0f, 210.0f, 491.0f);
@@ -1142,6 +1239,18 @@ HRESULT Engine::DrawImage()
         return hr;
     }
 
+    //1p name
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\p1name.png", 194.0f, 102.0f, 210.0f, 24.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
+    //2p name
+    hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\p2name.png", 538.0f, 102.0f, 210.0f, 24.0f);
+    if (FAILED(hr)) {
+        // JPG 이미지 로드 및 그리기 실패
+        return hr;
+    }
     //1p button
     hr = DrawJpgImage(m_pRenderTarget, wicFactory.Get(), L"image\\button.png", 194.0f, 640.0f, 210.0f, 100.0f);
     if (FAILED(hr)) {
@@ -1169,6 +1278,7 @@ HRESULT Engine::DrawImage()
         // JPG 이미지 로드 및 그리기 실패
         return hr;
     }
+    
 
     //1p 키눌림
     if (leftPressed == true) {
@@ -1284,8 +1394,8 @@ HRESULT Engine::DrawTextAndScore()
         m_pWhiteBrush
     );
 
-    // 이름 출력 위치를 지정 (점수 출력 위치 오른쪽으로 설정)
-D2D1_RECT_F PName1 = D2D1::RectF(centerRight +50.0f, padding + 220.0f, centerRight + 270.0f, padding + 340.0f);
+    // 이름 출력 위치를 지정 (점수 출력 위치 왼쪽으로 설정)
+D2D1_RECT_F PName1 = D2D1::RectF(centerLeft + 45.0f, padding - 300.0f, centerLeft + 175.0f, padding + 340.0f);
 
 // 이름 문자열 생성 (name1을 사용)
 WCHAR nameStr1[100];
@@ -1300,11 +1410,11 @@ m_pRenderTarget->DrawText(
     m_pWhiteBrush
 );
 // 이름 출력 위치를 지정 (점수 출력 위치 오른쪽으로 설정)
-D2D1_RECT_F PName2 = D2D1::RectF(centerRight - 315.0f, padding + 220.0f, centerRight + 175.0f, padding + 340.0f);
+D2D1_RECT_F PName2 = D2D1::RectF(centerRight - 315.0f, padding - 300.0f , centerRight + 175.0f, padding + 340.0f);
 
 // 이름 문자열 생성 (name1을 사용)
 WCHAR nameStr2[100];
-swprintf_s(nameStr2, L"%s", player1Name.c_str()); // name1에 저장된 이름을 사용하여 문자열 생성
+swprintf_s(nameStr2, L"%s", player2Name.c_str()); // name2에 저장된 이름을 사용하여 문자열 생성
 
 // 이름 출력
 m_pRenderTarget->DrawText(

@@ -80,6 +80,24 @@ void MainApp::GameLoop()
         else
         {
             engine->Draw2();
+            //// 여기에서 이름을 가져옵니다.
+            //wchar_t szText1[100];
+            //GetWindowText(hEdit1P, szText1, 100);
+
+            //wchar_t szText2[100];
+            //GetWindowText(hEdit2P, szText2, 100);
+
+            //// 이름을 화면에 출력
+            //HDC hdc = GetDC(m_hwnd);  // HDC 핸들을 가져옵니다.
+
+            //SetBkMode(hdc, TRANSPARENT); // 텍스트 배경을 투명하게 설정
+            //SetTextColor(hdc, RGB(0, 0, 0)); // 텍스트 색상을 흰색으로 설정
+
+            //// 위치를 지정하여 텍스트를 그립니다.
+            //TextOut(hdc, 375, 360, szText1, wcslen(szText1)); // 첫 번째 이름 출력
+            //TextOut(hdc, 375, 390, szText2, wcslen(szText2)); // 두 번째 이름 출력
+
+            //ReleaseDC(m_hwnd, hdc);  // HDC 핸들 해제
         }
     }
 }
@@ -142,7 +160,7 @@ HRESULT MainApp::Initialize()
         HWND hButton = CreateWindow(
             L"BUTTON", L"Start Game",
             WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-            100, 100, 100, 50, // 버튼 위치 및 크기
+            400, 420, 100, 50, // 버튼 위치 및 크기
             m_hwnd, (HMENU)ID_START_BUTTON, HINSTANCE(GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE)), NULL
         );
         if (!hButton) {
@@ -154,7 +172,7 @@ HRESULT MainApp::Initialize()
         hEdit1P = CreateWindow(
             L"EDIT", NULL,
             WS_CHILD | WS_VISIBLE | WS_BORDER,
-            100, 50, 150, 20, // 위치와 크기
+            375, 360, 150, 20, // 위치와 크기
             m_hwnd, NULL, HINSTANCE(GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE)), NULL
         );
 
@@ -162,7 +180,7 @@ HRESULT MainApp::Initialize()
         hEdit2P = CreateWindow(
             L"EDIT", NULL,
             WS_CHILD | WS_VISIBLE | WS_BORDER,
-            100, 80, 150, 20, // 위치와 크기
+            375, 390, 150, 20, // 위치와 크기
             m_hwnd, NULL, HINSTANCE(GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE)), NULL
         );
     hr = m_hwnd ? S_OK : E_FAIL;
@@ -249,19 +267,8 @@ LRESULT CALLBACK MainApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
             case WM_COMMAND:
                 // 버튼 클릭 이벤트 처리
                 if (LOWORD(wParam) == ID_START_BUTTON) {
-                    pMainApp -> GameStart = true; // GameStart 변수를 true로 설정
-                    
-                    // Start Game 버튼 클릭 시 동작
-                    wchar_t name1[100];
-                    GetWindowText(hEdit1P, name1, 100);
-                    pMainApp -> player1Name = name1;
+                    pMainApp->GameStart = true; // GameStart 변수를 true로 설정
 
-                    wchar_t name2[100];
-                    GetWindowText(hEdit2P, name2, 100);
-                    pMainApp-> player2Name = name2;
-
-                    pMainApp->engine->setPlayerName(1, name1);
-                    pMainApp->engine->setPlayerName(2, name2);
 
                     // 입력 창과 버튼을 숨기고 게임 시작
                     ShowWindow(hEdit1P, SW_HIDE);
@@ -271,6 +278,22 @@ LRESULT CALLBACK MainApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
                     // 버튼을 클릭한 후 메인 윈도우로 포커스 반환
                     SetFocus(hwnd);
+                }
+                if (HIWORD(wParam) == EN_CHANGE)  // Edit 컨트롤에서 텍스트가 변경될 때
+                {
+                    // Start Game 버튼 클릭 시 동작
+                    wchar_t name1[100];
+                    GetWindowText(hEdit1P, name1, 100);
+                    pMainApp->player1Name = name1;
+
+                    wchar_t name2[100];
+                    GetWindowText(hEdit2P, name2, 100);
+                    pMainApp->player2Name = name2;
+
+                    pMainApp->engine->setPlayerName(1, name1);
+                    pMainApp->engine->setPlayerName(2, name2);
+
+
                 }
                 break;
             case WM_KEYDOWN:
