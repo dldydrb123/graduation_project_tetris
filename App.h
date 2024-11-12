@@ -34,8 +34,6 @@ public:
     void RunMessageLoop();
     void GameLoop();
 
-    bool GameStart = false;
-
 private:
 
     HWND m_hwnd;

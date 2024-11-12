@@ -29,6 +29,11 @@ bool item2_6 = false;
 int atk = 0;
 int atk2 = 0;
 
+bool GameStart = false;
+bool GameEnd = false;
+
+bool reset = false;
+
 //아이템
  
 // 아이템 보관 - 갯수 누적 X

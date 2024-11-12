@@ -257,12 +257,12 @@ bool Piece::StackCollision(Matrix* stackCells)
 // 블럭을 그리는 부분입니다.
 void Piece::Draw(ID2D1HwndRenderTarget* m_pRenderTarget)
 {
-	double padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
-	double shiftX = 30;  // x축 이동 값
-	double shiftY = 30;  // y축 이동 값
+	float padding = (RESOLUTION_Y - (STACK_HEIGHT + 1) * CELL_SIZE) / 3;
+	float shiftX = 30;  // x축 이동 값
+	float shiftY = 30;  // y축 이동 값
 
-	double center_x = padding + (position.x + 1) * CELL_SIZE + shiftX-76;
-	double center_y = padding + position.y * CELL_SIZE + shiftY;
+	float center_x = padding + (position.x + 1) * CELL_SIZE + shiftX-76;
+	float center_y = padding + position.y * CELL_SIZE + shiftY;
 
 	// 대기 블럭을 그리는 부분입니다.
 	if (waiting)
