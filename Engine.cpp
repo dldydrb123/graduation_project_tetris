@@ -13,7 +13,7 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "dwrite")
 #pragma comment(lib, "Windowscodecs.lib")
 
-#define SOLO_PLAY 1
+#define SOLO_PLAY 0
 
 // 전역 변수
 ComPtr<ID2D1Factory> d2dFactory;
@@ -26,7 +26,7 @@ std::wstring StringToWString(const std::string& str) {
     MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
     return wstrTo;
 }
-// Direct2D 텍스트 출력 함수 (파일 내용 출력 예제)
+
 void Engine::DisplayScores(ID2D1HwndRenderTarget* m_pRenderTarget, IDWriteTextFormat* m_pTextFormat, ID2D1SolidColorBrush* m_pWhiteBrush) {
     std::ifstream file("score.txt");
     if (!file.is_open()) {
@@ -36,7 +36,7 @@ void Engine::DisplayScores(ID2D1HwndRenderTarget* m_pRenderTarget, IDWriteTextFo
 
     std::string line;
     float yPos = 255.0f; // 출력 시작 위치 (Y축)
-    const float xPosName = 270.0f; // 이름 X 위치
+    const float xPosName = 230.0f; // 이름 X 위치
     const float xPosScore = 530.0f; // 점수 X 위치
     const float lineSpacing = 50.0f; // 행 간격
 
@@ -56,11 +56,11 @@ void Engine::DisplayScores(ID2D1HwndRenderTarget* m_pRenderTarget, IDWriteTextFo
         }
 
         // 이름을 Wide 문자열로 변환하여 출력 준비
-        std::wstring nameWStr(name.begin(), name.end());
-        D2D1_RECT_F nameRect = D2D1::RectF(xPosName, yPos, xPosName + 75, yPos + 40);
+        std::wstring nameWStr = StringToWString(name);  // 여기서 변환
+        D2D1_RECT_F nameRect = D2D1::RectF(xPosName, yPos, xPosName + 150, yPos + 40);
         m_pRenderTarget->DrawText(
             nameWStr.c_str(),
-            static_cast<UINT32>(nameWStr.length()),     // Length() 를 UINT32로 변환
+            static_cast<UINT32>(nameWStr.length()),  // Length()를 UINT32로 변환
             m_pTextFormat,
             nameRect,
             m_pWhiteBrush
@@ -159,21 +159,22 @@ HRESULT Engine::DrawJpgImage(ID2D1RenderTarget* pRenderTarget, IWICImagingFactor
     }
 
     // WIC 비트맵을 Direct2D 비트맵으로 변환
-    hr = pRenderTarget->CreateBitmapFromWicBitmap(
-        pConverter.Get(),
-        nullptr,
-        &pBitmap
-    );
-    if (FAILED(hr)) {
-        return hr;
+    if (pRenderTarget != NULL) {
+        hr = pRenderTarget->CreateBitmapFromWicBitmap(
+            pConverter.Get(),
+            nullptr,
+            &pBitmap
+        );
+        if (FAILED(hr)) {
+            return hr;
+        }
+
+        // 비트맵을 렌더 타겟에 그립니다. 고정된 좌표 값을 사용해 그릴 위치를 조정합니다.
+        pRenderTarget->DrawBitmap(
+            pBitmap.Get(),
+            D2D1::RectF(x, y, x + width, y + height)  // 고정된 위치와 크기
+        );
     }
-
-    // 비트맵을 렌더 타겟에 그립니다. 고정된 좌표 값을 사용해 그릴 위치를 조정합니다.
-    pRenderTarget->DrawBitmap(
-        pBitmap.Get(),
-        D2D1::RectF(x, y, x + width, y + height)  // 고정된 위치와 크기
-    );
-
     return hr;
 }
 
@@ -487,6 +488,7 @@ void Engine::Logic(double elapsedTime)
     if (!scoreSaved && (gameOver||gameOver2))
     {
         over = true;
+        GameEnd = true;
         SaveHighScore("score.txt", score, player1Name, score2, player2Name);
         scoreSaved = true;
 
@@ -1075,10 +1077,11 @@ HRESULT Engine::Draw2()
     int centerLeft = (RESOLUTION_X - padding - (STACK_WIDTH + 2) * CELL_SIZE) / 3;
 
     // Begin drawing
-    m_pRenderTarget->BeginDraw();
-    m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-    m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
-
+    if (m_pRenderTarget != NULL) {
+        m_pRenderTarget->BeginDraw();
+        m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+        m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+    }
     
 
     // 배경화면 그리기
@@ -1138,36 +1141,37 @@ HRESULT Engine::Draw2()
     swprintf_s(nameStr1, L"%s", player1Name.c_str()); // name1에 저장된 이름을 사용하여 문자열 생성
 
     // 이름 출력
-    m_pRenderTarget->DrawText(
-        nameStr1,
-        static_cast<UINT32>(wcslen(nameStr1)),
-        m_pTextFormat,
-        PName1,
-        m_pWhiteBrush
-    );
-    // 이름 출력 위치를 지정 (점수 출력 위치 오른쪽으로 설정)
-    D2D1_RECT_F PName2 = D2D1::RectF(750.0f, 775.0f, 150.0f, 20.0f);
+    if (m_pRenderTarget != NULL) {
+        m_pRenderTarget->DrawText(
+            nameStr1,
+            static_cast<UINT32>(wcslen(nameStr1)),
+            m_pTextFormat,
+            PName1,
+            m_pWhiteBrush
+        );
+        // 이름 출력 위치를 지정 (점수 출력 위치 오른쪽으로 설정)
+        D2D1_RECT_F PName2 = D2D1::RectF(750.0f, 775.0f, 150.0f, 20.0f);
 
-    // 이름 문자열 생성 (name1을 사용)
-    WCHAR nameStr2[100];
-    swprintf_s(nameStr2, L"%s", player2Name.c_str()); // name2에 저장된 이름을 사용하여 문자열 생성
+        // 이름 문자열 생성 (name1을 사용)
+        WCHAR nameStr2[100];
+        swprintf_s(nameStr2, L"%s", player2Name.c_str()); // name2에 저장된 이름을 사용하여 문자열 생성
 
-    // 이름 출력
-    m_pRenderTarget->DrawText(
-        nameStr2,
-        static_cast<UINT32>(wcslen(nameStr2)),
-        m_pTextFormat,
-        PName2,
-        m_pWhiteBrush
-    );
+        // 이름 출력
+        m_pRenderTarget->DrawText(
+            nameStr2,
+            static_cast<UINT32>(wcslen(nameStr2)),
+            m_pTextFormat,
+            PName2,
+            m_pWhiteBrush
+        );
 
 
-    // 점수 출력 (DisplayScores 함수 호출)
-    DisplayScores(m_pRenderTarget, m_pTextFormat, m_pWhiteBrush);
+        // 점수 출력 (DisplayScores 함수 호출)
+        DisplayScores(m_pRenderTarget, m_pTextFormat, m_pWhiteBrush);
 
-    // End drawing
-    hr = m_pRenderTarget->EndDraw();
-
+        // End drawing
+        hr = m_pRenderTarget->EndDraw();
+    }
     return hr;
 }
 
