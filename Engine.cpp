@@ -98,11 +98,20 @@ void Engine::SaveHighScore(const std::string& fileName, int score1, const std::w
         highestScorer = player2Name;
     }
 
+    // WideCharToMultiByte를 사용하여 std::wstring을 UTF-8로 변환
+    int len = WideCharToMultiByte(CP_UTF8, 0, highestScorer.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (len == 0) {
+        std::cerr << "Error converting wide string to UTF-8" << std::endl;
+        return;
+    }
+
+    std::string scorerStr(len, 0);
+    WideCharToMultiByte(CP_UTF8, 0, highestScorer.c_str(), -1, &scorerStr[0], len, nullptr, nullptr);
+
     // 파일에 최고 점수와 플레이어 이름을 저장하기
     std::ofstream file(fileName, std::ios::out | std::ios::trunc); // 기존 내용 덮어씌우기
     if (file.is_open()) {
         // UTF-8로 변환하여 저장
-        std::string scorerStr(highestScorer.begin(), highestScorer.end());
         file << scorerStr << "," << highestScore << ",";
         file.close();
     }
