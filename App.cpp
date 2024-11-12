@@ -71,7 +71,10 @@ void MainApp::GameLoop()
             framesTime = 0;
         }
         
-        if (GameStart)
+        if (GameEnd) {
+            engine->Draw();
+        }
+        else if (GameStart)
         {
             // 게임 로직 업데이트 및 그리기
             engine->Logic(elapsed_secs);
@@ -80,25 +83,17 @@ void MainApp::GameLoop()
         else
         {
             engine->Draw2();
-            //// 여기에서 이름을 가져옵니다.
-            //wchar_t szText1[100];
-            //GetWindowText(hEdit1P, szText1, 100);
-
-            //wchar_t szText2[100];
-            //GetWindowText(hEdit2P, szText2, 100);
-
-            //// 이름을 화면에 출력
-            //HDC hdc = GetDC(m_hwnd);  // HDC 핸들을 가져옵니다.
-
-            //SetBkMode(hdc, TRANSPARENT); // 텍스트 배경을 투명하게 설정
-            //SetTextColor(hdc, RGB(0, 0, 0)); // 텍스트 색상을 흰색으로 설정
-
-            //// 위치를 지정하여 텍스트를 그립니다.
-            //TextOut(hdc, 375, 360, szText1, wcslen(szText1)); // 첫 번째 이름 출력
-            //TextOut(hdc, 375, 390, szText2, wcslen(szText2)); // 두 번째 이름 출력
-
-            //ReleaseDC(m_hwnd, hdc);  // HDC 핸들 해제
         }
+
+        if (reset == true && GameEnd == true) {
+            delete engine;
+
+            engine = new Engine();
+            reset = false;
+            GameEnd = false;
+            GameStart = false;
+        }
+
     }
 }
 
@@ -167,6 +162,7 @@ HRESULT MainApp::Initialize()
             MessageBox(m_hwnd, L"Start Game 버튼 생성에 실패했습니다.", L"오류", MB_OK);
             return HRESULT_FROM_WIN32(GetLastError());
         }
+
 
         // 1P 이름 입력 창
         hEdit1P = CreateWindow(
@@ -267,7 +263,7 @@ LRESULT CALLBACK MainApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
             case WM_COMMAND:
                 // 버튼 클릭 이벤트 처리
                 if (LOWORD(wParam) == ID_START_BUTTON) {
-                    pMainApp->GameStart = true; // GameStart 변수를 true로 설정
+                    GameStart = true; // GameStart 변수를 true로 설정
 
 
                     // 입력 창과 버튼을 숨기고 게임 시작
@@ -298,7 +294,12 @@ LRESULT CALLBACK MainApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 break;
             case WM_KEYDOWN:
             {
+                if (wParam == VK_NUMPAD0) {
+                    reset = true;
+                }
+
                 pMainApp->engine->KeyDown(wParam);
+
             }
             result = 0;
             wasHandled = true;
