@@ -98,25 +98,57 @@ void Engine::SaveHighScore(const std::string& fileName, int score1, const std::w
         highestScorer = player2Name;
     }
 
-    // WideCharToMultiByte를 사용하여 std::wstring을 UTF-8로 변환
-    int len = WideCharToMultiByte(CP_UTF8, 0, highestScorer.c_str(), -1, nullptr, 0, nullptr, nullptr);
-    if (len == 0) {
-        std::cerr << "Error converting wide string to UTF-8" << std::endl;
-        return;
-    }
+    // 기존 파일에서 최고 점수 읽기
+    int currentHighScore = 0;
+    std::wstring currentHighScorer;
+    std::ifstream file(fileName);
 
-    std::string scorerStr(len, 0);
-    WideCharToMultiByte(CP_UTF8, 0, highestScorer.c_str(), -1, &scorerStr[0], len, nullptr, nullptr);
-
-    // 파일에 최고 점수와 플레이어 이름을 저장하기
-    std::ofstream file(fileName, std::ios::out | std::ios::trunc); // 기존 내용 덮어씌우기
     if (file.is_open()) {
-        // UTF-8로 변환하여 저장
-        file << scorerStr << "," << highestScore << ",";
+        std::string line;
+        if (std::getline(file, line)) {
+            std::stringstream ss(line);
+            std::string name;
+            std::string scoreStr;
+
+            // 파일에서 읽은 데이터 처리
+            std::getline(ss, name, ',');      // 점수 기록자 이름
+            std::getline(ss, scoreStr, ',');  // 점수
+
+            // 현재 최고 점수와 플레이어 이름 추출
+            currentHighScorer = std::wstring(name.begin(), name.end()); // UTF-8 -> wstring 변환
+            currentHighScore = std::stoi(scoreStr);                     // 문자열 -> 정수 변환
+        }
         file.close();
     }
     else {
-        std::cerr << "Unable to open file for writing: " << fileName << std::endl;
+        std::cerr << "Unable to open file for reading: " << fileName << std::endl;
+    }
+
+    // 새로운 점수가 기존의 최고 점수보다 높으면 파일에 기록
+    if (highestScore > currentHighScore) {
+        // WideCharToMultiByte를 사용하여 std::wstring을 UTF-8로 변환
+        int len = WideCharToMultiByte(CP_UTF8, 0, highestScorer.c_str(), -1, nullptr, 0, nullptr, nullptr);
+        if (len == 0) {
+            std::cerr << "Error converting wide string to UTF-8" << std::endl;
+            return;
+        }
+
+        std::string scorerStr(len, 0);
+        WideCharToMultiByte(CP_UTF8, 0, highestScorer.c_str(), -1, &scorerStr[0], len, nullptr, nullptr);
+
+        // 파일에 최고 점수와 플레이어 이름을 저장
+        std::ofstream outFile(fileName, std::ios::out | std::ios::trunc); // 기존 내용 덮어쓰기
+        if (outFile.is_open()) {
+            // UTF-8로 변환하여 저장
+            outFile << scorerStr << "," << highestScore << ",";
+            outFile.close();
+        }
+        else {
+            std::cerr << "Unable to open file for writing: " << fileName << std::endl;
+        }
+    }
+    else {
+        std::cout << "The new score is not higher than the current high score." << std::endl;
     }
 }
 
